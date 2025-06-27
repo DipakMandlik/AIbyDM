@@ -12,7 +12,6 @@ import {
   Database, 
   Zap,
   Award,
-  Filter,
   Search
 } from 'lucide-react';
 

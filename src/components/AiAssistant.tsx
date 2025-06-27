@@ -2,7 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, Send, User } from 'lucide-react';
 
-const initialMessages = [
+type Message = {
+  id: number;
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+const initialMessages: Message[] = [
   {
     id: 1,
     role: 'assistant',
@@ -20,12 +26,6 @@ const fallbackAnswers = [
   // ➡️ Extend with more Q&A for broader coverage
 ];
 
-type Message = {
-  id: number;
-  role: 'user' | 'assistant';
-  content: string;
-};
-
 export default function AiAssistant() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState('');
@@ -36,10 +36,18 @@ export default function AiAssistant() {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const handleSendMessage = () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = { id: messages.length + 1, role: 'user', content: input };
+    const userMessage: Message = {
+      id: messages.length + 1,
+      role: 'user',
+      content: input
+    };
     setMessages(prev => [...prev, userMessage]);
 
     const lowerInput = input.toLowerCase();
@@ -67,10 +75,6 @@ export default function AiAssistant() {
     }
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   return (
     <div className="flex flex-col h-full bg-black/70 backdrop-blur-md rounded-2xl border border-purple-500/30 overflow-hidden shadow-lg">
       {/* Header */}
@@ -97,7 +101,9 @@ export default function AiAssistant() {
             <div className={`max-w-[80%] p-3 rounded-xl ${message.role === 'user' ? 'bg-purple-600 text-white rounded-tr-none' : 'bg-gray-800 text-gray-200 rounded-tl-none'} shadow`}>
               <div className="flex items-center mb-2">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center mr-2 ${message.role === 'user' ? 'bg-purple-500' : 'bg-indigo-600'}`}>
-                  {message.role === 'user' ? <User className="h-4 w-4 text-white" /> : <Cpu className="h-4 w-4 text-white" />}
+                  {message.role === 'user'
+                    ? <User className="h-4 w-4 text-white" />
+                    : <Cpu className="h-4 w-4 text-white" />}
                 </div>
                 <span className="text-xs opacity-70">{message.role === 'user' ? 'You' : 'AI Assistant'}</span>
               </div>
