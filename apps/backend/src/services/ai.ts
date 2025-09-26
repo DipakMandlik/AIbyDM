@@ -42,7 +42,8 @@ export async function generatePosts(count: number, categories: PostCategory[]): 
 	// Fallback mock when no key
 	if (!openai) {
 		return Array.from({ length: count }).map((_, i) => {
-			const cat = (categories.length ? categories[i % categories.length] : AllowedCategories[0]);
+			const catFromList = categories.length > 0 ? categories[i % categories.length] : undefined;
+			const cat: PostCategory = (catFromList ?? AllowedCategories[0]);
 			return {
 				id: `mock-${i + 1}`,
 				category: cat,
@@ -74,11 +75,10 @@ export async function generatePosts(count: number, categories: PostCategory[]): 
 	const items: Partial<GeneratedPost>[] = parsed.posts || parsed.items || parsed.data || [];
 	// Basic normalization
 	const normalized: GeneratedPost[] = (items as Partial<GeneratedPost>[]).map((p, idx) => {
-		const categoryFallback: PostCategory = (categories.length > 0)
-			? categories[idx % categories.length]
-			: AllowedCategories[0];
-		const inputCat = (p && "category" in p ? (p.category as unknown) : undefined);
-		const category: PostCategory = isPostCategory(inputCat) ? (inputCat as PostCategory) : categoryFallback;
+		const fromList = categories.length > 0 ? categories[idx % categories.length] : undefined;
+		const fallback: PostCategory = (fromList ?? AllowedCategories[0]);
+		const raw = (p as any)?.category;
+		const category: PostCategory = AllowedCategories.includes(raw) ? (raw as PostCategory) : fallback;
 		return {
 			id: p?.id && String(p.id).trim().length > 0 ? String(p.id) : `gen-${idx + 1}`,
 			category,

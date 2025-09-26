@@ -35,7 +35,8 @@ async function generatePosts(count, categories) {
     // Fallback mock when no key
     if (!openai) {
         return Array.from({ length: count }).map((_, i) => {
-            const cat = (categories.length ? categories[i % categories.length] : exports.AllowedCategories[0]);
+            const catFromList = categories.length > 0 ? categories[i % categories.length] : undefined;
+            const cat = (catFromList ?? exports.AllowedCategories[0]);
             return {
                 id: `mock-${i + 1}`,
                 category: cat,
@@ -69,11 +70,10 @@ async function generatePosts(count, categories) {
     const items = parsed.posts || parsed.items || parsed.data || [];
     // Basic normalization
     const normalized = items.map((p, idx) => {
-        const categoryFallback = (categories.length > 0)
-            ? categories[idx % categories.length]
-            : exports.AllowedCategories[0];
-        const inputCat = (p && "category" in p ? p.category : undefined);
-        const category = isPostCategory(inputCat) ? inputCat : categoryFallback;
+        const fromList = categories.length > 0 ? categories[idx % categories.length] : undefined;
+        const fallback = (fromList ?? exports.AllowedCategories[0]);
+        const raw = p?.category;
+        const category = exports.AllowedCategories.includes(raw) ? raw : fallback;
         return {
             id: p?.id && String(p.id).trim().length > 0 ? String(p.id) : `gen-${idx + 1}`,
             category,
