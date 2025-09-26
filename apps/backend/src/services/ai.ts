@@ -41,15 +41,18 @@ function getBrandGuidelines(): string {
 export async function generatePosts(count: number, categories: PostCategory[]): Promise<GeneratedPost[]> {
 	// Fallback mock when no key
 	if (!openai) {
-		return Array.from({ length: count }).map((_, i) => ({
-			id: `mock-${i + 1}`,
-			category: categories[i % categories.length],
-			title: `Sample ${categories[i % categories.length]} ${i + 1}`,
-			linkedin: `Here is a detailed LinkedIn post for ${categories[i % categories.length]} (#${i + 1}).` ,
-			instagramCaption: `IG caption for ${categories[i % categories.length]} ${i + 1} — swipe ➡️ for details! #AIbyDM`,
-			youtubeScript: `Intro hook -> key points -> CTA. Topic: ${categories[i % categories.length]} ${i + 1}.`,
-			hashtags: ["#AI", "#MachineLearning", "#Productivity", "#AIbyDM"],
-		}));
+		return Array.from({ length: count }).map((_, i) => {
+			const cat = (categories.length ? categories[i % categories.length] : AllowedCategories[0]);
+			return {
+				id: `mock-${i + 1}`,
+				category: cat,
+				title: `Sample ${cat} ${i + 1}`,
+				linkedin: `Here is a detailed LinkedIn post for ${cat} (#${i + 1}).` ,
+				instagramCaption: `IG caption for ${cat} ${i + 1} — swipe ➡️ for details! #AIbyDM`,
+				youtubeScript: `Intro hook -> key points -> CTA. Topic: ${cat} ${i + 1}.`,
+				hashtags: ["#AI", "#MachineLearning", "#Productivity", "#AIbyDM"],
+			};
+		});
 	}
 
 	const sys = `You are an expert content strategist and writer for AIbyDM.\n${getBrandGuidelines()}\nReturn crisp, structured outputs.`;
@@ -71,10 +74,11 @@ export async function generatePosts(count: number, categories: PostCategory[]): 
 	const items: Partial<GeneratedPost>[] = parsed.posts || parsed.items || parsed.data || [];
 	// Basic normalization
 	const normalized: GeneratedPost[] = (items as Partial<GeneratedPost>[]).map((p, idx) => {
-		const categoryFallback: PostCategory = (categories && categories.length > 0)
+		const categoryFallback: PostCategory = (categories.length > 0)
 			? categories[idx % categories.length]
 			: AllowedCategories[0];
-		const category: PostCategory = isPostCategory(p?.category) ? (p!.category as PostCategory) : categoryFallback;
+		const inputCat = (p && "category" in p ? (p.category as unknown) : undefined);
+		const category: PostCategory = isPostCategory(inputCat) ? (inputCat as PostCategory) : categoryFallback;
 		return {
 			id: p?.id && String(p.id).trim().length > 0 ? String(p.id) : `gen-${idx + 1}`,
 			category,
