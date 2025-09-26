@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
 import mongoose from "mongoose";
+import generationRoutes from "./routes/generationRoutes";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ async function start() {
 	}
 
 	app.get("/health", (_req, res) => res.json({ ok: true, db: isDbConnected }));
+	app.use("/api/generate", generationRoutes);
 	app.listen(PORT, () => console.log(`API listening on port ${PORT}`));
 }
 
