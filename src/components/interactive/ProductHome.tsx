@@ -159,13 +159,10 @@ export default function ProductHome() {
           <section className="module-grid" aria-label="Platform modules">
             {modules.map((module, index) => (
               <motion.a
-                className={`premium-card module-card tone-${module.tone}`}
+                className={`premium-card module-card tone-${module.tone} reveal`}
                 href={module.href}
                 key={module.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ delay: index * 0.05 }}
+                style={{ animationDelay: `${index * 0.05}s` }}
                 whileHover={{ y: -6 }}
               >
                 <span className="icon-tile">
@@ -206,12 +203,7 @@ function Hero() {
           <span key={index} style={{ '--i': index } as CSSProperties} />
         ))}
       </div>
-      <motion.div
-        className="hero-copy"
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      <div className="hero-copy reveal">
         <h1>
           <span>Learn AI.</span>
           <span>Build AI.</span>
@@ -238,7 +230,7 @@ function Hero() {
             Explore Tools
           </motion.a>
         </div>
-      </motion.div>
+      </div>
       <AiEcosystem />
     </section>
   );
@@ -255,13 +247,7 @@ function AiEcosystem() {
   ] as const;
 
   return (
-    <motion.div
-      className="ecosystem"
-      initial={{ opacity: 0, scale: 0.94 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.15 }}
-      aria-label="Animated AI ecosystem visualization"
-    >
+    <div className="ecosystem reveal" aria-label="Animated AI ecosystem visualization">
       <svg className="network-lines" viewBox="0 0 620 520" aria-hidden="true">
         <path d="M310 260 C160 120 120 170 110 250" />
         <path d="M310 260 C450 110 510 160 520 245" />
@@ -285,7 +271,7 @@ function AiEcosystem() {
           <span>{label}</span>
         </motion.div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 
@@ -304,12 +290,9 @@ function PathsSection() {
       <div className="path-grid">
         {learningPaths.map(({ title, subtitle, progress, count, icon: Icon }) => (
           <motion.a
-            className="premium-card path-card"
+            className="premium-card path-card reveal"
             href={withBase('/learn/')}
             key={title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
             whileHover={{ y: -6 }}
           >
             <div className="card-head">
@@ -335,11 +318,7 @@ function PathsSection() {
 
 function StreakCard() {
   return (
-    <motion.div
-      className="rail-card streak-card"
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-    >
+    <motion.div className="rail-card streak-card reveal">
       <div className="rail-card-head">
         <span className="rail-icon flame">
           <Flame size={16} />
@@ -366,12 +345,7 @@ function StreakCard() {
 
 function ContinueCard() {
   return (
-    <motion.div
-      className="rail-card continue-card"
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.05 }}
-    >
+    <motion.div className="rail-card continue-card reveal" style={{ animationDelay: '0.05s' }}>
       <div className="rail-card-head">
         <span className="rail-icon">
           <Rocket size={16} />
@@ -396,12 +370,7 @@ function ContinueCard() {
 
 function LeaderboardCard() {
   return (
-    <motion.div
-      className="rail-card leaderboard-card"
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.1 }}
-    >
+    <motion.div className="rail-card leaderboard-card reveal" style={{ animationDelay: '0.1s' }}>
       <div className="rail-card-head">
         <span className="rail-icon">
           <Trophy size={16} />
@@ -426,12 +395,7 @@ function LeaderboardCard() {
 
 function NewsletterCard() {
   return (
-    <motion.div
-      className="rail-card news-card"
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 0.15 }}
-    >
+    <motion.div className="rail-card news-card reveal" style={{ animationDelay: '0.15s' }}>
       <div className="rail-card-head">
         <span className="rail-icon">
           <Bell size={16} />
@@ -464,12 +428,7 @@ function StatsStrip() {
   return (
     <section className="stats-strip" aria-label="AIByDM platform statistics">
       {stats.map(({ value, label, icon: Icon }) => (
-        <motion.div
-          key={label}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
+        <motion.div key={label} className="reveal">
           <span className="icon-tile">
             <Icon size={20} />
           </span>

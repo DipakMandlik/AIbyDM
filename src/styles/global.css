@@ -1745,6 +1745,23 @@ kbd {
   }
 }
 
+/* JS-independent entrance: content is painted on first render even before
+   the React island hydrates (avoids a blank hero on slow connections). */
+.reveal {
+  animation: revealUp 0.5s ease both;
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
