@@ -1801,12 +1801,12 @@ kbd {
 
 .site-footer {
   margin-top: auto;
-  padding: 0 var(--content-pad) 1.5rem;
+  padding: 0 var(--content-pad) 1rem;
 }
 
 .footer-shell {
   width: 100%;
-  max-width: 1440px;
+  max-width: 1320px;
   margin: 0 auto;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -1876,9 +1876,10 @@ kbd {
 
 .footer-main {
   display: grid;
-  grid-template-columns: minmax(240px, 1.4fr) repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(220px, 1.6fr) repeat(2, minmax(0, 1fr));
   gap: 2rem;
-  padding: clamp(1.5rem, 4vw, 2.75rem);
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1.5rem);
+  border-top: 1px solid var(--border);
 }
 
 .footer-main h3 {
@@ -2032,6 +2033,7 @@ kbd {
   align-self: center;
   justify-self: center;
   width: 100%;
+  min-height: 480px;
 }
 
 /* Sections */
@@ -2137,15 +2139,15 @@ kbd {
 /* Featured Paths */
 .lp-paths-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
 }
 
 .lp-path-card {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding: 1.5rem;
+  gap: 0.75rem;
+  padding: 1.75rem;
   border: 1px solid var(--border);
   border-radius: 20px;
   background:
@@ -2156,13 +2158,15 @@ kbd {
   text-decoration: none;
   color: var(--text-primary);
   transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .lp-path-card:hover {
+  transform: translateY(-6px);
   border-color: var(--border-strong);
-  box-shadow: 0 28px 70px rgba(79, 70, 229, 0.2);
+  box-shadow: 0 32px 72px rgba(79, 70, 229, 0.22);
 }
 
 .lp-path-card-header {
@@ -2245,7 +2249,7 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  padding: 1.4rem;
+  padding: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 20px;
   background:
@@ -2256,13 +2260,15 @@ kbd {
   text-decoration: none;
   color: var(--text-primary);
   transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
 }
 
 .lp-tool-card:hover {
+  transform: translateY(-5px);
   border-color: rgba(6, 182, 212, 0.28);
-  box-shadow: 0 24px 60px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 24px 60px rgba(6, 182, 212, 0.14);
 }
 
 .lp-tool-header {
@@ -2338,6 +2344,10 @@ kbd {
   position: relative;
   display: flex;
   flex-direction: column;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
   gap: 0.7rem;
   padding: 1.5rem;
   border: 1px solid var(--border);
@@ -2350,14 +2360,12 @@ kbd {
   text-decoration: none;
   color: var(--text-primary);
   overflow: hidden;
-  transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
 }
 
 .lp-game-card:hover {
+  transform: translateY(-6px);
   border-color: rgba(236, 72, 153, 0.28);
-  box-shadow: 0 24px 60px rgba(236, 72, 153, 0.12);
+  box-shadow: 0 28px 64px rgba(236, 72, 153, 0.16);
 }
 
 .lp-game-featured {
@@ -2833,18 +2841,6 @@ kbd {
 
 /* Landing page breakpoints */
 @media (max-width: 1180px) {
-  .lp-hero-inner {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .lp-hero-visual {
-    display: none;
-  }
-
-  .lp-paths-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .lp-tools-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2875,10 +2871,6 @@ kbd {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .ecosystem {
-    display: none;
-  }
-
   .module-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2893,7 +2885,22 @@ kbd {
   }
 
   .footer-main {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Hero goes single-column at tablet */
+@media (max-width: 920px) {
+  .lp-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-hero-visual {
+    display: none;
+  }
+
+  .ecosystem {
+    display: none;
   }
 }
 
@@ -2905,7 +2912,8 @@ kbd {
   .lp-paths-grid,
   .lp-tools-grid,
   .lp-games-grid,
-  .lp-exams-grid {
+  .lp-exams-grid,
+  .lp-stats-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2955,13 +2963,8 @@ kbd {
     display: none;
   }
 
-  .footer-cta,
   .footer-bottom {
     align-items: stretch;
-    flex-direction: column;
-  }
-
-  .footer-form {
     flex-direction: column;
   }
 

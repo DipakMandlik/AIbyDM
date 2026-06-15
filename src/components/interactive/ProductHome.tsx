@@ -571,7 +571,7 @@ function FeaturedGames() {
         {featuredGames.map((game) => (
           <motion.a
             key={game.title}
-            className={`lp-game-card${game.featured ? 'lp-game-featured' : ''}`}
+            className={game.featured ? 'lp-game-card lp-game-featured' : 'lp-game-card'}
             href={withBase('/games/')}
             variants={fadeInUp}
             whileHover={{ y: -8, transition: { duration: 0.2 } }}
