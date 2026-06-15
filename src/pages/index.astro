@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ThemeToggle from '@components/interactive/ThemeToggle';
+---
+
+<BaseLayout
+  title="AIByDM - Learn AI. Build AI. Master AI."
+  description="A free, open-source learning platform for artificial intelligence. Interactive lessons, hands-on tools, coding games, and certification exams."
+>
+  <section class="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:px-8">
+    <h1
+      class="text-4xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl"
+    >
+      Learn AI. Build AI. <span class="text-[var(--color-accent)]">Master AI.</span>
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-lg text-[var(--color-text-secondary)]">
+      A free, open-source platform with interactive lessons, hands-on tools, coding games, and
+      certification exams.
+    </p>
+  </section>
+
+  <!-- Theme toggle rendered as a React island -->
+  <div class="fixed right-4 bottom-4 z-50">
+    <ThemeToggle client:load />
+  </div>
+</BaseLayout>

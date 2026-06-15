@@ -1,0 +1,16 @@
+title: '[Show and Tell]: '
+labels: ['discussion:show-and-tell']
+body:
+  - type: textarea
+    id: share
+    attributes:
+      label: What are you sharing?
+      description: Share a project, learning outcome, resource, or contribution story.
+    validations:
+      required: true
+
+  - type: textarea
+    id: links
+    attributes:
+      label: Links or screenshots
+      description: Optional. Add demos, repositories, images, or references.

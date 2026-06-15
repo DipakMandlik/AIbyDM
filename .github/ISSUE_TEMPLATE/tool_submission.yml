@@ -1,0 +1,76 @@
+name: Tool Submission
+description: Suggest a tool for the AIByDM tool directory
+labels: ['type:tool', 'status:needs-triage']
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Tool name
+      placeholder: Ollama
+    validations:
+      required: true
+
+  - type: input
+    id: website
+    attributes:
+      label: Website URL
+      placeholder: https://example.com
+    validations:
+      required: true
+
+  - type: input
+    id: github
+    attributes:
+      label: GitHub URL
+      placeholder: https://github.com/org/repo
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - LLMs
+        - Agents
+        - RAG
+        - Vector databases
+        - Prompt engineering
+        - Fine-tuning
+        - Evaluation
+        - Governance
+        - Metadata
+        - Lineage
+        - MLOps
+        - Data engineering
+        - Coding assistants
+        - Research
+        - Image generation
+        - Video generation
+        - Audio generation
+        - Automation
+        - Productivity
+        - Development
+        - Security
+        - Observability
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: Why should this be included?
+      description: Explain the main use cases, audience, and what makes it useful.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: License type
+      options:
+        - Open source
+        - Source available
+        - Commercial
+        - Unknown
+    validations:
+      required: true

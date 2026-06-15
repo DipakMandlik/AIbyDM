@@ -1,0 +1,140 @@
+{
+  "track": "foundations",
+  "title": "Python Basics Exam",
+  "description": "Check your understanding of Python fundamentals used in AI workflows, including data types, control flow, functions, and NumPy basics.",
+  "difficulty": "beginner",
+  "questions": [
+    {
+      "id": "py-basics-001",
+      "question": "Which Python data structure is best suited for storing model hyperparameters as key-value pairs?",
+      "type": "mcq",
+      "options": [
+        {
+          "label": "List",
+          "value": "a"
+        },
+        {
+          "label": "Tuple",
+          "value": "b"
+        },
+        {
+          "label": "Dictionary",
+          "value": "c"
+        },
+        {
+          "label": "Set",
+          "value": "d"
+        }
+      ],
+      "correct": "c",
+      "explanation": "A dictionary maps keys to values, making it a natural fit for configuration objects such as learning rates, batch sizes, and optimizer names.",
+      "difficulty": "easy",
+      "topic": "data-structures",
+      "tags": ["python", "dictionary", "configuration"]
+    },
+    {
+      "id": "py-basics-002",
+      "question": "What does NumPy vectorization usually help you avoid?",
+      "type": "mcq",
+      "options": [
+        {
+          "label": "Writing explicit Python loops for element-wise numeric operations",
+          "value": "a"
+        },
+        {
+          "label": "Importing external libraries",
+          "value": "b"
+        },
+        {
+          "label": "Using arrays to store numeric data",
+          "value": "c"
+        },
+        {
+          "label": "Documenting code with comments",
+          "value": "d"
+        }
+      ],
+      "correct": "a",
+      "explanation": "Vectorized NumPy operations run optimized array code under the hood, so you can express numerical transformations without manual Python loops.",
+      "difficulty": "easy",
+      "topic": "numpy",
+      "tags": ["python", "numpy", "vectorization"]
+    },
+    {
+      "id": "py-basics-003",
+      "question": "A Python tuple is mutable after creation.",
+      "type": "true-false",
+      "options": [
+        {
+          "label": "True",
+          "value": "true"
+        },
+        {
+          "label": "False",
+          "value": "false"
+        }
+      ],
+      "correct": "false",
+      "explanation": "Tuples are immutable. They are commonly used for fixed values such as input shapes or coordinate pairs.",
+      "difficulty": "easy",
+      "topic": "data-structures",
+      "tags": ["python", "tuple", "immutability"]
+    },
+    {
+      "id": "py-basics-004",
+      "question": "Which steps are commonly part of a basic AI data preprocessing pipeline?",
+      "type": "multi-select",
+      "options": [
+        {
+          "label": "Handle missing values",
+          "value": "a"
+        },
+        {
+          "label": "Scale numeric features",
+          "value": "b"
+        },
+        {
+          "label": "Split data into train and test sets",
+          "value": "c"
+        },
+        {
+          "label": "Delete the target variable before training",
+          "value": "d"
+        }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "A typical preprocessing flow cleans missing values, scales features when needed, and splits data for evaluation. The target variable must be separated, not deleted entirely.",
+      "difficulty": "medium",
+      "topic": "preprocessing",
+      "tags": ["python", "preprocessing", "machine-learning"]
+    },
+    {
+      "id": "py-basics-005",
+      "question": "What is the output shape when a feature matrix with shape (3, 2) is multiplied by a weight matrix with shape (2, 4)?",
+      "type": "mcq",
+      "options": [
+        {
+          "label": "(3, 4)",
+          "value": "a"
+        },
+        {
+          "label": "(2, 3)",
+          "value": "b"
+        },
+        {
+          "label": "(4, 2)",
+          "value": "c"
+        },
+        {
+          "label": "(3, 2)",
+          "value": "d"
+        }
+      ],
+      "correct": "a",
+      "explanation": "Matrix multiplication keeps the outer dimensions. A (3, 2) matrix multiplied by a (2, 4) matrix produces a (3, 4) result.",
+      "difficulty": "medium",
+      "topic": "numpy",
+      "tags": ["python", "numpy", "matrix-multiplication"]
+    }
+  ]
+}

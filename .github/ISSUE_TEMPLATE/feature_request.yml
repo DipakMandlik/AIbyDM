@@ -1,0 +1,53 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the platform
+labels: ['type:feature', 'status:needs-triage']
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Learn
+        - Tools
+        - Games
+        - Exams
+        - Newsletter
+        - Search
+        - Community
+        - Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What user need, pain point, or workflow should this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the change you want to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Share other approaches or tradeoffs.
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Are you interested in working on this?
+      options:
+        - Yes, I can open a PR
+        - Maybe, I need guidance
+        - No, I am only suggesting it
+    validations:
+      required: true

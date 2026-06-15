@@ -1,0 +1,63 @@
+name: Content Request
+description: Request a new learning topic, exam, or article
+labels: ['type:content', 'status:needs-triage']
+body:
+  - type: dropdown
+    id: content-type
+    attributes:
+      label: Content Type
+      options:
+        - Learn Topic
+        - Exam Questions
+        - Tool Entry
+        - Newsletter Article
+        - Game Idea
+    validations:
+      required: true
+
+  - type: input
+    id: title
+    attributes:
+      label: Topic / Title
+    validations:
+      required: true
+
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track (for Learn content)
+      options:
+        - Foundations
+        - Machine Learning
+        - Deep Learning
+        - Computer Vision
+        - NLP
+        - Transformers
+        - LLM Engineering
+        - RAG
+        - Agents
+        - AI Security
+        - Governance
+        - Lineage
+        - Metadata
+        - LLMOps
+        - Production AI
+        - Enterprise AI
+        - N/A
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should this content cover?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced

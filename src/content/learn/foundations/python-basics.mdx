@@ -1,0 +1,347 @@
+---
+title: 'Python Basics for AI and Machine Learning'
+description: 'Master Python fundamentals essential for AI development including data types, control flow, functions, and key libraries like NumPy and Pandas.'
+track: foundations
+order: 1
+difficulty: beginner
+tags:
+  - python
+  - programming
+  - foundations
+  - numpy
+  - pandas
+  - data-structures
+prerequisites: []
+relatedTools:
+  - jupyter-notebook
+  - google-colab
+  - vscode
+author: 'AIByDM'
+lastUpdated: 2026-06-15
+estimatedTime: '45 min'
+draft: false
+---
+
+## Overview
+
+Python is the dominant programming language in artificial intelligence and machine learning. Its readable syntax, extensive library ecosystem, and strong community support make it the ideal starting point for anyone entering the AI field. This module covers the core Python concepts you will use daily when building AI systems, from data manipulation to model training.
+
+By the end of this lesson, you will be comfortable with Python's data structures, control flow, functions, and the foundational libraries that power every AI workflow.
+
+## Theory
+
+### Why Python for AI?
+
+Python became the language of AI for three practical reasons:
+
+1. **Readability over ceremony** -- Python code reads almost like pseudocode. When you are translating a mathematical formula into working code, fewer syntactic hurdles means fewer bugs and faster iteration.
+
+2. **Library ecosystem** -- Libraries like NumPy, Pandas, Scikit-learn, TensorFlow, and PyTorch provide optimized, battle-tested implementations of algorithms that would take months to write from scratch.
+
+3. **Community and tooling** -- Jupyter notebooks, Google Colab, and VS Code extensions create an interactive development experience where you can run code cell-by-cell, inspect intermediate results, and visualize data inline.
+
+### Data Types and Variables
+
+Python is dynamically typed. You do not need to declare variable types explicitly -- the interpreter infers them at runtime.
+
+```python
+# Numeric types
+learning_rate = 0.001        # float
+epochs = 100                  # int
+use_gpu = True                # bool
+
+# Strings
+model_name = "gpt-4"
+
+# None represents the absence of a value
+best_weights = None
+```
+
+Understanding types matters in AI because numerical precision affects model training. A `float32` versus `float64` choice can determine whether a model fits in GPU memory.
+
+### Collections: Lists, Tuples, Dicts, and Sets
+
+Collections are the backbone of data handling in AI pipelines.
+
+```python
+# Lists -- ordered, mutable sequences
+layers = [128, 64, 32, 10]
+layers.append(1)  # add output neuron
+
+# Tuples -- ordered, immutable sequences
+input_shape = (224, 224, 3)  # height, width, channels
+
+# Dictionaries -- key-value mappings
+hyperparams = {
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "optimizer": "adam",
+}
+
+# Sets -- unique, unordered elements
+unique_labels = {"cat", "dog", "bird"}
+```
+
+In practice, you will use lists for batches of data, tuples for shapes and coordinates, dictionaries for configuration and hyperparameters, and sets for deduplication.
+
+### Control Flow
+
+Control flow lets you make decisions and repeat operations -- both essential when processing datasets and training models.
+
+```python
+# Conditional logic
+accuracy = 0.92
+if accuracy >= 0.95:
+    print("Excellent model performance")
+elif accuracy >= 0.85:
+    print("Good performance, consider fine-tuning")
+else:
+    print("Model needs significant improvement")
+
+# For loops -- iterating over data
+dataset = [1.2, 3.4, 5.6, 7.8, 9.0]
+squared = []
+for value in dataset:
+    squared.append(value ** 2)
+
+# List comprehension -- the Pythonic way
+squared = [v ** 2 for v in dataset]
+
+# While loops -- useful for training until convergence
+loss = 10.0
+threshold = 0.01
+iteration = 0
+while loss > threshold:
+    loss *= 0.9  # simulated training step
+    iteration += 1
+```
+
+### Functions and Lambda Expressions
+
+Functions let you encapsulate reusable logic. In AI code, you will write functions for data preprocessing, metric calculation, and custom training steps.
+
+```python
+def calculate_accuracy(predictions, labels):
+    """Calculate classification accuracy."""
+    correct = sum(1 for p, l in zip(predictions, labels) if p == l)
+    return correct / len(labels)
+
+# Lambda -- inline anonymous functions
+normalize = lambda x, mean, std: (x - mean) / std
+
+# Functions with default parameters
+def create_model(input_dim, hidden_dim=128, dropout=0.2):
+    """Create a simple neural network configuration."""
+    return {
+        "input": input_dim,
+        "hidden": hidden_dim,
+        "dropout": dropout,
+    }
+```
+
+### Working with NumPy
+
+NumPy is the numerical computing foundation for all of AI in Python. It provides n-dimensional arrays that are orders of magnitude faster than native Python lists for mathematical operations.
+
+```python
+import numpy as np
+
+# Creating arrays
+features = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+print(features.shape)  # (3, 2) -- 3 samples, 2 features
+
+# Vectorized operations (no loops needed)
+normalized = (features - features.mean(axis=0)) / features.std(axis=0)
+
+# Matrix multiplication -- core of neural networks
+weights = np.random.randn(2, 3)  # 2 inputs, 3 outputs
+output = features @ weights       # matrix multiply
+print(output.shape)               # (3, 3)
+
+# Broadcasting -- automatic shape alignment
+bias = np.array([0.1, 0.2, 0.3])
+output_with_bias = output + bias  # bias added to every row
+```
+
+NumPy's vectorized operations replace explicit Python loops. A single matrix multiplication replaces thousands of individual multiply-and-sum operations, running on optimized C code under the hood.
+
+### Working with Pandas
+
+Pandas provides high-level data structures for tabular data -- the format most real-world datasets come in.
+
+```python
+import pandas as pd
+
+# Loading data
+df = pd.read_csv("training_data.csv")
+
+# Inspecting the dataset
+print(df.shape)          # (rows, columns)
+print(df.head())         # first 5 rows
+print(df.describe())     # statistical summary
+print(df.isnull().sum()) # missing value count per column
+
+# Filtering and selecting
+high_accuracy = df[df["accuracy"] > 0.9]
+selected_cols = df[["model_name", "accuracy", "loss"]]
+
+# Feature engineering
+df["accuracy_pct"] = df["accuracy"] * 100
+df["is_overfit"] = df["train_acc"] - df["val_acc"] > 0.1
+
+# Grouping and aggregation
+summary = df.groupby("model_type").agg({
+    "accuracy": "mean",
+    "training_time": "sum",
+    "loss": "min",
+})
+```
+
+## Build From Scratch
+
+Let us build a complete data preprocessing pipeline from scratch, combining everything covered above. This is a realistic exercise -- before any model can be trained, the data must be cleaned, transformed, and prepared.
+
+### Step 1: Load and Inspect Raw Data
+
+```python
+import numpy as np
+import pandas as pd
+
+# Simulate a raw dataset (in practice, you would load from CSV)
+np.random.seed(42)
+n_samples = 200
+
+raw_data = pd.DataFrame({
+    "age": np.random.randint(18, 70, n_samples),
+    "income": np.random.normal(50000, 15000, n_samples),
+    "education_years": np.random.randint(8, 22, n_samples),
+    "credit_score": np.random.randint(300, 850, n_samples),
+    "approved": np.random.choice([0, 1], n_samples, p=[0.4, 0.6]),
+})
+
+# Inject some missing values (common in real data)
+mask = np.random.random(n_samples) < 0.05
+raw_data.loc[mask, "income"] = np.nan
+
+print(f"Dataset shape: {raw_data.shape}")
+print(f"Missing values:\n{raw_data.isnull().sum()}")
+print(f"\nFirst 5 rows:\n{raw_data.head()}")
+```
+
+### Step 2: Handle Missing Values
+
+```python
+def handle_missing(df, strategy="median"):
+    """Fill missing numeric values using the specified strategy."""
+    df_clean = df.copy()
+    numeric_cols = df_clean.select_dtypes(include=[np.number]).columns
+
+    for col in numeric_cols:
+        if df_clean[col].isnull().any():
+            if strategy == "median":
+                fill_value = df_clean[col].median()
+            elif strategy == "mean":
+                fill_value = df_clean[col].mean()
+            else:
+                fill_value = 0
+
+            df_clean[col] = df_clean[col].fillna(fill_value)
+            print(f"  Filled {col} missing values with {strategy}: {fill_value:.2f}")
+
+    return df_clean
+
+clean_data = handle_missing(raw_data, strategy="median")
+print(f"Missing values after cleaning: {clean_data.isnull().sum().sum()}")
+```
+
+### Step 3: Feature Scaling
+
+```python
+def min_max_scale(arr):
+    """Scale features to the 0-1 range."""
+    min_val = arr.min(axis=0)
+    max_val = arr.max(axis=0)
+    return (arr - min_val) / (max_val - min_val)
+
+def standard_scale(arr):
+    """Standardize features to zero mean and unit variance."""
+    return (arr - arr.mean(axis=0)) / arr.std(axis=0)
+
+# Separate features and target
+feature_cols = ["age", "income", "education_years", "credit_score"]
+X = clean_data[feature_cols].values
+y = clean_data["approved"].values
+
+# Apply standard scaling
+X_scaled = standard_scale(X)
+
+print(f"Before scaling -- Mean: {X.mean(axis=0).round(2)}")
+print(f"Before scaling -- Std:  {X.std(axis=0).round(2)}")
+print(f"After scaling  -- Mean: {X_scaled.mean(axis=0).round(4)}")
+print(f"After scaling  -- Std:  {X_scaled.std(axis=0).round(4)}")
+```
+
+### Step 4: Train-Test Split
+
+```python
+def train_test_split(X, y, test_ratio=0.2, seed=42):
+    """Split data into training and test sets."""
+    np.random.seed(seed)
+    n = len(X)
+    indices = np.random.permutation(n)
+    test_size = int(n * test_ratio)
+
+    test_idx = indices[:test_size]
+    train_idx = indices[test_size:]
+
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y)
+
+print(f"Training set: {X_train.shape[0]} samples")
+print(f"Test set:     {X_test.shape[0]} samples")
+print(f"Train label distribution: {np.bincount(y_train)}")
+print(f"Test label distribution:  {np.bincount(y_test)}")
+```
+
+### Step 5: Putting It All Together
+
+```python
+def preprocess_pipeline(filepath, target_col, test_ratio=0.2):
+    """Complete preprocessing pipeline from raw data to model-ready arrays."""
+    # Load
+    df = pd.read_csv(filepath)
+
+    # Clean
+    df = handle_missing(df, strategy="median")
+
+    # Split features and target
+    feature_cols = [c for c in df.columns if c != target_col]
+    X = df[feature_cols].values
+    y = df[target_col].values
+
+    # Scale
+    X = standard_scale(X)
+
+    # Split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_ratio)
+
+    return {
+        "X_train": X_train,
+        "X_test": X_test,
+        "y_train": y_train,
+        "y_test": y_test,
+        "feature_names": feature_cols,
+        "n_features": len(feature_cols),
+    }
+```
+
+This pipeline encapsulates the exact pattern used in production AI systems. Every step -- loading, cleaning, scaling, and splitting -- is a function you can test independently, swap implementations for, and compose into larger workflows.
+
+## Key Takeaways
+
+- Python's readability and library ecosystem make it the standard language for AI development.
+- NumPy arrays replace Python lists for any numerical computation -- they are faster and support vectorized operations.
+- Pandas DataFrames handle real-world tabular data with built-in tools for cleaning, filtering, and aggregating.
+- A preprocessing pipeline (clean, scale, split) is the first piece of code you write before any model training.
+- Writing reusable functions from the start saves time and reduces bugs as projects grow in complexity.

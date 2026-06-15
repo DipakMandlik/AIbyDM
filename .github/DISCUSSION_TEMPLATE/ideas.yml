@@ -1,0 +1,22 @@
+title: '[Idea]: '
+labels: ['discussion:idea']
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What would you like AIByDM to explore?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Who is this for, and why does it matter?
+
+  - type: textarea
+    id: next_steps
+    attributes:
+      label: Possible next steps
+      description: Optional. Share how the community could move this forward.

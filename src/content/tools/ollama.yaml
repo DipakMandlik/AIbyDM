@@ -1,0 +1,31 @@
+name: Ollama
+slug: ollama
+logo: /logos/ollama.svg
+description: 'Run large language models locally on your machine with a simple CLI. Supports Llama 3, Mistral, Gemma, Phi, and dozens of open-weight models.'
+category: llms
+openSource: true
+githubUrl: https://github.com/ollama/ollama
+websiteUrl: https://ollama.com
+license: MIT
+difficulty: beginner
+useCases:
+  - Run LLMs locally for development and testing without API costs
+  - Build privacy-first AI applications where data never leaves your machine
+  - Experiment with different open-weight models before committing to a provider
+  - Create local RAG pipelines with embedding models
+  - Fine-tune and customize model behavior with Modelfiles
+  - Run AI coding assistants locally with tools like Continue
+alternatives:
+  - llama.cpp
+  - LM Studio
+  - GPT4All
+  - vLLM
+  - LocalAI
+tags:
+  - local-llm
+  - inference
+  - open-source
+  - privacy
+  - self-hosted
+  - cli
+featured: true

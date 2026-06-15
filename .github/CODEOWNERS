@@ -1,0 +1,16 @@
+# Personal-account ownership. Add more collaborators here as the project grows.
+# See docs/community/GITHUB_SETUP.md for the recommended setup checklist.
+
+* @DipakMandlik
+
+/.github/ @DipakMandlik
+/docs/ @DipakMandlik
+/src/content/learn/ @DipakMandlik
+/src/content/tools/ @DipakMandlik
+/src/content/exams/ @DipakMandlik
+/src/content/games/ @DipakMandlik
+/src/content/newsletter/ @DipakMandlik
+/src/components/ @DipakMandlik
+/src/layouts/ @DipakMandlik
+/src/pages/ @DipakMandlik
+/src/styles/ @DipakMandlik

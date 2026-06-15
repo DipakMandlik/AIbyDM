@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:00'
+      timezone: Asia/Kolkata
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - status:needs-triage
+    groups:
+      astro:
+        patterns:
+          - astro
+          - '@astrojs/*'
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react*'
+      tooling:
+        patterns:
+          - eslint*
+          - prettier*
+          - typescript*
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '04:30'
+      timezone: Asia/Kolkata
+    labels:
+      - dependencies
+      - github-actions
+      - status:needs-triage

@@ -1,0 +1,16 @@
+title: '[Question]: '
+labels: ['discussion:question']
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What do you need help with?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Share relevant files, pages, commands, or screenshots.

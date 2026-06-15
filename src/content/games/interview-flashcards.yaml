@@ -1,0 +1,12 @@
+name: Interview Flashcards
+slug: interview-flashcards
+description: Practice AI and Python interview prompts with spaced flashcards focused on concise technical explanations.
+type: flashcard
+difficulty: beginner
+estimatedTime: '15 min'
+component: InterviewFlashcardsGame
+relatedTopics:
+  - foundations/python-basics
+  - foundations/math-for-ai
+  - exams/python-basics
+featured: true

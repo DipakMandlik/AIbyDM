@@ -1,0 +1,25 @@
+name: Documentation Improvement
+description: Report unclear docs or suggest documentation improvements
+labels: ['type:docs', 'status:needs-triage']
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Page or file
+      placeholder: docs/architecture/01-PRD.md or /learn/foundations/python-basics/
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What needs improvement?
+      description: Describe what is missing, confusing, outdated, or incorrect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: Optional. Add wording, examples, links, or structure ideas.
