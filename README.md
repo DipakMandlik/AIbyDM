@@ -2,9 +2,9 @@
 
 **Learn AI. Build AI. Master AI.**
 
-[![Validate](https://github.com/DipakMandlik/AIByDM/actions/workflows/validate.yml/badge.svg)](https://github.com/DipakMandlik/AIByDM/actions/workflows/validate.yml)
-[![CodeQL](https://github.com/DipakMandlik/AIByDM/actions/workflows/codeql.yml/badge.svg)](https://github.com/DipakMandlik/AIByDM/actions/workflows/codeql.yml)
-[![Deploy to GitHub Pages](https://github.com/DipakMandlik/AIByDM/actions/workflows/deploy.yml/badge.svg)](https://github.com/DipakMandlik/AIByDM/actions/workflows/deploy.yml)
+[![Validate](https://github.com/DipakMandlik/AIbyDM/actions/workflows/validate.yml/badge.svg)](https://github.com/DipakMandlik/AIbyDM/actions/workflows/validate.yml)
+[![CodeQL](https://github.com/DipakMandlik/AIbyDM/actions/workflows/codeql.yml/badge.svg)](https://github.com/DipakMandlik/AIbyDM/actions/workflows/codeql.yml)
+[![Deploy to GitHub Pages](https://github.com/DipakMandlik/AIbyDM/actions/workflows/deploy.yml/badge.svg)](https://github.com/DipakMandlik/AIbyDM/actions/workflows/deploy.yml)
 
 AIByDM is a free, open-source, community-driven AI Engineering learning platform. From fundamentals to production — learn through structured tracks, curated tools, interactive games, exam preparation, and curated newsletters.
 
@@ -38,7 +38,7 @@ AIByDM is a free, open-source, community-driven AI Engineering learning platform
 
 ```bash
 # Clone the repository
-git clone https://github.com/DipakMandlik/AIByDM.git
+git clone https://github.com/DipakMandlik/AIbyDM.git
 cd aibydm
 
 # Install dependencies
@@ -87,7 +87,7 @@ No coding required for content contributions — just write Markdown.
 - [Maintainers](MAINTAINERS.md) — ownership areas and expected reviewer teams
 - [Security Policy](SECURITY.md) — private vulnerability reporting process
 - [GitHub Setup Checklist](docs/community/GITHUB_SETUP.md) — repository settings for maintainers
-- [GitHub Discussions](https://github.com/DipakMandlik/AIByDM/discussions) — ideas, questions, and community help
+- [GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions) — ideas, questions, and community help
 
 ## Project Structure
 
@@ -121,7 +121,7 @@ MIT License — see [LICENSE](LICENSE).
 
 ## Community
 
-- [GitHub Discussions](https://github.com/DipakMandlik/AIByDM/discussions)
+- [GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions)
 - [Contributing Guide](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Support](SUPPORT.md)

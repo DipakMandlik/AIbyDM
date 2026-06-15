@@ -6,7 +6,7 @@ the GitHub UI.
 
 ## Repository Basics
 
-1. Create the repository at `github.com/DipakMandlik/AIByDM`.
+1. Create the repository at `github.com/DipakMandlik/AIbyDM`.
 2. Set the default branch to `main`.
 3. Enable Issues, Discussions, Projects, and Wiki only if the team plans to use
    them.

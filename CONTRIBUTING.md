@@ -34,7 +34,7 @@ Thank you for your interest in contributing to AIByDM! This guide will help you 
 ### Setup
 
 ```bash
-git clone https://github.com/DipakMandlik/AIByDM.git
+git clone https://github.com/DipakMandlik/AIbyDM.git
 cd aibydm
 pnpm install
 pnpm dev
@@ -156,4 +156,4 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/DipakMandlik/AIByDM/discussions) for questions or ideas.
+Open a [GitHub Discussion](https://github.com/DipakMandlik/AIbyDM/discussions) for questions or ideas.
