@@ -35,7 +35,7 @@ Thank you for your interest in contributing to AIByDM! This guide will help you 
 
 ```bash
 git clone https://github.com/DipakMandlik/AIbyDM.git
-cd aibydm
+cd AIbyDM
 pnpm install
 pnpm dev
 ```
@@ -111,11 +111,17 @@ docs: update contributing guide
 
 ### Pull Request Process
 
-1. Create a branch from `main`
-2. Make your changes
-3. Run `pnpm validate`
-4. Submit a PR using the PR template
-5. Wait for review (aim for 48h first response)
+1. Create a branch from `main` for review-oriented work.
+2. Make your changes.
+3. Run `pnpm validate`.
+4. Submit a PR using the PR template.
+5. Wait for review (aim for 48h first response).
+
+### Direct Push Workflow
+
+If you are a maintainer and the change is intentionally being shipped without a
+PR review step, work on a current branch, run `pnpm validate`, then push the
+result directly to `main` after confirming it is safe to publish.
 
 ### Pull Request Expectations
 

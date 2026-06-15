@@ -39,7 +39,7 @@ AIByDM is a free, open-source, community-driven AI Engineering learning platform
 ```bash
 # Clone the repository
 git clone https://github.com/DipakMandlik/AIbyDM.git
-cd aibydm
+cd AIbyDM
 
 # Install dependencies
 pnpm install
@@ -76,6 +76,12 @@ We welcome contributions from everyone! See [CONTRIBUTING.md](CONTRIBUTING.md) f
 2. Add your content in `src/content/`
 3. Follow the templates in `templates/`
 4. Submit a Pull Request
+
+### Main Branch Workflow
+
+This repository uses `main` as the primary integration branch. If you have
+maintainer access and a change is ready to ship, push directly to `main` after
+running the validation checks in `CONTRIBUTING.md`.
 
 No coding required for content contributions — just write Markdown.
 
