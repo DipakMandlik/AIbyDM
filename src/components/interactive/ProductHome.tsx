@@ -47,47 +47,213 @@ const inViewProps = { once: true, margin: '-80px' };
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
-const modules: { title: string; text: string; metric: string; href: string; icon: LucideIcon; tone: string }[] = [
-  { title: 'Learn', text: 'Structured courses, roadmap & labs', metric: '120+ Courses', href: withBase('/learn/'), icon: BookOpen, tone: 'violet' },
-  { title: 'Tools', text: 'Discover 500+ open-source AI tools', metric: '500+ Tools', href: withBase('/tools/'), icon: Blocks, tone: 'cyan' },
-  { title: 'Games', text: 'Play & practice with AI-themed games', metric: '25+ Games', href: withBase('/games/'), icon: Gamepad2, tone: 'pink' },
-  { title: 'Exams', text: 'Mock tests, MCQs & interview prep', metric: '1000+ Questions', href: withBase('/exams/'), icon: GraduationCap, tone: 'amber' },
-  { title: 'Newsletter', text: 'Weekly AI news & curated resources', metric: 'Weekly Updates', href: withBase('/newsletter/'), icon: Bell, tone: 'blue' },
+const modules: {
+  title: string;
+  text: string;
+  metric: string;
+  href: string;
+  icon: LucideIcon;
+  tone: string;
+}[] = [
+  {
+    title: 'Learn',
+    text: 'Structured courses, roadmap & labs',
+    metric: '120+ Courses',
+    href: withBase('/learn/'),
+    icon: BookOpen,
+    tone: 'violet',
+  },
+  {
+    title: 'Tools',
+    text: 'Discover 500+ open-source AI tools',
+    metric: '500+ Tools',
+    href: withBase('/tools/'),
+    icon: Blocks,
+    tone: 'cyan',
+  },
+  {
+    title: 'Games',
+    text: 'Play & practice with AI-themed games',
+    metric: '25+ Games',
+    href: withBase('/games/'),
+    icon: Gamepad2,
+    tone: 'pink',
+  },
+  {
+    title: 'Exams',
+    text: 'Mock tests, MCQs & interview prep',
+    metric: '1000+ Questions',
+    href: withBase('/exams/'),
+    icon: GraduationCap,
+    tone: 'amber',
+  },
+  {
+    title: 'Newsletter',
+    text: 'Weekly AI news & curated resources',
+    metric: 'Weekly Updates',
+    href: withBase('/newsletter/'),
+    icon: Bell,
+    tone: 'blue',
+  },
 ];
 
 const learningPaths = [
-  { title: 'AI Engineer Path', subtitle: 'Beginner to Advanced', duration: '12 weeks', difficulty: 'Intermediate', courses: 24, icon: BrainCircuit, color: 'violet' },
-  { title: 'LLM Engineer Path', subtitle: 'Build LLMs & Agents', duration: '8 weeks', difficulty: 'Advanced', courses: 18, icon: Bot, color: 'cyan' },
-  { title: 'AI Governance Path', subtitle: 'Responsible AI & Ethics', duration: '6 weeks', difficulty: 'Beginner', courses: 12, icon: Shield, color: 'pink' },
-  { title: 'Data Scientist Path', subtitle: 'ML, DL & Data Science', duration: '10 weeks', difficulty: 'Intermediate', courses: 20, icon: BarChart3, color: 'amber' },
+  {
+    title: 'AI Engineer Path',
+    subtitle: 'Beginner to Advanced',
+    duration: '12 weeks',
+    difficulty: 'Intermediate',
+    courses: 24,
+    icon: BrainCircuit,
+    color: 'violet',
+  },
+  {
+    title: 'LLM Engineer Path',
+    subtitle: 'Build LLMs & Agents',
+    duration: '8 weeks',
+    difficulty: 'Advanced',
+    courses: 18,
+    icon: Bot,
+    color: 'cyan',
+  },
+  {
+    title: 'AI Governance Path',
+    subtitle: 'Responsible AI & Ethics',
+    duration: '6 weeks',
+    difficulty: 'Beginner',
+    courses: 12,
+    icon: Shield,
+    color: 'pink',
+  },
+  {
+    title: 'Data Scientist Path',
+    subtitle: 'ML, DL & Data Science',
+    duration: '10 weeks',
+    difficulty: 'Intermediate',
+    courses: 20,
+    icon: BarChart3,
+    color: 'amber',
+  },
 ];
 
 const featuredTools = [
-  { name: 'Hugging Face', category: 'ML Platform', description: 'The AI community platform for models, datasets, and spaces.', stars: '450K', icon: '🤗' },
-  { name: 'LangChain', category: 'LLM Framework', description: 'Build production-grade AI applications with LLMs and agents.', stars: '95K', icon: '⛓️' },
-  { name: 'Ollama', category: 'Local LLMs', description: 'Run large language models locally with a single command.', stars: '88K', icon: '🦙' },
-  { name: 'ChromaDB', category: 'Vector DB', description: 'The open-source embedding database built for AI workflows.', stars: '14K', icon: '🎨' },
-  { name: 'LiteLLM', category: 'LLM Gateway', description: '100+ LLM providers in one unified API interface.', stars: '12K', icon: '⚡' },
-  { name: 'Instructor', category: 'Structured Output', description: 'Structured LLM outputs using Pydantic — effortlessly.', stars: '8K', icon: '📐' },
+  {
+    name: 'Hugging Face',
+    category: 'ML Platform',
+    description: 'The AI community platform for models, datasets, and spaces.',
+    stars: '450K',
+    icon: '🤗',
+  },
+  {
+    name: 'LangChain',
+    category: 'LLM Framework',
+    description: 'Build production-grade AI applications with LLMs and agents.',
+    stars: '95K',
+    icon: '⛓️',
+  },
+  {
+    name: 'Ollama',
+    category: 'Local LLMs',
+    description: 'Run large language models locally with a single command.',
+    stars: '88K',
+    icon: '🦙',
+  },
+  {
+    name: 'ChromaDB',
+    category: 'Vector DB',
+    description: 'The open-source embedding database built for AI workflows.',
+    stars: '14K',
+    icon: '🎨',
+  },
+  {
+    name: 'LiteLLM',
+    category: 'LLM Gateway',
+    description: '100+ LLM providers in one unified API interface.',
+    stars: '12K',
+    icon: '⚡',
+  },
+  {
+    name: 'Instructor',
+    category: 'Structured Output',
+    description: 'Structured LLM outputs using Pydantic — effortlessly.',
+    stars: '8K',
+    icon: '📐',
+  },
 ];
 
 const featuredGames = [
-  { title: 'Prompt Engineering Duel', description: 'Craft perfect prompts to outsmart the AI judge. Compete in real-time.', xp: '+150 XP', difficulty: 'Medium', players: '2.4K', tag: '🔥 Daily Challenge', featured: true },
-  { title: 'AI Concept Quest', description: 'Race through AI concepts in this knowledge battle against the clock.', xp: '+100 XP', difficulty: 'Beginner', players: '5.1K', tag: '⭐ Popular', featured: false },
-  { title: 'Model Matchup', description: 'Identify AI models from their outputs and climb the competitive ladder.', xp: '+200 XP', difficulty: 'Hard', players: '1.8K', tag: '🏆 Competitive', featured: false },
+  {
+    title: 'Prompt Engineering Duel',
+    description: 'Craft perfect prompts to outsmart the AI judge. Compete in real-time.',
+    xp: '+150 XP',
+    difficulty: 'Medium',
+    players: '2.4K',
+    tag: '🔥 Daily Challenge',
+    featured: true,
+  },
+  {
+    title: 'AI Concept Quest',
+    description: 'Race through AI concepts in this knowledge battle against the clock.',
+    xp: '+100 XP',
+    difficulty: 'Beginner',
+    players: '5.1K',
+    tag: '⭐ Popular',
+    featured: false,
+  },
+  {
+    title: 'Model Matchup',
+    description: 'Identify AI models from their outputs and climb the competitive ladder.',
+    xp: '+200 XP',
+    difficulty: 'Hard',
+    players: '1.8K',
+    tag: '🏆 Competitive',
+    featured: false,
+  },
 ];
 
 const examCategories = [
-  { title: 'Mock Tests', description: 'Full-length AI certification exam simulations', count: '50+', icon: FileText, color: 'violet' },
-  { title: 'Question Bank', description: 'Curated MCQs across all AI engineering domains', count: '1000+', icon: Database, color: 'cyan' },
-  { title: 'Interview Prep', description: 'Real ML and AI engineer interview questions', count: '200+', icon: Target, color: 'pink' },
-  { title: 'Flashcards', description: 'Quick-review AI concepts and key terminology', count: '500+', icon: Layers, color: 'amber' },
+  {
+    title: 'Mock Tests',
+    description: 'Full-length AI certification exam simulations',
+    count: '50+',
+    icon: FileText,
+    color: 'violet',
+  },
+  {
+    title: 'Question Bank',
+    description: 'Curated MCQs across all AI engineering domains',
+    count: '1000+',
+    icon: Database,
+    color: 'cyan',
+  },
+  {
+    title: 'Interview Prep',
+    description: 'Real ML and AI engineer interview questions',
+    count: '200+',
+    icon: Target,
+    color: 'pink',
+  },
+  {
+    title: 'Flashcards',
+    description: 'Quick-review AI concepts and key terminology',
+    count: '500+',
+    icon: Layers,
+    color: 'amber',
+  },
 ];
 
 const newsletterIssues = [
   { title: 'OpenAI Releases GPT-5 Turbo — What Changed?', date: 'Jun 10, 2026', tag: '🔥 Hot' },
-  { title: 'Top 10 Open Source LLMs You Should Know in 2026', date: 'Jun 3, 2026', tag: '⭐ Featured' },
-  { title: 'AI Agents Are Changing the Engineering Game', date: 'May 27, 2026', tag: '📚 Deep Dive' },
+  {
+    title: 'Top 10 Open Source LLMs You Should Know in 2026',
+    date: 'Jun 3, 2026',
+    tag: '⭐ Featured',
+  },
+  {
+    title: 'AI Agents Are Changing the Engineering Game',
+    date: 'May 27, 2026',
+    tag: '📚 Deep Dive',
+  },
 ];
 
 const stats: { value: string; label: string; icon: LucideIcon }[] = [
@@ -114,7 +280,10 @@ export default function ProductHome() {
   return (
     <div
       className="lp-wrap"
-      onMouseMove={(e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); }}
+      onMouseMove={(e) => {
+        mouseX.set(e.clientX);
+        mouseY.set(e.clientY);
+      }}
     >
       <motion.div className="cursor-glow" style={glowStyle} aria-hidden="true" />
       <HeroSection />
@@ -157,8 +326,8 @@ function HeroSection() {
           </motion.h1>
 
           <motion.p variants={fadeInUp} className="lp-subheadline">
-            Master AI engineering through structured learning paths, open-source tools,
-            interactive challenges, and real-world projects — all for free.
+            Master AI engineering through structured learning paths, open-source tools, interactive
+            challenges, and real-world projects — all for free.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="lp-hero-ctas">
@@ -263,7 +432,9 @@ function ModuleNav() {
             variants={fadeInUp}
             whileHover={{ y: -6 }}
           >
-            <span className="icon-tile"><m.icon size={22} /></span>
+            <span className="icon-tile">
+              <m.icon size={22} />
+            </span>
             <span className="module-title">{m.title}</span>
             <span className="module-copy">{m.text}</span>
             <span className="card-link">
@@ -400,13 +571,15 @@ function FeaturedGames() {
         {featuredGames.map((game) => (
           <motion.a
             key={game.title}
-            className={`lp-game-card${game.featured ? ' lp-game-featured' : ''}`}
+            className={`lp-game-card${game.featured ? 'lp-game-featured' : ''}`}
             href={withBase('/games/')}
             variants={fadeInUp}
             whileHover={{ y: -8, transition: { duration: 0.2 } }}
           >
             <div className="lp-game-tag">{game.tag}</div>
-            <div className="lp-game-icon"><Gamepad2 size={28} /></div>
+            <div className="lp-game-icon">
+              <Gamepad2 size={28} />
+            </div>
             <h3 className="lp-game-title">{game.title}</h3>
             <p className="lp-game-desc">{game.description}</p>
             <div className="lp-game-footer">
@@ -528,13 +701,20 @@ function CommunitySection() {
         transition={{ duration: 0.7, ease: EASE }}
       >
         <div className="lp-community-bg" aria-hidden="true" />
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ color: 'var(--text-muted)' }}>
+        <svg
+          width="36"
+          height="36"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          style={{ color: 'var(--text-muted)' }}
+        >
           <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
         </svg>
         <h2>Built Open Source, Together</h2>
         <p>
-          AIByDM is 100% open source. Contribute tools, courses, games, and ideas.
-          Join 100+ contributors shaping the future of AI education.
+          AIByDM is 100% open source. Contribute tools, courses, games, and ideas. Join 100+
+          contributors shaping the future of AI education.
         </p>
         <div className="lp-community-actions">
           <motion.a
@@ -580,7 +760,9 @@ function StatsSection() {
       >
         {stats.map(({ value, label, icon: Icon }) => (
           <motion.div key={label} className="lp-stat-item" variants={fadeInUp}>
-            <span className="icon-tile"><Icon size={20} /></span>
+            <span className="icon-tile">
+              <Icon size={20} />
+            </span>
             <b className="lp-stat-value">{value}</b>
             <small className="lp-stat-label">{label}</small>
           </motion.div>
