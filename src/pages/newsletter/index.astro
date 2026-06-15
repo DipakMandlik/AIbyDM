@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { Bell, Sparkles, ChevronRight } from 'lucide-react';
+
+const issues = [
+  {
+    title: 'OpenAI Releases GPT-5 Turbo',
+    date: 'May 10, 2026',
+    summary: 'Architecture notes, tool updates, and what builders should do next.',
+  },
+  {
+    title: 'Top 10 Open Source LLMs in 2026',
+    date: 'May 8, 2026',
+    summary: 'The models worth running locally and where each one shines.',
+  },
+  {
+    title: 'AI Agents Are Changing the Game',
+    date: 'May 5, 2026',
+    summary: 'Patterns, pitfalls, and production lessons from real agent deployments.',
+  },
+  {
+    title: 'RAG Is Not Dead — It Evolved',
+    date: 'May 1, 2026',
+    summary: 'How retrieval pipelines adapted to long-context and agentic workflows.',
+  },
+];
+---
+
+<BaseLayout
+  title="AIByDM Newsletter - Weekly AI Engineering Briefings"
+  description="Curated model releases, open-source tools, interview prep, and production lessons for AI builders. A premium weekly archive of AI engineering intelligence."
+>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow"><Bell size={16} /> Newsletter</span>
+      <h1>AI engineering briefings.</h1>
+      <p>
+        Brief, visual AI engineering intelligence — model releases, open-source picks, interview
+        prep, and production lessons, every week.
+      </p>
+    </header>
+
+    <section aria-label="Featured edition" class="page-section">
+      <article class="premium-card feature-panel">
+        <span class="eyebrow"><Sparkles size={16} /> Featured edition</span>
+        <h2 style="margin:0.4rem 0;font-size:clamp(1.5rem,3vw,2.1rem)">
+          OpenAI releases GPT-5 Turbo
+        </h2>
+        <p style="color:var(--text-secondary);margin:0 0 1rem;max-width:46rem">
+          Architecture notes, tool updates, open-source picks, and what builders should do next.
+        </p>
+        <a
+          class="see-all"
+          href="https://github.com/DipakMandlik/AIbyDM"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read the issue <ChevronRight size={16} />
+        </a>
+      </article>
+    </section>
+
+    <section class="page-section" aria-label="Recent issues">
+      <div class="section-header">
+        <h2>Latest issues</h2>
+        <p>Catch up on what shipped across the AI ecosystem.</p>
+      </div>
+      <div class="newsletter-list">
+        {
+          issues.map((issue) => (
+            <article class="premium-card newsletter-item">
+              <span class="news-thumb" aria-hidden="true">
+                <Sparkles size={18} />
+              </span>
+              <div>
+                <h3>{issue.title}</h3>
+                <p>{issue.summary}</p>
+              </div>
+              <span class="lb-xp" style="margin-left:auto;white-space:nowrap">
+                {issue.date}
+              </span>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>

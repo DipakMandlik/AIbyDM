@@ -1,0 +1,75 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { Gamepad2 } from 'lucide-react';
+
+const quests = [
+  {
+    title: 'Daily RAG Drill',
+    xp: '+80 XP',
+    time: '10 min',
+    text: 'Retrieve, rank, and ground answers under time pressure.',
+  },
+  {
+    title: 'Vector DB Boss Fight',
+    xp: '+140 XP',
+    time: '25 min',
+    text: 'Tune indexes and beat the latency boss.',
+  },
+  {
+    title: 'Agent Debug Arena',
+    xp: '+120 XP',
+    time: '18 min',
+    text: 'Trace tool calls and fix the broken agent loop.',
+  },
+  {
+    title: 'Prompt Golf',
+    xp: '+60 XP',
+    time: '8 min',
+    text: 'Hit the target output in the fewest tokens.',
+  },
+  {
+    title: 'Token Economy',
+    xp: '+100 XP',
+    time: '15 min',
+    text: 'Optimize context windows for cost and quality.',
+  },
+  {
+    title: 'Eval Gauntlet',
+    xp: '+130 XP',
+    time: '20 min',
+    text: 'Build evals that catch regressions before they ship.',
+  },
+];
+---
+
+<BaseLayout
+  title="AI Games Zone - Learn AI Through Play | AIByDM"
+  description="Daily quests, XP, leaderboards, streaks, and challenges that make AI engineering concepts stick. Practice loops that feel addictive."
+>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow"><Gamepad2 size={16} /> Games</span>
+      <h1>Practice loops that feel addictive.</h1>
+      <p>
+        Daily quests, XP, leaderboards, streaks, and reward animations make AI concepts stick while
+        you play.
+      </p>
+    </header>
+
+    <div class="quest-grid">
+      {
+        quests.map(({ title, xp, time, text }, index) => (
+          <article class="premium-card quest-card">
+            <span class="quest-rank">0{index + 1}</span>
+            <Gamepad2 size={26} />
+            <h3>{title}</h3>
+            <p>{text}</p>
+            <span class="reward-burst">
+              {xp} · {time}
+            </span>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

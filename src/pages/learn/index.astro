@@ -1,0 +1,110 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { BrainCircuit, Bot, Sparkles, Database, BookOpen, FlaskConical, Map } from 'lucide-react';
+
+const paths = [
+  {
+    title: 'AI Engineer Path',
+    subtitle: 'Beginner to Advanced',
+    progress: 68,
+    count: '24 Courses',
+    icon: BrainCircuit,
+  },
+  {
+    title: 'LLM Engineer Path',
+    subtitle: 'Build LLMs & Agents',
+    progress: 55,
+    count: '18 Courses',
+    icon: Bot,
+  },
+  {
+    title: 'AI Governance Path',
+    subtitle: 'Responsible AI & Ethics',
+    progress: 40,
+    count: '12 Courses',
+    icon: Sparkles,
+  },
+  {
+    title: 'Data Scientist Path',
+    subtitle: 'ML, DL & Data Science',
+    progress: 72,
+    count: '20 Courses',
+    icon: Database,
+  },
+];
+
+const formats = [
+  {
+    icon: BookOpen,
+    title: 'Structured courses',
+    text: 'Sequenced lessons with progress tracking and checkpoints.',
+  },
+  {
+    icon: FlaskConical,
+    title: 'Hands-on labs',
+    text: 'Build real RAG pipelines, agents, and fine-tuned models.',
+  },
+  { icon: Map, title: 'Roadmaps', text: 'Clear skill trees from fundamentals to production AI.' },
+];
+---
+
+<BaseLayout
+  title="Learn AI - Courses, Paths & Labs | AIByDM"
+  description="Structured AI learning paths, hands-on labs, tutorials, and projects. Go from beginner to production AI engineer with curated courses."
+>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow"><BookOpen size={16} /> Learn</span>
+      <h1>Netflix for AI learning.</h1>
+      <p>
+        Structured paths, progress tracking, achievements, and hands-on labs make learning feel like
+        a product — not a folder of docs.
+      </p>
+    </header>
+
+    <section aria-label="Learning formats">
+      <div class="module-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+        {
+          formats.map((f) => (
+            <article class="premium-card module-card">
+              <span class="icon-tile">
+                <f.icon size={22} />
+              </span>
+              <span class="module-title">{f.title}</span>
+              <span class="module-copy">{f.text}</span>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="page-section" aria-label="Learning paths">
+      <div class="section-header">
+        <h2>Popular learning paths</h2>
+        <p>Curated tracks that take you from fundamentals to shipping AI systems.</p>
+      </div>
+      <div class="path-grid">
+        {
+          paths.map(({ title, subtitle, progress, count, icon: Icon }) => (
+            <article class="premium-card path-card">
+              <div class="card-head">
+                <span class="icon-tile">
+                  <Icon size={20} />
+                </span>
+              </div>
+              <h3>{title}</h3>
+              <p>{subtitle}</p>
+              <div class="progress-line" aria-label={`${progress}% complete`}>
+                <span style={`width: ${progress}%`} />
+              </div>
+              <div class="card-meta">
+                <span>{count}</span>
+                <span>{progress}%</span>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>

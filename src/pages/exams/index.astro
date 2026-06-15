@@ -1,0 +1,85 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { GraduationCap, FileText, Timer, Database, Library } from 'lucide-react';
+
+const prep = [
+  { icon: Database, label: 'Question bank', value: '1,000+' },
+  { icon: Timer, label: 'Mock interview room', value: 'Live' },
+  { icon: Library, label: 'Flashcard sprint', value: '12 decks' },
+  { icon: FileText, label: 'Company prep tracks', value: '8 tracks' },
+];
+
+const exams = [
+  {
+    icon: FileText,
+    title: 'Practice Exams',
+    text: 'Topic-wise MCQs with explanations and scoring.',
+  },
+  {
+    icon: Timer,
+    title: 'Timed Mock Tests',
+    text: 'Simulate real interview and certification conditions.',
+  },
+  {
+    icon: Library,
+    title: 'Study Materials',
+    text: 'Revision notes, cheat sheets, and curated readings.',
+  },
+];
+---
+
+<BaseLayout
+  title="AI Interview Hub - Mock Tests, MCQs & Flashcards | AIByDM"
+  description="Prepare for AI interviews and certifications with 1000+ questions, mock interviews, timed tests, company tracks, and flashcards in one focused system."
+>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow"><GraduationCap size={16} /> Exams</span>
+      <h1>AI Interview Hub.</h1>
+      <p>
+        Mock interviews, company tracks, topic filters, timed tests, revision notes, and flashcards
+        in one focused prep system.
+      </p>
+    </header>
+
+    <div class="feature-grid">
+      <article class="premium-card feature-panel">
+        <div class="section-header">
+          <h2>What's inside</h2>
+          <p>Everything you need to walk into an AI interview prepared.</p>
+        </div>
+        <div class="stacked-list">
+          {
+            prep.map(({ icon: Icon, label, value }) => (
+              <span>
+                <Icon size={16} />
+                {label}
+                <b>{value}</b>
+              </span>
+            ))
+          }
+        </div>
+      </article>
+
+      <article class="premium-card feature-panel">
+        <div class="section-header">
+          <h2>Study your way</h2>
+          <p>Choose the format that fits how you learn best.</p>
+        </div>
+        <div class="stacked-list">
+          {
+            exams.map(({ icon: Icon, title, text }) => (
+              <span>
+                <Icon size={16} />
+                <span style="margin-right:auto">
+                  <b style="display:block;color:var(--text-primary)">{title}</b>
+                  <small style="color:var(--text-muted)">{text}</small>
+                </span>
+              </span>
+            ))
+          }
+        </div>
+      </article>
+    </div>
+  </div>
+</BaseLayout>

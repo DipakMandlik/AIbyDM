@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+---
+
+<BaseLayout
+  title="Page not found - AIByDM"
+  description="The page you are looking for does not exist. Head back to AIByDM to keep learning, building, and mastering AI."
+>
+  <section class="notfound-stage">
+    <span class="notfound-code">404</span>
+    <h1>This page took a wrong turn.</h1>
+    <p>
+      The page you are looking for moved, is still being built, or never existed. Let's get you back
+      on track.
+    </p>
+    <div class="notfound-actions">
+      <a class="primary-action" href={withBase('/')}>Back to home</a>
+      <a
+        class="secondary-action"
+        href="https://github.com/DipakMandlik/AIbyDM"
+        target="_blank"
+        rel="noopener noreferrer">View on GitHub</a
+      >
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound-stage {
+    display: flex;
+    min-height: 60vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 6rem 1.5rem;
+    text-align: center;
+  }
+
+  .notfound-code {
+    font-size: clamp(4rem, 12vw, 8rem);
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(120deg, var(--color-accent), #a855f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .notfound-stage h1 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .notfound-stage p {
+    max-width: 32rem;
+    color: var(--color-text-secondary);
+  }
+
+  .notfound-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .notfound-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    padding: 0.7rem 1.4rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .notfound-actions .primary-action {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .notfound-actions .secondary-action {
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+  }
+</style>

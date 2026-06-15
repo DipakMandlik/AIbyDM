@@ -2,6 +2,8 @@
 import '@styles/global.css';
 import Header from '@components/layout/Header.astro';
 import Footer from '@components/layout/Footer.astro';
+import Sidebar from '@components/layout/Sidebar.astro';
+import CommandPalette from '@components/interactive/CommandPalette';
 
 interface Props {
   title: string;
@@ -98,9 +100,7 @@ const isHomepage =
       })();
     </script>
   </head>
-  <body
-    class="flex min-h-screen flex-col bg-[var(--color-bg-base)] text-[var(--color-text-primary)] antialiased"
-  >
+  <body class="bg-[var(--color-bg-base)] text-[var(--color-text-primary)] antialiased">
     <a
       href="#main-content"
       class="skip-to-content focus:ring-2 focus:ring-[var(--color-accent)] focus:outline-none"
@@ -108,12 +108,17 @@ const isHomepage =
       Skip to content
     </a>
 
-    <Header />
+    <div class="app-shell">
+      <Sidebar />
+      <div class="app-column">
+        <Header />
+        <main id="main-content" class="app-content">
+          <slot />
+        </main>
+        <Footer />
+      </div>
+    </div>
 
-    <main id="main-content" class="flex-1">
-      <slot />
-    </main>
-
-    <Footer />
+    <CommandPalette client:idle />
   </body>
 </html>

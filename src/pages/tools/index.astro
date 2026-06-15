@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { Blocks } from 'lucide-react';
+
+const filters = ['Trending', 'Open source', 'RAG', 'Agents', 'Vector DBs', 'Compare'];
+
+const tools = [
+  {
+    name: 'LangChain',
+    category: 'Agent orchestration',
+    license: 'MIT',
+    trend: 'Trending',
+    score: '90%',
+  },
+  {
+    name: 'Qdrant',
+    category: 'Vector database',
+    license: 'Apache 2.0',
+    trend: 'Popular',
+    score: '86%',
+  },
+  {
+    name: 'Ollama',
+    category: 'Local model runtime',
+    license: 'MIT',
+    trend: 'Developer favorite',
+    score: '94%',
+  },
+  {
+    name: 'LlamaIndex',
+    category: 'RAG framework',
+    license: 'MIT',
+    trend: 'Fast growing',
+    score: '88%',
+  },
+  {
+    name: 'vLLM',
+    category: 'Inference serving',
+    license: 'Apache 2.0',
+    trend: 'Trending',
+    score: '91%',
+  },
+  {
+    name: 'Weaviate',
+    category: 'Vector database',
+    license: 'BSD-3',
+    trend: 'Popular',
+    score: '84%',
+  },
+];
+---
+
+<BaseLayout
+  title="AI Tools Directory - Compare Open Source AI Tools | AIByDM"
+  description="Browse, compare, and bookmark 500+ open-source AI tools across agents, RAG, vector databases, and inference. Find the right stack for your project."
+>
+  <div class="page">
+    <header class="page-head">
+      <span class="eyebrow"><Blocks size={16} /> Tools</span>
+      <h1>AI tool explorer built for builders.</h1>
+      <p>
+        Browse, compare, and assemble open-source stacks with category, license, popularity, and
+        trend signals.
+      </p>
+    </header>
+
+    <div class="filter-row" aria-label="Tool filters">
+      {filters.map((filter) => <span>{filter}</span>)}
+    </div>
+
+    <div class="tool-table">
+      {
+        tools.map(({ name, category, license, trend, score }) => (
+          <div class="tool-row">
+            <span class="tool-logo">{name.slice(0, 1)}</span>
+            <span>
+              <b>{name}</b>
+              <small>{category}</small>
+            </span>
+            <em>{license}</em>
+            <strong>{trend}</strong>
+            <span class="tool-score">{score}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

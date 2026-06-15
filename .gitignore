@@ -24,6 +24,14 @@ pnpm-debug.log*
 *.swp
 *.swo
 
+# tooling
+.claude/
+.pnpm-store/
+
+# reference screenshots (local only)
+home_screen_dark.png
+home_screen_light.png
+
 # OS
 .DS_Store
 Thumbs.db
