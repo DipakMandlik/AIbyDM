@@ -1,11 +1,205 @@
 ---
+import { getCollection } from 'astro:content';
+import { BookOpen, CircleCheck, GitPullRequest, TerminalSquare } from 'lucide-react';
+
 import BaseLayout from '@layouts/BaseLayout.astro';
-import ProductHome from '@components/interactive/ProductHome';
+
+const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+
+const [learnEntries, toolEntries, examEntries, gameEntries, newsletterEntries] = await Promise.all([
+  getCollection('learn', ({ data }) => !data.draft),
+  getCollection('tools'),
+  getCollection('exams'),
+  getCollection('games'),
+  getCollection('newsletter'),
+]);
+
+const lessons = learnEntries.sort((a, b) => a.data.order - b.data.order);
+const tools = toolEntries.sort((a, b) => a.data.name.localeCompare(b.data.name));
+const exams = examEntries.sort((a, b) => a.data.title.localeCompare(b.data.title));
+const games = gameEntries.sort((a, b) => a.data.name.localeCompare(b.data.name));
+const issues = newsletterEntries.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const questionCount = exams.reduce((total, exam) => total + exam.data.questions.length, 0);
+const totalEntries = lessons.length + tools.length + exams.length + games.length + issues.length;
+const repoUrl = 'https://github.com/DipakMandlik/AIbyDM';
+
+const modules = [
+  {
+    title: 'Learn',
+    href: withBase('/learn/'),
+    metric: `${lessons.length} lessons`,
+    accent: 'var(--color-learn)',
+    description: 'Python, math, prerequisites, and the first foundation sequence.',
+  },
+  {
+    title: 'Tools',
+    href: withBase('/tools/'),
+    metric: `${tools.length} tools`,
+    accent: 'var(--color-tools)',
+    description: 'Ollama, LangChain, Qdrant, and practical open-source AI infrastructure.',
+  },
+  {
+    title: 'Games',
+    href: withBase('/games/'),
+    metric: `${games.length} drills`,
+    accent: 'var(--color-games)',
+    description: 'Fast recall loops for AI concepts and interview flashcards.',
+  },
+  {
+    title: 'Exams',
+    href: withBase('/exams/'),
+    metric: `${questionCount} questions`,
+    accent: 'var(--color-exams)',
+    description: 'Question banks with explanations, topics, and difficulty metadata.',
+  },
+  {
+    title: 'Newsletter',
+    href: withBase('/newsletter/'),
+    metric: `${issues.length} issue`,
+    accent: 'var(--color-newsletter)',
+    description: 'Launch notes, release signal, and the next learning roadmap.',
+  },
+];
+
+const systemStats = [
+  { label: 'Content entries', value: totalEntries },
+  { label: 'Learning modules', value: lessons.length },
+  { label: 'Open tools', value: tools.filter((tool) => tool.data.openSource).length },
+  { label: 'Practice assets', value: games.length + exams.length },
+];
 ---
 
 <BaseLayout
-  title="AIByDM - Learn AI. Build AI. Master AI."
-  description="A free, open-source learning platform for artificial intelligence. Interactive lessons, hands-on tools, coding games, and certification exams."
+  title="AIByDM - AI Engineering Learning Command Center"
+  description="AIByDM is an open-source command center for learning AI engineering through lessons, tools, exams, games, and practical collaboration."
 >
-  <ProductHome client:load />
+  <section
+    class="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-14"
+  >
+    <div
+      class="flex min-h-[30rem] flex-col justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 sm:p-8"
+    >
+      <div>
+        <div
+          class="mb-6 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 text-sm text-[var(--color-text-secondary)]"
+        >
+          <TerminalSquare className="h-4 w-4 text-[var(--color-accent)]" aria-hidden="true" />
+          <span class="font-mono">open-source AI learning workspace</span>
+        </div>
+        <h1
+          class="max-w-3xl text-4xl leading-[1.08] font-semibold text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl"
+        >
+          A command center for practical AI builders.
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-[var(--color-text-secondary)] sm:text-lg">
+          AIByDM connects foundations, real tools, practice loops, exams, and community workflows
+          into one contributor-ready learning system. Start with Python and math, then move into
+          local LLMs, agents, and vector search without losing the map.
+        </p>
+      </div>
+
+      <div class="mt-8 grid gap-3 sm:grid-cols-2">
+        <a
+          href={withBase('/learn/')}
+          class="command-button border border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+        >
+          <BookOpen className="h-5 w-5" aria-hidden="true" />
+          Start foundations
+        </a>
+        <a
+          href={repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="command-button border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+        >
+          <GitPullRequest className="h-5 w-5" aria-hidden="true" />
+          Collaborate on GitHub
+        </a>
+      </div>
+    </div>
+
+    <aside class="ui-panel min-h-[30rem] rounded-lg p-6 sm:p-8" aria-label="AIByDM platform status">
+      <div
+        class="flex items-start justify-between gap-4 border-b border-[var(--color-border)] pb-5"
+      >
+        <div>
+          <p class="font-mono text-sm text-[var(--color-accent)]">runtime/status</p>
+          <h2 class="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
+            Platform inventory
+          </h2>
+        </div>
+        <CircleCheck className="h-6 w-6 text-[var(--color-accent)]" aria-hidden="true" />
+      </div>
+
+      <dl class="mt-6 grid gap-3 sm:grid-cols-2">
+        {
+          systemStats.map((stat) => (
+            <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+              <dt class="font-mono text-xs text-[var(--color-text-tertiary)]">{stat.label}</dt>
+              <dd class="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+                {stat.value}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div
+        class="mt-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-base)] p-4 font-mono text-sm text-[var(--color-text-secondary)]"
+      >
+        <p class="text-[var(--color-accent)]">next build queue</p>
+        <ol class="mt-4 space-y-3 leading-6">
+          <li>Route lessons into full reading pages with progress checkpoints.</li>
+          <li>Connect exams and games to topic pages for closed-loop practice.</li>
+          <li>Expose contribution lanes for content, tools, and review workflows.</li>
+        </ol>
+      </div>
+    </aside>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+    <div class="grid gap-4 lg:grid-cols-5">
+      {
+        modules.map((module, index) => (
+          <a
+            href={module.href}
+            class:list={[
+              'group flex min-h-64 flex-col justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-5 transition duration-200 hover:-translate-y-0.5 hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]',
+              index === 0 ? 'lg:col-span-2' : '',
+            ]}
+          >
+            <div>
+              <div class="flex items-center justify-between gap-3">
+                <span
+                  class="inline-flex h-11 w-11 items-center justify-center rounded-lg border font-mono text-sm font-semibold"
+                  style={`border-color: color-mix(in srgb, ${module.accent} 38%, transparent); background: color-mix(in srgb, ${module.accent} 12%, transparent); color: ${module.accent};`}
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span class="font-mono text-sm text-[var(--color-text-tertiary)]">
+                  {module.metric}
+                </span>
+              </div>
+              <h2 class="mt-6 text-2xl font-semibold text-[var(--color-text-primary)]">
+                {module.title}
+              </h2>
+              <p class="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                {module.description}
+              </p>
+            </div>
+            <span class="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--color-text-primary)]">
+              Open module
+              <span
+                class="ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                -&gt;
+              </span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
 </BaseLayout>

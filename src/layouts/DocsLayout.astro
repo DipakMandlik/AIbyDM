@@ -25,7 +25,6 @@ const trackColor = track ? trackColorMap[track] : undefined;
 <BaseLayout title={`${title} - AIByDM`} description={description}>
   <div class="mx-auto max-w-[90rem] px-4 sm:px-6 lg:px-8">
     <div class="relative flex gap-8 py-8 lg:py-12">
-      <!-- Left sidebar -->
       <aside
         id="docs-sidebar"
         class="fixed inset-y-0 left-0 z-40 w-72 -translate-x-full overflow-y-auto border-r border-[var(--color-border)] bg-[var(--color-bg-base)] pt-20 pr-4 pb-6 pl-4 transition-transform duration-200 lg:sticky lg:top-20 lg:z-auto lg:block lg:h-[calc(100vh-5rem)] lg:w-64 lg:translate-x-0 lg:border-r-0 lg:bg-transparent lg:pt-0 lg:pl-0 xl:w-72"
@@ -36,7 +35,6 @@ const trackColor = track ? trackColorMap[track] : undefined;
         </nav>
       </aside>
 
-      <!-- Sidebar overlay (mobile) -->
       <div
         id="sidebar-overlay"
         class="fixed inset-0 z-30 hidden bg-black/50 lg:hidden"
@@ -44,11 +42,10 @@ const trackColor = track ? trackColorMap[track] : undefined;
       >
       </div>
 
-      <!-- Mobile sidebar toggle -->
       <button
         id="sidebar-toggle"
         type="button"
-        class="fixed bottom-4 left-4 z-50 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-lg transition-transform hover:scale-105 lg:hidden"
+        class="fixed bottom-4 left-4 z-50 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white shadow-lg transition-transform hover:scale-[1.02] lg:hidden"
         aria-label="Toggle sidebar"
         aria-expanded="false"
         aria-controls="docs-sidebar"
@@ -69,7 +66,6 @@ const trackColor = track ? trackColorMap[track] : undefined;
         </svg>
       </button>
 
-      <!-- Main content -->
       <article class="min-w-0 flex-1">
         {
           track && trackColor && (
@@ -87,9 +83,7 @@ const trackColor = track ? trackColorMap[track] : undefined;
         }
 
         <header class="mb-8">
-          <h1
-            class="text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl"
-          >
+          <h1 class="text-3xl font-bold text-[var(--color-text-primary)] sm:text-4xl">
             {title}
           </h1>
           {
@@ -103,7 +97,6 @@ const trackColor = track ? trackColorMap[track] : undefined;
           <slot />
         </div>
 
-        <!-- Prev / Next navigation -->
         {
           (prevPage || nextPage) && (
             <nav
@@ -113,7 +106,7 @@ const trackColor = track ? trackColorMap[track] : undefined;
               {prevPage ? (
                 <a
                   href={prevPage.href}
-                  class="group flex flex-1 flex-col items-start rounded-xl border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+                  class="group flex flex-1 flex-col items-start rounded-lg border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
                 >
                   <span class="mb-1 text-xs font-medium text-[var(--color-text-tertiary)]">
                     Previous
@@ -143,7 +136,7 @@ const trackColor = track ? trackColorMap[track] : undefined;
               {nextPage ? (
                 <a
                   href={nextPage.href}
-                  class="group flex flex-1 flex-col items-end rounded-xl border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+                  class="group flex flex-1 flex-col items-end rounded-lg border border-[var(--color-border)] p-4 transition-colors hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
                 >
                   <span class="mb-1 text-xs font-medium text-[var(--color-text-tertiary)]">
                     Next
@@ -174,7 +167,6 @@ const trackColor = track ? trackColorMap[track] : undefined;
         }
       </article>
 
-      <!-- Right rail: table of contents -->
       <aside class="hidden w-56 shrink-0 xl:block" aria-label="Table of contents">
         <div class="sticky top-20">
           <slot name="toc" />
@@ -219,8 +211,8 @@ const trackColor = track ? trackColorMap[track] : undefined;
 
     overlay.addEventListener('click', closeSidebar);
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
         closeSidebar();
         toggle.focus();
       }

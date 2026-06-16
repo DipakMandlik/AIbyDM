@@ -273,8 +273,8 @@ export default function ProductHome() {
   const glowX = useSpring(mouseX, { stiffness: 80, damping: 25 });
   const glowY = useSpring(mouseY, { stiffness: 80, damping: 25 });
   const glowStyle = {
-    left: useTransform(glowX, (v) => `${v}px`),
-    top: useTransform(glowY, (v) => `${v}px`),
+    left: useTransform(glowX, (value: number) => `${value}px`),
+    top: useTransform(glowY, (value: number) => `${value}px`),
   };
 
   return (

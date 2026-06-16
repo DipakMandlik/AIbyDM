@@ -1,3 +1,4 @@
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Command, Search } from 'lucide-react';
@@ -69,7 +70,7 @@ export default function CommandPalette() {
             initial={{ opacity: 0, y: 22, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            onMouseDown={(event) => event.stopPropagation()}
+            onMouseDown={(event: ReactMouseEvent<HTMLDivElement>) => event.stopPropagation()}
           >
             <label>
               <Search size={18} aria-hidden="true" />

@@ -1,27 +1,45 @@
 ---
+import { ExternalLink } from 'lucide-react';
+
 const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+const repoUrl = 'https://github.com/DipakMandlik/AIbyDM';
 
-const repo = 'https://github.com/DipakMandlik/AIbyDM';
-
-const columns = [
+const footerSections = [
   {
-    title: 'Product',
+    title: 'Platform',
     links: [
-      ['Learn', '/learn/'],
-      ['Tools', '/tools/'],
-      ['Games', '/games/'],
-      ['Exams', '/exams/'],
-      ['Newsletter', '/newsletter/'],
+      { label: 'Learn', href: '/learn/', external: false },
+      { label: 'Tools', href: '/tools/', external: false },
+      { label: 'Games', href: '/games/', external: false },
+      { label: 'Exams', href: '/exams/', external: false },
     ],
   },
   {
-    title: 'Open Source',
+    title: 'Resources',
     links: [
-      ['GitHub', repo],
-      ['Discussions', `${repo}/discussions`],
-      ['Contributing', `${repo}/blob/main/CONTRIBUTING.md`],
-      ['Issues', `${repo}/issues`],
-      ['License', `${repo}/blob/main/LICENSE`],
+      { label: 'Newsletter', href: '/newsletter/', external: false },
+      { label: 'Contributing', href: `${repoUrl}/blob/main/CONTRIBUTING.md`, external: true },
+      {
+        label: 'Roadmap',
+        href: `${repoUrl}/blob/main/docs/architecture/10-Roadmap.md`,
+        external: true,
+      },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      { label: 'GitHub', href: repoUrl, external: true },
+      { label: 'Discussions', href: `${repoUrl}/discussions`, external: true },
+      { label: 'Support', href: `${repoUrl}/blob/main/SUPPORT.md`, external: true },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'License', href: `${repoUrl}/blob/main/LICENSE`, external: true },
+      { label: 'Code of Conduct', href: `${repoUrl}/blob/main/CODE_OF_CONDUCT.md`, external: true },
+      { label: 'Security', href: `${repoUrl}/blob/main/SECURITY.md`, external: true },
     ],
   },
 ];
@@ -29,56 +47,50 @@ const columns = [
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-shell">
-    <div class="footer-main">
-      <div class="footer-brand">
-        <a href={withBase('/')} class="brand-mark" aria-label="AIByDM home">
-          <span>AI</span>
-          <strong>AIByDM</strong>
-        </a>
-        <p>
-          A premium open-source AI engineering platform for learning, tools, games, and community.
-        </p>
-      </div>
-
+<footer
+  class="mt-auto border-t border-[var(--color-border)] bg-[var(--color-bg-surface)]"
+  role="contentinfo"
+>
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-2 gap-8 sm:grid-cols-4">
       {
-        columns.map((column) => (
-          <nav aria-label={column.title}>
-            <h3>{column.title}</h3>
-            {column.links.map(([label, href]) => {
-              const external = href.startsWith('https://');
-              return (
-                <a
-                  href={external ? href : withBase(href)}
-                  target={external ? '_blank' : undefined}
-                  rel={external ? 'noopener noreferrer' : undefined}
-                >
-                  {label}
-                </a>
-              );
-            })}
-          </nav>
+        footerSections.map((section) => (
+          <div>
+            <h2 class="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">
+              {section.title}
+            </h2>
+            <ul class="space-y-2" role="list">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    href={link.external ? link.href : withBase(link.href)}
+                    class="inline-flex min-h-8 items-center gap-1 text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+                    target={link.external ? '_blank' : undefined}
+                    rel={link.external ? 'noopener noreferrer' : undefined}
+                  >
+                    {link.label}
+                    {link.external && (
+                      <ExternalLink className="h-3 w-3 opacity-60" aria-hidden="true" />
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))
       }
     </div>
 
-    <div class="footer-bottom">
-      <p>&copy; {currentYear} AIByDM. Open source under MIT License.</p>
-      <div>
-        <a href={`${repo}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">License</a>
-        <a href={repo} target="_blank" rel="noopener noreferrer">GitHub</a>
-      </div>
+    <div
+      class="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--color-border)] pt-8 sm:flex-row"
+    >
+      <p class="text-sm text-[var(--color-text-secondary)]">
+        <span class="font-semibold text-[var(--color-text-primary)]">AIByDM</span>
+        - Learn AI. Build AI. Master AI.
+      </p>
+      <p class="text-sm text-[var(--color-text-tertiary)]">
+        &copy; {currentYear} AIByDM. Open source under MIT License.
+      </p>
     </div>
   </div>
 </footer>
-
-<script is:inline>
-  document.querySelectorAll('[data-newsletter-form]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const button = form.querySelector('button');
-      if (button) button.textContent = 'Joined';
-    });
-  });
-</script>
