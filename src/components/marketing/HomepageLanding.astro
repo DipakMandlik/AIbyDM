@@ -1,0 +1,827 @@
+---
+import {
+  Activity,
+  ArrowRight,
+  Bell,
+  BookOpen,
+  Bot,
+  Code2,
+  Database,
+  Eye,
+  Flame,
+  Gamepad2,
+  GitBranch,
+  GraduationCap,
+  Mail,
+  Newspaper,
+  Search,
+  Sparkles,
+  Trophy,
+  Users,
+  Wrench,
+} from 'lucide-react';
+
+import ThemeToggle from '@components/interactive/ThemeToggle';
+
+interface FeatureCard {
+  kind: 'learn' | 'tools' | 'games' | 'exams' | 'newsletter';
+  title: string;
+  href: string;
+  metric: string;
+  description: string;
+  accent: string;
+}
+
+interface LearningPathCard {
+  title: string;
+  href: string;
+  subtitle: string;
+  lessonsLabel: string;
+  progress: number;
+  accent: string;
+}
+
+interface NewsletterHighlight {
+  title: string;
+  href: string;
+  meta: string;
+}
+
+interface StatCard {
+  kind: 'tracks' | 'tools' | 'projects' | 'games' | 'questions' | 'lessons';
+  value: string;
+  label: string;
+  accent: string;
+}
+
+interface Props {
+  learnHref: string;
+  toolsHref: string;
+  gamesHref: string;
+  examsHref: string;
+  newsletterHref: string;
+  communityHref: string;
+  roadmapHref: string;
+  searchHref: string;
+  repoUrl: string;
+  featureCards: readonly FeatureCard[];
+  learningPaths: readonly LearningPathCard[];
+  newsletterHighlights: readonly NewsletterHighlight[];
+  stats: readonly StatCard[];
+}
+
+const {
+  learnHref,
+  toolsHref,
+  gamesHref,
+  examsHref,
+  newsletterHref,
+  communityHref,
+  roadmapHref,
+  searchHref,
+  repoUrl,
+  featureCards,
+  learningPaths,
+  newsletterHighlights,
+  stats,
+} = Astro.props;
+
+const navLinks = [
+  { label: 'Learn', href: learnHref, active: true },
+  { label: 'Tools', href: toolsHref, active: false },
+  { label: 'Games', href: gamesHref, active: false },
+  { label: 'Exams', href: examsHref, active: false },
+  { label: 'Newsletter', href: newsletterHref, active: false },
+];
+
+const chipCards = [
+  {
+    label: 'LLM',
+    Icon: Sparkles,
+    className: 'left-2 top-4 sm:left-6',
+    tint: 'rgba(95, 93, 255, 0.18)',
+  },
+  {
+    label: 'Agents',
+    Icon: Bot,
+    className: 'right-2 top-0 sm:right-5',
+    tint: 'rgba(79, 70, 229, 0.16)',
+  },
+  {
+    label: 'Code',
+    Icon: Code2,
+    className: 'left-0 top-[34%] sm:left-0',
+    tint: 'rgba(99, 102, 241, 0.14)',
+  },
+  {
+    label: 'RAG',
+    Icon: GitBranch,
+    className: 'right-0 top-[36%] sm:right-3',
+    tint: 'rgba(129, 140, 248, 0.16)',
+  },
+  {
+    label: 'Vision',
+    Icon: Eye,
+    className: 'left-2 bottom-8 sm:left-8',
+    tint: 'rgba(59, 130, 246, 0.14)',
+  },
+  {
+    label: 'Vector DBs',
+    Icon: Database,
+    className: 'right-2 bottom-8 sm:right-8',
+    tint: 'rgba(37, 99, 235, 0.14)',
+  },
+];
+
+const leaderboard = [
+  { rank: 1, name: 'Alex Dev', xp: '15,230 XP', accent: '#fbbf24' },
+  { rank: 2, name: 'AI Explorer', xp: '12,840 XP', accent: '#cbd5e1' },
+  { rank: 3, name: 'NeuralNinja', xp: '9,420 XP', accent: '#fb923c' },
+  { rank: 4, name: 'CodeMaster', xp: '8,910 XP', accent: '#cbd5e1' },
+];
+
+const brainNodes = [
+  { size: 74, top: 8, left: 80, tone: 'linear-gradient(145deg, #6f67ff, #4f46e5)' },
+  { size: 68, top: 38, left: 40, tone: 'linear-gradient(145deg, #7c3aed, #6366f1)' },
+  { size: 72, top: 42, left: 120, tone: 'linear-gradient(145deg, #60a5fa, #6366f1)' },
+  { size: 62, top: 82, left: 18, tone: 'linear-gradient(145deg, #8b5cf6, #ec4899)' },
+  { size: 70, top: 96, left: 86, tone: 'linear-gradient(145deg, #7c3aed, #ec4899)' },
+  { size: 60, top: 98, left: 150, tone: 'linear-gradient(145deg, #60a5fa, #8b5cf6)' },
+  { size: 54, top: 138, left: 52, tone: 'linear-gradient(145deg, #c084fc, #818cf8)' },
+  { size: 56, top: 144, left: 122, tone: 'linear-gradient(145deg, #6366f1, #f472b6)' },
+  { size: 48, top: 168, left: 92, tone: 'linear-gradient(145deg, #f472b6, #a855f7)' },
+];
+
+const featureIconMap = {
+  learn: BookOpen,
+  tools: Wrench,
+  games: Gamepad2,
+  exams: GraduationCap,
+  newsletter: Mail,
+};
+
+const statIconMap = {
+  tracks: Users,
+  tools: Bot,
+  projects: Activity,
+  games: Gamepad2,
+  questions: GraduationCap,
+  lessons: BookOpen,
+};
+---
+
+<div class="homepage-shell">
+  <div class="mx-auto max-w-[1540px] px-4 pt-6 pb-14 sm:px-6 lg:px-8 xl:px-10">
+    <header
+      class="home-surface flex flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-5 lg:px-6"
+    >
+      <a
+        href={learnHref}
+        class="flex min-h-11 items-center gap-3 text-slate-900"
+        aria-label="AIByDM home"
+      >
+        <span
+          class="grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#5b5cff_0%,#7c3aed_55%,#ec4899_100%)] text-lg font-semibold text-white shadow-[0_18px_40px_rgba(92,77,255,0.32)]"
+        >
+          AI
+        </span>
+        <span class="text-[1.8rem] font-semibold tracking-[-0.05em] text-slate-900">AIByDM</span>
+      </a>
+
+      <nav
+        class="order-3 flex w-full items-center justify-center gap-2 overflow-x-auto pb-1 md:order-2 md:w-auto md:justify-start"
+        aria-label="Primary navigation"
+      >
+        {
+          navLinks.map((link) => (
+            <a
+              href={link.href}
+              class:list={[
+                'relative rounded-full px-4 py-2.5 text-sm font-semibold whitespace-nowrap text-slate-700 transition-colors hover:text-slate-950',
+                link.active && 'text-slate-950',
+              ]}
+              aria-current={link.active ? 'page' : undefined}
+            >
+              {link.label}
+              {link.active && (
+                <span class="absolute inset-x-4 bottom-0 h-0.5 rounded-full bg-[#5b5cff]" />
+              )}
+            </a>
+          ))
+        }
+      </nav>
+
+      <div
+        class="order-2 flex min-w-0 flex-1 items-center justify-end gap-2 md:order-3 md:flex-initial"
+      >
+        <button
+          type="button"
+          data-command-open
+          class="hidden min-h-11 min-w-[260px] items-center gap-3 rounded-full border border-[rgba(210,218,236,0.9)] bg-white/92 px-4 text-left text-sm text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] transition hover:border-[rgba(160,173,204,0.95)] hover:text-slate-700 sm:inline-flex"
+          aria-label="Search AIByDM"
+        >
+          <Search className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          <span class="flex-1 truncate">Search AIByDM...</span>
+          <kbd
+            class="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-400"
+            >Ctrl K</kbd
+          >
+        </button>
+
+        <ThemeToggle client:load />
+
+        <button
+          type="button"
+          class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-transparent text-slate-600 transition hover:bg-white/70 hover:text-slate-950"
+          aria-label="Notifications"
+        >
+          <Bell className="h-5 w-5" aria-hidden="true" />
+          <span
+            class="absolute top-1 right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-semibold text-white"
+            >3</span
+          >
+        </button>
+
+        <a
+          href={communityHref}
+          class="inline-flex min-h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4f46e5_0%,#6d5dfd_55%,#9333ea_100%)] px-5 text-sm font-semibold text-white shadow-[0_20px_44px_rgba(91,92,255,0.28)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_54px_rgba(91,92,255,0.34)]"
+        >
+          Join Community
+        </a>
+
+        <a
+          href={repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,#7c3aed_0%,#ec4899_100%)] text-sm font-semibold text-white shadow-[0_18px_40px_rgba(168,85,247,0.26)]"
+          aria-label="View AIByDM on GitHub"
+        >
+          DM
+        </a>
+      </div>
+    </header>
+
+    <main class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div>
+        <section
+          class="home-surface overflow-hidden px-5 py-7 sm:px-6 lg:px-8 lg:py-8 xl:px-10 xl:py-10"
+        >
+          <div class="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+            <div class="max-w-[37rem]">
+              <div
+                class="inline-flex min-h-11 items-center gap-2 rounded-full bg-[rgba(91,92,255,0.08)] px-4 text-sm font-medium text-[#5848f2] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
+              >
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+                Your AI Learning Journey Starts Here
+              </div>
+
+              <h1
+                class="mt-8 text-5xl font-semibold tracking-[-0.075em] text-slate-950 sm:text-6xl xl:text-[5rem] xl:leading-[0.92]"
+              >
+                Learn AI. Build AI.
+                <span class="home-gradient-text block">Master AI.</span>
+              </h1>
+
+              <p class="mt-6 max-w-[34rem] text-lg leading-9 text-slate-600 sm:text-[1.34rem]">
+                The all-in-one platform to learn, build, explore tools, play games, and prepare for
+                exams - all for free.
+              </p>
+
+              <div class="mt-9 flex flex-wrap gap-3">
+                <a
+                  href={learnHref}
+                  class="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#5b5cff_0%,#6d5dfd_45%,#4f46e5_100%)] px-6 text-base font-semibold text-white shadow-[0_24px_54px_rgba(91,92,255,0.28)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_64px_rgba(91,92,255,0.34)]"
+                >
+                  Start Learning
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+                <a
+                  href={toolsHref}
+                  class="inline-flex min-h-12 items-center justify-center rounded-2xl border border-[rgba(210,218,236,0.9)] bg-white/92 px-6 text-base font-semibold text-slate-900 shadow-[0_14px_34px_rgba(148,163,184,0.12)] transition hover:-translate-y-0.5 hover:border-[rgba(160,173,204,0.95)] hover:shadow-[0_18px_40px_rgba(148,163,184,0.16)]"
+                >
+                  Explore Tools
+                </a>
+              </div>
+            </div>
+
+            <div class="relative min-h-[420px]">
+              {
+                chipCards.map((chip, index) => {
+                  const Icon = chip.Icon;
+                  return (
+                    <div
+                      class:list={['home-chip absolute', chip.className]}
+                      style={
+                        '--chip-tint: ' + chip.tint + '; animation-delay: ' + index * 120 + 'ms;'
+                      }
+                    >
+                      <span class="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--chip-tint)] text-[#4f46e5]">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span class="mt-3 block text-center text-[1.05rem] font-medium text-slate-700">
+                        {chip.label}
+                      </span>
+                    </div>
+                  );
+                })
+              }
+
+              <div class="absolute inset-x-0 bottom-6 flex justify-center">
+                <div
+                  class="home-visual relative flex h-[320px] w-[320px] items-center justify-center"
+                >
+                  <div class="home-visual__beam" aria-hidden="true"></div>
+                  <div class="home-brain" aria-hidden="true">
+                    {
+                      brainNodes.map((node, index) => (
+                        <span
+                          class="home-brain__node"
+                          style={
+                            'width:' +
+                            node.size +
+                            'px;height:' +
+                            node.size +
+                            'px;top:' +
+                            node.top +
+                            'px;left:' +
+                            node.left +
+                            'px;background:' +
+                            node.tone +
+                            ';animation-delay:' +
+                            index * 90 +
+                            'ms;'
+                          }
+                        />
+                      ))
+                    }
+                  </div>
+                  <div class="home-platform" aria-hidden="true">
+                    <span class="home-platform__disc"></span>
+                    <span class="home-platform__disc home-platform__disc--middle"></span>
+                    <span class="home-platform__disc home-platform__disc--top"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          {
+            featureCards.map((card) => {
+              const Icon = featureIconMap[card.kind];
+              return (
+                <a
+                  href={card.href}
+                  class="home-surface group flex h-full flex-col rounded-[28px] px-5 py-5 transition hover:-translate-y-1 hover:shadow-[0_28px_54px_rgba(148,163,184,0.18)]"
+                  style={'--feature-accent: ' + card.accent + ';'}
+                >
+                  <span class="grid h-14 w-14 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--feature-accent)_14%,white)] text-[var(--feature-accent)] shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]">
+                    <Icon className="h-7 w-7" aria-hidden="true" />
+                  </span>
+                  <h2 class="mt-5 text-[1.85rem] font-semibold tracking-[-0.055em] text-slate-950">
+                    {card.title}
+                  </h2>
+                  <p class="mt-2 text-[1rem] leading-7 text-slate-600">{card.description}</p>
+                  <div class="mt-auto flex items-center justify-between pt-6 text-sm font-semibold text-[var(--feature-accent)]">
+                    <span>{card.metric}</span>
+                    <ArrowRight
+                      className="h-4 w-4 transition group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </a>
+              );
+            })
+          }
+        </section>
+
+        <section class="mt-7">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 class="text-[2.1rem] font-semibold tracking-[-0.06em] text-slate-950">
+                Popular Learning Paths
+              </h2>
+              <p class="mt-2 text-base text-slate-600">
+                Explore curated paths to master AI step by step.
+              </p>
+            </div>
+            <a
+              href={roadmapHref}
+              class="inline-flex items-center gap-2 text-base font-semibold text-[#4f46e5] transition hover:text-[#4338ca]"
+            >
+              View all paths
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+
+          <div class="mt-5 grid gap-4 xl:grid-cols-4">
+            {
+              learningPaths.map((path) => (
+                <a
+                  href={path.href}
+                  class="home-surface rounded-[26px] px-5 py-5 transition hover:-translate-y-1 hover:shadow-[0_28px_54px_rgba(148,163,184,0.18)]"
+                  style={'--path-accent: ' + path.accent + ';'}
+                >
+                  <div class="flex items-start gap-4">
+                    <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--path-accent)_14%,white)] text-[var(--path-accent)]">
+                      <BookOpen className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 class="text-lg font-semibold text-slate-950">{path.title}</h3>
+                      <p class="mt-1 text-sm text-slate-500">{path.subtitle}</p>
+                    </div>
+                  </div>
+
+                  <div class="mt-5 h-2 rounded-full bg-slate-100">
+                    <div
+                      class="h-full rounded-full"
+                      style={'width:' + path.progress + '%; background:' + path.accent + ';'}
+                    />
+                  </div>
+
+                  <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+                    <span>{path.lessonsLabel}</span>
+                    <span class="font-semibold text-slate-700">{path.progress}%</span>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+
+        <section
+          class="home-surface mt-7 grid gap-3 px-4 py-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6"
+        >
+          {
+            stats.map((stat) => {
+              const Icon = statIconMap[stat.kind];
+              return (
+                <div
+                  class="flex min-h-[88px] items-center gap-3 rounded-[22px] px-3 py-2"
+                  style={'--stat-accent: ' + stat.accent + ';'}
+                >
+                  <span class="grid h-12 w-12 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--stat-accent)_14%,white)] text-[var(--stat-accent)]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <p class="text-[1.7rem] font-semibold tracking-[-0.05em] text-[var(--stat-accent)]">
+                      {stat.value}
+                    </p>
+                    <p class="text-sm text-slate-600">{stat.label}</p>
+                  </div>
+                </div>
+              );
+            })
+          }
+        </section>
+      </div>
+
+      <aside class="space-y-4 xl:sticky xl:top-6 xl:self-start">
+        <section class="home-surface px-5 py-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="inline-flex items-center gap-2 text-lg font-semibold text-slate-950">
+              <Flame className="h-5 w-5 text-orange-500" aria-hidden="true" />
+              Daily Streak
+            </div>
+            <span class="text-sm font-semibold text-orange-500">+20 XP</span>
+          </div>
+          <div class="mt-5 flex items-end gap-2 text-slate-950">
+            <span class="text-6xl font-semibold tracking-[-0.08em]">12</span>
+            <span class="mb-3 text-2xl font-medium text-slate-600">days</span>
+          </div>
+          <p class="mt-3 text-base text-slate-600">Keep it up, AI Engineer!</p>
+          <div class="mt-5 flex items-center justify-between gap-2">
+            {
+              [1, 2, 3, 4, 5].map((item) => (
+                <span class="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(91,92,255,0.08)] text-[#5b5cff] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                  {item < 5 ? '✓' : '•'}
+                </span>
+              ))
+            }
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(251,146,60,0.16)] text-orange-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
+            >
+              <Flame className="h-4 w-4" aria-hidden="true" />
+            </span>
+          </div>
+        </section>
+
+        <section class="home-surface px-5 py-5">
+          <div class="inline-flex items-center gap-2 text-lg font-semibold text-slate-950">
+            <Sparkles className="h-5 w-5 text-[#7c3aed]" aria-hidden="true" />
+            Continue Learning
+          </div>
+          <a
+            href={searchHref}
+            class="mt-5 flex items-center gap-4 rounded-[22px] bg-[rgba(248,250,255,0.85)] p-4 transition hover:bg-white"
+          >
+            <span
+              class="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#5b5cff_0%,#7c3aed_55%,#ec4899_100%)] text-center text-xs font-semibold tracking-[0.18em] text-white uppercase shadow-[0_18px_34px_rgba(91,92,255,0.24)]"
+            >
+              AI
+            </span>
+            <div class="min-w-0 flex-1">
+              <h3 class="truncate text-base font-semibold text-slate-950">
+                Transformers From Scratch
+              </h3>
+              <div class="mt-3 h-2 rounded-full bg-slate-100">
+                <div
+                  class="h-full w-[65%] rounded-full bg-[linear-gradient(135deg,#5b5cff_0%,#7c3aed_100%)]"
+                >
+                </div>
+              </div>
+            </div>
+            <span class="text-sm font-semibold text-slate-500">65%</span>
+          </a>
+        </section>
+
+        <section class="home-surface px-5 py-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="inline-flex items-center gap-2 text-lg font-semibold text-slate-950">
+              <Trophy className="h-5 w-5 text-[#5b5cff]" aria-hidden="true" />
+              Leaderboard
+            </div>
+            <a
+              href={communityHref}
+              class="text-sm font-semibold text-[#4f46e5] transition hover:text-[#4338ca]"
+              >See all</a
+            >
+          </div>
+          <div class="mt-5 space-y-3">
+            {
+              leaderboard.map((entry) => (
+                <div class="flex items-center gap-3 rounded-[18px] bg-[rgba(248,250,255,0.9)] px-3 py-3">
+                  <span
+                    class="grid h-8 w-8 place-items-center rounded-full text-sm font-semibold text-slate-900"
+                    style={'background:' + entry.accent + ';'}
+                  >
+                    {entry.rank}
+                  </span>
+                  <span class="grid h-10 w-10 place-items-center rounded-full bg-[linear-gradient(135deg,#5b5cff_0%,#7c3aed_55%,#ec4899_100%)] text-sm font-semibold text-white">
+                    {entry.name.slice(0, 2).toUpperCase()}
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-semibold text-slate-950">{entry.name}</p>
+                  </div>
+                  <span class="text-sm text-slate-500">{entry.xp}</span>
+                </div>
+              ))
+            }
+          </div>
+        </section>
+
+        <section class="home-surface px-5 py-5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="inline-flex items-center gap-2 text-lg font-semibold text-slate-950">
+              <Newspaper className="h-5 w-5 text-[#4f46e5]" aria-hidden="true" />
+              Latest from Newsletter
+            </div>
+            <a
+              href={newsletterHref}
+              class="text-sm font-semibold text-[#4f46e5] transition hover:text-[#4338ca]"
+              >View all</a
+            >
+          </div>
+          <div class="mt-5 space-y-4">
+            {
+              newsletterHighlights.map((item) => (
+                <a
+                  href={item.href}
+                  class="flex items-start gap-3 rounded-[20px] bg-[rgba(248,250,255,0.9)] p-3 transition hover:bg-white"
+                >
+                  <span class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#5b5cff_0%,#7c3aed_55%,#ec4899_100%)] text-white shadow-[0_16px_32px_rgba(91,92,255,0.2)]">
+                    <Mail className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 class="text-base leading-6 font-semibold text-slate-950">{item.title}</h3>
+                    <p class="mt-1 text-sm text-slate-500">{item.meta}</p>
+                  </div>
+                </a>
+              ))
+            }
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+</div>
+
+<style>
+  .homepage-shell {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .home-surface {
+    border: 1px solid rgba(226, 232, 240, 0.88);
+    border-radius: 32px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.84)),
+      rgba(255, 255, 255, 0.82);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.82),
+      0 28px 70px rgba(148, 163, 184, 0.18);
+    backdrop-filter: blur(18px);
+  }
+
+  .home-gradient-text {
+    background: linear-gradient(135deg, #5b5cff 0%, #7c3aed 46%, #ec4899 100%);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .home-chip {
+    width: 112px;
+    border: 1px solid rgba(226, 232, 240, 0.88);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 1rem 0.9rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.78),
+      0 20px 44px rgba(148, 163, 184, 0.16);
+    backdrop-filter: blur(16px);
+    animation: float-card 5.4s ease-in-out infinite;
+  }
+
+  .home-visual {
+    animation: float-card 6.8s ease-in-out infinite;
+  }
+
+  .home-visual__beam {
+    position: absolute;
+    bottom: 88px;
+    left: 50%;
+    height: 170px;
+    width: 18px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(244, 114, 182, 0.18), rgba(91, 92, 255, 0.65));
+    filter: blur(0.6px);
+    opacity: 0.8;
+  }
+
+  .home-brain {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    height: 230px;
+    width: 240px;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 30px 48px rgba(91, 92, 255, 0.24));
+  }
+
+  .home-brain::after {
+    content: '';
+    position: absolute;
+    inset: 26px 44px 22px;
+    border-radius: 999px;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.38), transparent 70%);
+    filter: blur(16px);
+  }
+
+  .home-brain__node {
+    position: absolute;
+    display: block;
+    border: 2px solid rgba(255, 255, 255, 0.32);
+    border-radius: 999px;
+    box-shadow:
+      inset 0 8px 18px rgba(255, 255, 255, 0.18),
+      0 18px 36px rgba(99, 102, 241, 0.16);
+    animation: pulse-node 4.2s ease-in-out infinite;
+  }
+
+  .home-platform {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    height: 130px;
+    width: 284px;
+    transform: translateX(-50%);
+  }
+
+  .home-platform::before {
+    content: '';
+    position: absolute;
+    inset: auto 10px 4px;
+    height: 36px;
+    border-radius: 999px;
+    background: radial-gradient(
+      circle at center,
+      rgba(244, 114, 182, 0.2),
+      rgba(91, 92, 255, 0.08) 68%,
+      transparent 72%
+    );
+    filter: blur(14px);
+  }
+
+  .home-platform__disc {
+    position: absolute;
+    inset: auto 16px 0;
+    height: 78px;
+    border-radius: 999px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(231, 236, 255, 0.88)),
+      rgba(255, 255, 255, 0.9);
+    box-shadow:
+      inset 0 10px 18px rgba(255, 255, 255, 0.92),
+      0 22px 42px rgba(160, 173, 204, 0.22);
+  }
+
+  .home-platform__disc::before {
+    content: '';
+    position: absolute;
+    inset: 10px 16px;
+    border-radius: 999px;
+    border: 3px solid rgba(130, 133, 255, 0.55);
+    box-shadow: 0 0 0 10px rgba(130, 133, 255, 0.08);
+  }
+
+  .home-platform__disc--middle {
+    inset: auto 30px 18px;
+    height: 58px;
+    opacity: 0.9;
+  }
+
+  .home-platform__disc--top {
+    inset: auto 54px 34px;
+    height: 34px;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.98),
+      rgba(246, 240, 255, 0.92)
+    );
+  }
+
+  .home-platform__disc--top::before {
+    inset: 5px 18px;
+    border-width: 2px;
+    box-shadow: 0 0 0 8px rgba(244, 114, 182, 0.08);
+  }
+
+  @keyframes float-card {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes pulse-node {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(1.03);
+    }
+  }
+
+  :global(.dark) .home-surface {
+    border-color: rgba(51, 65, 85, 0.72);
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), rgba(15, 23, 42, 0.82);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 28px 70px rgba(2, 8, 23, 0.42);
+  }
+
+  :global(.dark) .home-chip {
+    border-color: rgba(51, 65, 85, 0.8);
+    background: rgba(15, 23, 42, 0.84);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 20px 44px rgba(2, 8, 23, 0.32);
+  }
+
+  :global(.dark) .home-platform__disc {
+    background:
+      linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.9)), rgba(15, 23, 42, 0.9);
+  }
+
+  :global(.dark) .home-platform__disc--top {
+    background: radial-gradient(circle at center, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.92));
+  }
+
+  @media (max-width: 1279px) {
+    .home-chip {
+      width: 102px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .home-chip {
+      width: 96px;
+      padding-inline: 0.75rem;
+    }
+
+    .home-visual {
+      transform: scale(0.92);
+      transform-origin: center bottom;
+    }
+  }
+</style>

@@ -79,6 +79,23 @@
   --color-border-hover: #9fb2c8;
   --color-grid-line: rgba(15, 23, 42, 0.08);
 }
+body.homepage-body {
+  --color-bg-base: #f5f5ff;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #eef2ff;
+  --color-bg-hover: #e7ebff;
+  --color-bg-panel: #f8faff;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748b;
+  --color-accent: #5b5cff;
+  --color-accent-hover: #4f46e5;
+  --color-accent-subtle: #e8e8ff;
+  --color-accent-contrast: #ffffff;
+  --color-border: #dbe3f2;
+  --color-border-hover: #b8c5dc;
+  --color-grid-line: rgba(91, 92, 255, 0.05);
+}
 
 /* Base styles */
 html {
@@ -114,6 +131,15 @@ body::before {
     100% 100%,
     100% 100%;
   mask-image: linear-gradient(to bottom, black 0%, black 48%, transparent 95%);
+}
+body.homepage-body::before {
+  background-image:
+    radial-gradient(circle at top left, rgba(91, 92, 255, 0.22), transparent 26rem),
+    radial-gradient(circle at top center, rgba(236, 72, 153, 0.12), transparent 24rem),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 24rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 245, 255, 0.96));
+  background-size: 100% 100%;
+  mask-image: none;
 }
 
 h1,

@@ -29,7 +29,7 @@ function getStoredTheme(): Theme {
   if (stored === 'dark' || stored === 'light' || stored === 'system') {
     return stored;
   }
-  return 'system';
+  return 'light';
 }
 
 const themeOrder: Theme[] = ['dark', 'light', 'system'];

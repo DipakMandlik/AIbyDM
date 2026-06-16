@@ -8,9 +8,19 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
+  bodyClass?: string;
 }
 
-const { title, description, ogImage } = Astro.props;
+const {
+  title,
+  description,
+  ogImage,
+  showHeader = true,
+  showFooter = true,
+  bodyClass = '',
+} = Astro.props;
 
 const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
 const siteBaseURL = new URL(import.meta.env.BASE_URL, Astro.site);
@@ -89,7 +99,18 @@ const isHomepage =
         const stored = localStorage.getItem('aibydm-theme');
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        if (stored === 'light' || (!stored && !prefersDark)) {
+        const resolvedTheme =
+          stored === 'dark'
+            ? 'dark'
+            : stored === 'system'
+              ? prefersDark
+                ? 'dark'
+                : 'light'
+              : stored === 'light'
+                ? 'light'
+                : 'light';
+
+        if (resolvedTheme === 'light') {
           document.documentElement.classList.remove('dark');
           document.documentElement.classList.add('light');
         } else {
@@ -99,7 +120,12 @@ const isHomepage =
       })();
     </script>
   </head>
-  <body class="bg-[var(--color-bg-base)] text-[var(--color-text-primary)] antialiased">
+  <body
+    class:list={[
+      'bg-[var(--color-bg-base)] text-[var(--color-text-primary)] antialiased',
+      bodyClass,
+    ]}
+  >
     <a
       href="#main-content"
       class="skip-to-content focus:ring-2 focus:ring-[var(--color-accent)] focus:outline-none"
@@ -108,11 +134,11 @@ const isHomepage =
     </a>
 
     <div class="app-shell">
-      <Header />
+      {showHeader && <Header />}
       <main id="main-content" class="app-content">
         <slot />
       </main>
-      <Footer />
+      {showFooter && <Footer />}
     </div>
 
     <CommandPalette client:idle />

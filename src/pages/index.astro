@@ -1,13 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
 
-import ProductHome from '@components/interactive/ProductHome';
+import HomepageLanding from '@components/marketing/HomepageLanding.astro';
 import {
+  getLearningTrack,
+  getTrackHref,
   getTrackLessonCount,
-  getTrackProjectCount,
-  learningStageGroups,
   learnTotals,
-  type LearningTrack,
 } from '@data/learn/catalog';
 import BaseLayout from '@layouts/BaseLayout.astro';
 
@@ -21,120 +20,189 @@ const [toolEntries, examEntries, gameEntries, newsletterEntries] = await Promise
 ]);
 
 const questionCount = examEntries.reduce((total, exam) => total + exam.data.questions.length, 0);
-const indexedLearningEntries = learnTotals.tracks + learnTotals.lessons + learnTotals.projects;
 const repoUrl = 'https://github.com/DipakMandlik/AIByDM';
 
-function toTrackPreview(track: LearningTrack) {
-  return {
-    slug: track.slug,
-    title: track.title,
-    strapline: track.strapline,
-    difficulty: track.difficulty,
-    estimatedWeeks: track.estimatedWeeks,
-    lessons: getTrackLessonCount(track),
-    projects: getTrackProjectCount(track),
-  };
-}
+type FeatureCard = {
+  kind: 'learn' | 'tools' | 'games' | 'exams' | 'newsletter';
+  title: string;
+  href: string;
+  metric: string;
+  description: string;
+  accent: string;
+};
 
-const stages = learningStageGroups.map((group) => ({
-  stage: group.stage,
-  eyebrow: group.eyebrow,
-  title: group.title,
-  summary: group.summary,
-  tracks: group.tracks.map(toTrackPreview),
-}));
+type LearningPathCard = {
+  title: string;
+  href: string;
+  subtitle: string;
+  lessonsLabel: string;
+  progress: number;
+  accent: string;
+};
 
-const metrics = [
+type NewsletterHighlight = {
+  title: string;
+  href: string;
+  meta: string;
+};
+
+type StatCard = {
+  kind: 'tracks' | 'tools' | 'projects' | 'games' | 'questions' | 'lessons';
+  value: string;
+  label: string;
+  accent: string;
+};
+const featureCards: FeatureCard[] = [
   {
-    label: 'Tracks',
-    value: String(learnTotals.tracks),
-    detail: 'Connected paths from foundations to enterprise AI.',
+    kind: 'learn',
+    title: 'Learn',
+    href: withBase('/learn/'),
+    metric: `${learnTotals.tracks}+ tracks`,
+    description: 'Structured courses, projects, and roadmap-driven learning paths.',
+    accent: 'var(--color-learn)',
   },
   {
-    label: 'Lessons',
-    value: String(learnTotals.lessons),
-    detail: 'Short, structured lesson briefs with next steps.',
+    kind: 'tools',
+    title: 'Tools',
+    href: withBase('/tools/'),
+    metric: `${toolEntries.length}+ guides`,
+    description: 'Discover practical open-source AI tools and workflow companions.',
+    accent: 'var(--color-tools)',
   },
   {
-    label: 'Projects',
-    value: String(learnTotals.projects),
-    detail: 'Practice ladders from starter sprint to capstone.',
+    kind: 'games',
+    title: 'Games',
+    href: withBase('/games/'),
+    metric: `${gameEntries.length}+ games`,
+    description: 'Play and practice with interactive loops designed for retention.',
+    accent: 'var(--color-games)',
   },
   {
-    label: 'Practice',
-    value: String(questionCount + gameEntries.length),
-    detail: 'Assessment prompts and reinforcement loops.',
+    kind: 'exams',
+    title: 'Exams',
+    href: withBase('/exams/'),
+    metric: `${questionCount}+ questions`,
+    description: 'Prepare with exams, MCQs, and quick checks to validate understanding.',
+    accent: 'var(--color-exams)',
+  },
+  {
+    kind: 'newsletter',
+    title: 'Newsletter',
+    href: withBase('/newsletter/'),
+    metric: `${newsletterEntries.length}+ issues`,
+    description: 'Stay updated with weekly learning highlights, releases, and community signal.',
+    accent: 'var(--color-newsletter)',
   },
 ];
 
-const modules = [
+const aiFoundationsTrack = getLearningTrack('ai-foundations');
+const llmEngineeringTrack = getLearningTrack('llm-engineering');
+const aiGovernanceTrack = getLearningTrack('ai-governance');
+const machineLearningTrack = getLearningTrack('machine-learning');
+
+if (!aiFoundationsTrack || !llmEngineeringTrack || !aiGovernanceTrack || !machineLearningTrack) {
+  throw new Error('Expected showcase learning tracks are missing from the catalog.');
+}
+
+const learningPaths: LearningPathCard[] = [
   {
-    title: 'Learn',
-    href: withBase('/learn/'),
-    metric: `${learnTotals.tracks} tracks`,
-    description: 'Structured learning paths, local progress, project ladders, and roadmap unlocks.',
-    accent: 'var(--color-learn)',
-    eyebrow: 'Start',
-    cta: 'Open learn platform',
+    title: 'AI Engineer Path',
+    href: getTrackHref(aiFoundationsTrack.slug),
+    subtitle: 'Beginner to Advanced',
+    lessonsLabel: `${getTrackLessonCount(aiFoundationsTrack)} lessons`,
+    progress: 68,
+    accent: '#6d5dfd',
   },
   {
-    title: 'Tools',
-    href: withBase('/tools/'),
-    metric: `${toolEntries.length} guides`,
-    description:
-      'Practical tooling context for local LLMs, frameworks, vector search, and delivery workflows.',
-    accent: 'var(--color-tools)',
-    eyebrow: 'Build',
-    cta: 'Browse tool stack',
+    title: 'LLM Engineer Path',
+    href: getTrackHref(llmEngineeringTrack.slug),
+    subtitle: 'Build LLMs and Agents',
+    lessonsLabel: `${getTrackLessonCount(llmEngineeringTrack)} lessons`,
+    progress: 55,
+    accent: '#60a5fa',
   },
   {
-    title: 'Games',
-    href: withBase('/games/'),
-    metric: `${gameEntries.length} loops`,
-    description: 'Fast reinforcement layers for recall, fluency, and interview rhythm.',
-    accent: 'var(--color-games)',
-    eyebrow: 'Practice',
-    cta: 'Open game lab',
+    title: 'AI Governance Path',
+    href: getTrackHref(aiGovernanceTrack.slug),
+    subtitle: 'Responsible AI and Ethics',
+    lessonsLabel: `${getTrackLessonCount(aiGovernanceTrack)} lessons`,
+    progress: 40,
+    accent: '#f59e0b',
   },
   {
-    title: 'Exams',
-    href: withBase('/exams/'),
-    metric: `${questionCount} prompts`,
-    description:
-      'Question banks with explanations and topic coverage to validate what is sticking.',
-    accent: 'var(--color-exams)',
-    eyebrow: 'Assess',
-    cta: 'Review assessments',
+    title: 'Data Scientist Path',
+    href: getTrackHref(machineLearningTrack.slug),
+    subtitle: 'ML, Data, and Evaluation',
+    lessonsLabel: `${getTrackLessonCount(machineLearningTrack)} lessons`,
+    progress: 72,
+    accent: '#14b8a6',
   },
+];
+
+const latestNewsletterEntry = newsletterEntries
+  .slice()
+  .sort((left, right) => right.data.date.getTime() - left.data.date.getTime())[0];
+
+const newsletterHighlights: NewsletterHighlight[] = [
   {
-    title: 'Newsletter',
+    title: latestNewsletterEntry?.data.title ?? 'AIByDM Launch Issue',
     href: withBase('/newsletter/'),
-    metric: `${newsletterEntries.length} issues`,
-    description:
-      'Release signal for what shipped, what changed, and what the learning system is building next.',
-    accent: 'var(--color-newsletter)',
-    eyebrow: 'Signal',
-    cta: 'Read release signal',
+    meta: latestNewsletterEntry
+      ? latestNewsletterEntry.data.date.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : 'June 1, 2026',
   },
   {
-    title: 'Community',
+    title: 'Public roadmap is live',
+    href: withBase('/learn/roadmap/'),
+    meta: 'Track the next platform milestones',
+  },
+  {
+    title: 'Community hub is ready',
     href: withBase('/community/'),
-    metric: 'Contributor hub',
-    description:
-      'Clear contribution lanes, discussion spaces, roadmap visibility, and community operating rhythm.',
-    accent: 'var(--color-community)',
-    eyebrow: 'Collaborate',
-    cta: 'Enter community hub',
+    meta: 'Discussions, support, and contribution flow',
+  },
+];
+
+const stats: StatCard[] = [
+  {
+    kind: 'tracks',
+    value: `${learnTotals.tracks}+`,
+    label: 'Learning tracks',
+    accent: '#6d5dfd',
   },
   {
-    title: 'Search',
-    href: withBase('/search/'),
-    metric: `${indexedLearningEntries} entries`,
-    description:
-      'Search tracks, lessons, modules, and projects without losing your place in the roadmap.',
-    accent: 'var(--color-learn)',
-    eyebrow: 'Find',
-    cta: 'Search the curriculum',
+    kind: 'tools',
+    value: `${toolEntries.length}+`,
+    label: 'Open-source tools',
+    accent: '#3b82f6',
+  },
+  {
+    kind: 'projects',
+    value: `${learnTotals.projects}+`,
+    label: 'Hands-on projects',
+    accent: '#14b8a6',
+  },
+  {
+    kind: 'games',
+    value: `${gameEntries.length}+`,
+    label: 'Practice games',
+    accent: '#f472b6',
+  },
+  {
+    kind: 'questions',
+    value: `${questionCount}+`,
+    label: 'Exam questions',
+    accent: '#f59e0b',
+  },
+  {
+    kind: 'lessons',
+    value: `${learnTotals.lessons}+`,
+    label: 'Guided lessons',
+    accent: '#8b5cf6',
   },
 ];
 ---
@@ -142,17 +210,23 @@ const modules = [
 <BaseLayout
   title="AIByDM - Learn AI. Build AI. Master AI."
   description="AIByDM is an open-source AI learning platform built as a guided product journey across structured tracks, projects, tools, practice, and community collaboration."
+  showHeader={false}
+  showFooter={false}
+  bodyClass="homepage-body"
 >
-  <ProductHome
-    client:load
+  <HomepageLanding
     repoUrl={repoUrl}
-    discussionUrl={`${repoUrl}/discussions`}
     communityHref={withBase('/community/')}
     roadmapHref={withBase('/learn/roadmap/')}
     searchHref={withBase('/search/')}
     learnHref={withBase('/learn/')}
-    modules={modules}
-    metrics={metrics}
-    stages={stages}
+    toolsHref={withBase('/tools/')}
+    gamesHref={withBase('/games/')}
+    examsHref={withBase('/exams/')}
+    newsletterHref={withBase('/newsletter/')}
+    featureCards={featureCards}
+    learningPaths={learningPaths}
+    newsletterHighlights={newsletterHighlights}
+    stats={stats}
   />
 </BaseLayout>
