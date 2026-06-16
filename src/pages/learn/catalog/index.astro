@@ -1,0 +1,17 @@
+---
+import LearningAtlas from '@components/learn/LearningAtlas';
+import LearnSectionNav from '@components/learn/LearnSectionNav.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const initialQuery = Astro.url.searchParams.get('q') ?? '';
+---
+
+<BaseLayout
+  title="Catalog - AIByDM Learn"
+  description="Browse every AIByDM learning track, module arc, milestone, and project entry from one structured catalog."
+>
+  <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <LearnSectionNav active="catalog" />
+    <LearningAtlas client:load initialView="catalog" initialQuery={initialQuery} />
+  </section>
+</BaseLayout>

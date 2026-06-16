@@ -1,5 +1,5 @@
 ---
-import { GitPullRequest, Menu, X } from 'lucide-react';
+import { GitPullRequest, Menu, Search, X } from 'lucide-react';
 
 import ThemeToggle from '@components/interactive/ThemeToggle';
 
@@ -80,6 +80,20 @@ const homeHref = withBase('/');
     </nav>
 
     <div class="flex items-center gap-1">
+      <button
+        type="button"
+        data-command-open
+        class="inline-flex min-h-10 items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-surface)] px-3 text-sm text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)]"
+        aria-label="Open search command palette"
+      >
+        <Search className="h-4 w-4" aria-hidden="true" />
+        <span class="hidden lg:inline">Search</span>
+        <kbd
+          class="hidden rounded border border-[var(--color-border)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-text-tertiary)] lg:inline-flex"
+          >Ctrl K</kbd
+        >
+      </button>
+
       <ThemeToggle client:load />
 
       <a

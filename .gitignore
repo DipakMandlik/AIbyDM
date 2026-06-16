@@ -28,7 +28,14 @@ pnpm-debug.log*
 .claude/
 .pnpm-store/
 
+# local preview artifacts
+.codex-nav.diff
+preview.log
+preview.err.log
+
 # reference screenshots (local only)
+docs/assets/screenshot-hero.png
+home.png
 home_screen_dark.png
 home_screen_light.png
 

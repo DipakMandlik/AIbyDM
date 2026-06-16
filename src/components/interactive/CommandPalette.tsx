@@ -1,56 +1,173 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Command, Search } from 'lucide-react';
+import { ArrowRight, Clock3, Search } from 'lucide-react';
 
-const base = import.meta.env.BASE_URL;
-const withBase = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
+import type { LearnSearchItem } from '@data/learn/catalog';
+import {
+  getRecentLessons,
+  readLearnProgress,
+  subscribeToLearnProgress,
+} from '@data/learn/progress';
+import { searchLearnCatalog } from '@data/learn/search';
 
-type Item = { label: string; href: string };
+interface CommandResult {
+  id: string;
+  label: string;
+  href: string;
+  meta: string;
+  kind: string;
+  duration?: string;
+}
 
-const commandItems: Item[] = [
-  { label: 'Open AI Engineer Path', href: withBase('/learn/') },
-  { label: 'Browse the AI tools directory', href: withBase('/tools/') },
-  { label: 'Compare LangChain vs LlamaIndex', href: withBase('/tools/') },
-  { label: 'Start a daily game quest', href: withBase('/games/') },
-  { label: 'Review GPT interview flashcards', href: withBase('/exams/') },
-  { label: 'Read the latest newsletter', href: withBase('/newsletter/') },
-];
+function kindLabel(kind: LearnSearchItem['kind']): string {
+  switch (kind) {
+    case 'track':
+      return 'Track';
+    case 'module':
+      return 'Module';
+    case 'lesson':
+      return 'Lesson';
+    case 'project':
+      return 'Project';
+    case 'resource':
+      return 'Resource';
+    case 'glossary':
+      return 'Glossary';
+    default:
+      return 'Result';
+  }
+}
+
+function fromSearchItem(item: LearnSearchItem): CommandResult {
+  return {
+    id: item.kind + ':' + item.href + ':' + item.title,
+    label: item.title,
+    href: item.href,
+    meta: item.moduleTitle ? item.trackTitle + ' / ' + item.moduleTitle : item.trackTitle,
+    kind: kindLabel(item.kind),
+    duration: item.duration,
+  };
+}
 
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const deferredQuery = useDeferredValue(query);
+  const [recentResults, setRecentResults] = useState<CommandResult[]>(() =>
+    getRecentLessons(readLearnProgress(), 4).map((item) => ({
+      id: item.lessonKey,
+      label: item.lessonTitle,
+      href: item.href,
+      meta: item.trackTitle + ' / ' + item.moduleTitle,
+      kind: item.completed ? 'recent-complete' : 'recent',
+    })),
+  );
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
+    const openPalette = () => {
+      setOpen(true);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        setOpen(true);
+        openPalette();
+        return;
       }
-      if (event.key === 'Escape') setOpen(false);
+
+      if (!open) {
+        if (event.key === 'Escape') setOpen(false);
+        return;
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setActiveIndex((current) => current + 1);
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setActiveIndex((current) => Math.max(0, current - 1));
+      }
     };
 
     const openers = Array.from(document.querySelectorAll('[data-command-open]'));
-    const open = () => {
-      const sidebar = document.getElementById('app-sidebar');
-      const scrim = document.getElementById('sidebar-scrim');
-      sidebar?.classList.remove('is-open');
-      if (scrim) scrim.hidden = true;
-      setOpen(true);
-    };
-    openers.forEach((opener) => opener.addEventListener('click', open));
-    window.addEventListener('keydown', onKeyDown);
+    openers.forEach((opener) => opener.addEventListener('click', openPalette));
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
-      openers.forEach((opener) => opener.removeEventListener('click', open));
-      window.removeEventListener('keydown', onKeyDown);
+      openers.forEach((opener) => opener.removeEventListener('click', openPalette));
+      window.removeEventListener('keydown', handleKeyDown);
     };
+  }, [open]);
+
+  useEffect(() => {
+    return subscribeToLearnProgress((nextState) => {
+      setRecentResults(
+        getRecentLessons(nextState, 4).map((item) => ({
+          id: item.lessonKey,
+          label: item.lessonTitle,
+          href: item.href,
+          meta: item.trackTitle + ' / ' + item.moduleTitle,
+          kind: item.completed ? 'recent-complete' : 'recent',
+        })),
+      );
+    });
   }, []);
 
-  const filtered = useMemo(() => {
-    const value = query.trim().toLowerCase();
-    if (!value) return commandItems;
-    return commandItems.filter((item) => item.label.toLowerCase().includes(value));
-  }, [query]);
+  const results = useMemo(() => {
+    if (!deferredQuery.trim()) {
+      const popular = searchLearnCatalog('', 8).map(fromSearchItem);
+      const seen = new Set<string>();
+      const merged = [...recentResults, ...popular].filter((item) => {
+        const key = item.href + ':' + item.label;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      return merged.slice(0, 8);
+    }
+
+    return searchLearnCatalog(deferredQuery, 10).map(fromSearchItem);
+  }, [deferredQuery, recentResults]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [deferredQuery, open]);
+
+  useEffect(() => {
+    if (results.length === 0) {
+      setActiveIndex(0);
+      return;
+    }
+
+    setActiveIndex((current) => Math.min(current, results.length - 1));
+  }, [results]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && results[activeIndex]) {
+        event.preventDefault();
+        window.location.assign(results[activeIndex].href);
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeIndex, open, results]);
 
   return (
     <AnimatePresence>
@@ -77,19 +194,42 @@ export default function CommandPalette() {
               <input
                 autoFocus
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search paths, tools, games, exams..."
+                onChange={(event) => {
+                  const value = event.target.value;
+                  startTransition(() => {
+                    setQuery(value);
+                  });
+                }}
+                placeholder="Search tracks, lessons, retrieval, MLOps, governance..."
                 aria-label="Search query"
               />
               <kbd>Esc</kbd>
             </label>
-            <div className="command-results">
-              {filtered.length === 0 && <p className="command-empty">No results found.</p>}
-              {filtered.map((item) => (
-                <a href={item.href} key={item.label} onClick={() => setOpen(false)}>
-                  <Command size={16} aria-hidden="true" />
-                  <span>{item.label}</span>
-                  <ArrowRight size={16} aria-hidden="true" />
+            <div className="command-results" role="listbox" aria-label="Command palette results">
+              {results.length === 0 && <p className="command-empty">No results found.</p>}
+              {results.map((item, index) => (
+                <a
+                  href={item.href}
+                  key={item.id}
+                  className={index === activeIndex ? 'is-active' : undefined}
+                  aria-selected={index === activeIndex}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => setOpen(false)}
+                >
+                  <div className="command-result-copy">
+                    <span className="command-result-kind">{item.kind.replace('-', ' ')}</span>
+                    <span>{item.label}</span>
+                    <small>{item.meta}</small>
+                  </div>
+                  <div className="command-result-meta">
+                    {item.duration && (
+                      <span>
+                        <Clock3 size={14} aria-hidden="true" />
+                        {item.duration}
+                      </span>
+                    )}
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </div>
                 </a>
               ))}
             </div>

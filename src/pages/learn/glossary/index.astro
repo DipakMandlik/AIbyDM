@@ -1,0 +1,17 @@
+---
+import LearningAtlas from '@components/learn/LearningAtlas';
+import LearnSectionNav from '@components/learn/LearnSectionNav.astro';
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const initialQuery = Astro.url.searchParams.get('q') ?? '';
+---
+
+<BaseLayout
+  title="Glossary - AIByDM Learn"
+  description="Explore the AIByDM learning glossary across concepts, tools, technologies, and project skills."
+>
+  <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <LearnSectionNav active="glossary" />
+    <LearningAtlas client:load initialView="glossary" initialQuery={initialQuery} />
+  </section>
+</BaseLayout>
