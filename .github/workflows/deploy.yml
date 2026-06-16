@@ -12,7 +12,7 @@ permissions:
 
 env:
   SITE_URL: https://dipakmandlik.github.io
-  BASE_PATH: /AIbyDM
+  BASE_PATH: /AIByDM
 
 concurrency:
   group: pages
