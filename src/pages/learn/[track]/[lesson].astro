@@ -1,17 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content';
-import {
-  ArrowLeft,
-  ArrowRight,
-  BookMarked,
-  BookOpen,
-  Compass,
-  Layers3,
-  Sparkles,
-} from 'lucide-react';
+import { BookMarked, BookOpen, Compass, Layers3, Sparkles } from 'lucide-react';
 
 import LearnSectionNav from '@components/learn/LearnSectionNav.astro';
-import LessonProgressButton from '@components/learn/LessonProgressButton';
+import LessonCommandCenter from '@components/learn/LessonCommandCenter';
 import LessonRail from '@components/learn/LessonRail';
 import {
   getAllLearningLessons,
@@ -46,6 +38,9 @@ const nextLesson =
     ? allTrackLessons[currentIndex + 1]
     : undefined;
 const relatedProjects = track.projects.slice(0, 2);
+const lessonIndex = currentIndex + 1;
+const moduleIndex = track.modules.findIndex((entry) => entry.slug === module.slug) + 1;
+const moduleLessonIndex = module.lessons.findIndex((entry) => entry.slug === lesson.slug) + 1;
 
 const contentEntries = lesson.contentEntryId ? await getCollection('learn') : [];
 const contentEntry = contentEntries.find(
@@ -125,29 +120,45 @@ const artifactUses = [
         <p class="mt-5 max-w-3xl text-lg leading-8 text-[var(--color-text-secondary)]">
           {lesson.summary}
         </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <LessonProgressButton client:load trackSlug={track.slug} lessonSlug={lesson.slug} />
-          {
-            nextLesson && (
-              <a
-                href={getTrackHref(track.slug) + nextLesson.lesson.slug + '/'}
-                class="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
-              >
-                Next lesson
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </a>
-            )
-          }
-        </div>
       </div>
 
       <aside class="space-y-6 lg:sticky lg:top-24">
+        <LessonCommandCenter
+          client:load
+          trackSlug={track.slug}
+          trackTitle={track.title}
+          trackHref={getTrackHref(track.slug)}
+          moduleSlug={module.slug}
+          moduleTitle={module.title}
+          lessonSlug={lesson.slug}
+          lessonTitle={lesson.title}
+          lessonDuration={lesson.duration}
+          lessonFormat={lesson.format}
+          lessonChallenge={lesson.challenge}
+          outputKind={lesson.output.kind}
+          outputTitle={lesson.output.title}
+          lessonIndex={lessonIndex}
+          lessonCount={allTrackLessons.length}
+          moduleIndex={moduleIndex}
+          moduleCount={track.modules.length}
+          moduleLessonIndex={moduleLessonIndex}
+          moduleLessonCount={module.lessons.length}
+          previousHref={previousLesson
+            ? getTrackHref(track.slug) + previousLesson.lesson.slug + '/'
+            : undefined}
+          previousTitle={previousLesson?.lesson.title}
+          nextHref={nextLesson
+            ? getTrackHref(track.slug) + nextLesson.lesson.slug + '/'
+            : undefined}
+          nextTitle={nextLesson?.lesson.title}
+        />
+
         <section
           class="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_20px_60px_rgba(2,8,23,0.16)]"
         >
           <div class="flex items-center gap-3">
             <Compass className="h-5 w-5 text-[var(--color-learn)]" aria-hidden="true" />
-            <h2 class="text-xl font-semibold text-[var(--color-text-primary)]">Lesson map</h2>
+            <h2 class="text-xl font-semibold text-[var(--color-text-primary)]">Lesson materials</h2>
           </div>
           <div class="mt-5 space-y-3">
             <div
@@ -580,74 +591,6 @@ const artifactUses = [
                   {step}
                 </div>
               ))
-            }
-          </div>
-        </section>
-
-        <section
-          class="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_20px_60px_rgba(2,8,23,0.16)]"
-        >
-          <h2 class="text-2xl font-semibold text-[var(--color-text-primary)]">Navigation</h2>
-          <div class="mt-5 space-y-3">
-            {
-              previousLesson ? (
-                <a
-                  href={getTrackHref(track.slug) + previousLesson.lesson.slug + '/'}
-                  class="flex items-center justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
-                >
-                  <div>
-                    <p class="font-mono text-xs tracking-[0.24em] text-[var(--color-text-tertiary)] uppercase">
-                      Previous
-                    </p>
-                    <p class="mt-2 text-base font-semibold text-[var(--color-text-primary)]">
-                      {previousLesson.lesson.title}
-                    </p>
-                  </div>
-                  <ArrowLeft
-                    className="h-4 w-4 text-[var(--color-text-tertiary)]"
-                    aria-hidden="true"
-                  />
-                </a>
-              ) : (
-                <a
-                  href={getTrackHref(track.slug)}
-                  class="flex items-center justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
-                >
-                  <div>
-                    <p class="font-mono text-xs tracking-[0.24em] text-[var(--color-text-tertiary)] uppercase">
-                      Back to track
-                    </p>
-                    <p class="mt-2 text-base font-semibold text-[var(--color-text-primary)]">
-                      {track.title}
-                    </p>
-                  </div>
-                  <ArrowLeft
-                    className="h-4 w-4 text-[var(--color-text-tertiary)]"
-                    aria-hidden="true"
-                  />
-                </a>
-              )
-            }
-            {
-              nextLesson && (
-                <a
-                  href={getTrackHref(track.slug) + nextLesson.lesson.slug + '/'}
-                  class="flex items-center justify-between gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
-                >
-                  <div>
-                    <p class="font-mono text-xs tracking-[0.24em] text-[var(--color-text-tertiary)] uppercase">
-                      Next
-                    </p>
-                    <p class="mt-2 text-base font-semibold text-[var(--color-text-primary)]">
-                      {nextLesson.lesson.title}
-                    </p>
-                  </div>
-                  <ArrowRight
-                    className="h-4 w-4 text-[var(--color-text-tertiary)]"
-                    aria-hidden="true"
-                  />
-                </a>
-              )
             }
           </div>
         </section>
