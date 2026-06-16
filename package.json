@@ -3,13 +3,13 @@
   "type": "module",
   "version": "0.1.0",
   "description": "Open-source AI learning platform featuring structured learning paths, projects, roadmaps, AI tools, challenges, exams, and community-driven learning.",
-  "homepage": "https://dipakmandlik.github.io/AIbyDM/",
+  "homepage": "https://dipakmandlik.github.io/AIByDM/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/DipakMandlik/AIbyDM.git"
+    "url": "https://github.com/DipakMandlik/AIByDM.git"
   },
   "bugs": {
-    "url": "https://github.com/DipakMandlik/AIbyDM/issues"
+    "url": "https://github.com/DipakMandlik/AIByDM/issues"
   },
   "author": "Dipak Mandlik (https://github.com/DipakMandlik)",
   "license": "MIT",

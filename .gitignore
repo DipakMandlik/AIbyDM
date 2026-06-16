@@ -32,12 +32,16 @@ pnpm-debug.log*
 .codex-nav.diff
 preview.log
 preview.err.log
+preview-product.log
+preview-product.err.log
 
 # reference screenshots (local only)
 docs/assets/screenshot-hero.png
 home.png
 home_screen_dark.png
 home_screen_light.png
+homepage-check.png
+community-check.png
 
 # OS
 .DS_Store

@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 
 const site = env.SITE_URL ?? 'https://dipakmandlik.github.io';
-const base = env.BASE_PATH ?? '/AIbyDM';
+const base = env.BASE_PATH ?? '/AIByDM';
 
 export default defineConfig({
   site,

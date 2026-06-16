@@ -1,45 +1,44 @@
 ---
-import { ExternalLink } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 
 const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
-const repoUrl = 'https://github.com/DipakMandlik/AIbyDM';
+const repoUrl = 'https://github.com/DipakMandlik/AIByDM';
 
 const footerSections = [
   {
     title: 'Platform',
     links: [
       { label: 'Learn', href: '/learn/', external: false },
+      { label: 'Roadmap', href: '/learn/roadmap/', external: false },
+      { label: 'Search', href: '/search/', external: false },
+      { label: 'Community', href: '/community/', external: false },
+    ],
+  },
+  {
+    title: 'Practice',
+    links: [
       { label: 'Tools', href: '/tools/', external: false },
       { label: 'Games', href: '/games/', external: false },
       { label: 'Exams', href: '/exams/', external: false },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
       { label: 'Newsletter', href: '/newsletter/', external: false },
-      { label: 'Contributing', href: `${repoUrl}/blob/main/CONTRIBUTING.md`, external: true },
-      {
-        label: 'Roadmap',
-        href: `${repoUrl}/blob/main/docs/architecture/10-Roadmap.md`,
-        external: true,
-      },
     ],
   },
   {
-    title: 'Community',
+    title: 'Open Source',
     links: [
-      { label: 'GitHub', href: repoUrl, external: true },
+      { label: 'Contributing', href: `${repoUrl}/blob/main/CONTRIBUTING.md`, external: true },
+      { label: 'Roadmap.md', href: `${repoUrl}/blob/main/ROADMAP.md`, external: true },
+      { label: 'Community.md', href: `${repoUrl}/blob/main/COMMUNITY.md`, external: true },
       { label: 'Discussions', href: `${repoUrl}/discussions`, external: true },
-      { label: 'Support', href: `${repoUrl}/blob/main/SUPPORT.md`, external: true },
     ],
   },
   {
-    title: 'Legal',
+    title: 'Trust',
     links: [
       { label: 'License', href: `${repoUrl}/blob/main/LICENSE`, external: true },
       { label: 'Code of Conduct', href: `${repoUrl}/blob/main/CODE_OF_CONDUCT.md`, external: true },
       { label: 'Security', href: `${repoUrl}/blob/main/SECURITY.md`, external: true },
+      { label: 'Support', href: `${repoUrl}/blob/main/SUPPORT.md`, external: true },
     ],
   },
 ];
@@ -52,7 +51,41 @@ const currentYear = new Date().getFullYear();
   role="contentinfo"
 >
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-2 gap-8 sm:grid-cols-4">
+    <div
+      class="rounded-[30px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_22rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-panel)] p-6 shadow-[0_18px_50px_rgba(2,8,23,0.14)] sm:p-8"
+    >
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-3xl">
+          <p class="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+            AIByDM
+          </p>
+          <h2 class="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+            Learn AI like a product team, not a bookmark folder.
+          </h2>
+          <p class="mt-4 text-sm leading-8 text-[var(--color-text-secondary)] sm:text-base">
+            Follow structured tracks, keep your place with local progress, reinforce what you learn,
+            and help improve the platform in public.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <a
+            href={withBase('/learn/')}
+            class="command-button border border-transparent bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+          >
+            Start learning
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </a>
+          <a
+            href={withBase('/community/')}
+            class="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+          >
+            Community hub
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-4">
       {
         footerSections.map((section) => (
           <div>
@@ -86,7 +119,7 @@ const currentYear = new Date().getFullYear();
     >
       <p class="text-sm text-[var(--color-text-secondary)]">
         <span class="font-semibold text-[var(--color-text-primary)]">AIByDM</span>
-        - Learn AI. Build AI. Master AI.
+        {' '}Learn AI. Build AI. Master AI.
       </p>
       <p class="text-sm text-[var(--color-text-tertiary)]">
         &copy; {currentYear} AIByDM. Open source under MIT License.

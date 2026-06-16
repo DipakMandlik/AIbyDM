@@ -1,0 +1,297 @@
+---
+import {
+  ArrowRight,
+  BookOpen,
+  GitBranch,
+  GitPullRequest,
+  Handshake,
+  MessagesSquare,
+  ShieldCheck,
+  Sparkles,
+  Trophy,
+  Users,
+} from 'lucide-react';
+
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+const withBase = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+const repoUrl = 'https://github.com/DipakMandlik/AIByDM';
+const discussionsUrl = `${repoUrl}/discussions`;
+const contributingUrl = `${repoUrl}/blob/main/CONTRIBUTING.md`;
+const roadmapUrl = `${repoUrl}/blob/main/ROADMAP.md`;
+const supportUrl = `${repoUrl}/blob/main/SUPPORT.md`;
+const contributorsUrl = `${repoUrl}/graphs/contributors`;
+
+const contributionLanes = [
+  {
+    title: 'Curriculum and lessons',
+    description:
+      'Improve track structure, lesson clarity, glossary entries, project briefs, and resource quality.',
+    icon: BookOpen,
+  },
+  {
+    title: 'Product and UX',
+    description:
+      'Help refine navigation, interaction quality, motion, accessibility, and information architecture.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Tooling and systems',
+    description:
+      'Contribute tool guides, exams, search improvements, content operations, and deployment polish.',
+    icon: GitBranch,
+  },
+  {
+    title: 'Community operations',
+    description:
+      'Support triage, contributor onboarding, discussions, roadmap shaping, and release communication.',
+    icon: Handshake,
+  },
+];
+
+const rituals = [
+  {
+    title: 'Start with the roadmap',
+    description:
+      'Understand what is shipping next, where contribution is most valuable, and how each area connects.',
+    href: roadmapUrl,
+    cta: 'Open roadmap',
+  },
+  {
+    title: 'Join public discussions',
+    description:
+      'Use discussions for ideas, launch notes, learning requests, UX feedback, and collaboration threads.',
+    href: discussionsUrl,
+    cta: 'Open discussions',
+  },
+  {
+    title: 'Pick a contribution lane',
+    description:
+      'Follow the contribution guide to choose an issue, propose a change, or improve a learning surface.',
+    href: contributingUrl,
+    cta: 'Read contributing guide',
+  },
+];
+---
+
+<BaseLayout
+  title="Community - AIByDM"
+  description="Join the AIByDM community hub for discussions, contribution lanes, roadmap visibility, and open-source collaboration around the AI learning platform."
+>
+  <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <div class="grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+      <div
+        class="rounded-[34px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_24rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_24px_90px_rgba(2,8,23,0.24)] sm:p-8 lg:p-10"
+      >
+        <div
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(148,163,184,0.22)] bg-[rgba(7,12,22,0.52)] px-4 text-sm text-[var(--color-text-secondary)]"
+        >
+          <Users className="h-4 w-4 text-[var(--color-community)]" aria-hidden="true" />
+          Community hub
+        </div>
+        <h1
+          class="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl"
+        >
+          Build AIByDM in public with us.
+        </h1>
+        <p class="mt-5 max-w-3xl text-base leading-8 text-[var(--color-text-secondary)] sm:text-lg">
+          AIByDM is designed to feel like a flagship open-source learning product. That means clear
+          contribution lanes, visible roadmap thinking, thoughtful community rituals, and a
+          repository experience that welcomes serious builders.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href={discussionsUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="command-button border border-transparent bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+          >
+            <MessagesSquare className="h-5 w-5" aria-hidden="true" />
+            Join discussions
+          </a>
+          <a
+            href={contributingUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+          >
+            <GitPullRequest className="h-5 w-5" aria-hidden="true" />
+            Contribute
+          </a>
+          <a
+            href={withBase('/learn/')}
+            class="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+          >
+            <BookOpen className="h-5 w-5" aria-hidden="true" />
+            Start learning
+          </a>
+        </div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+        <div
+          class="rounded-[26px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-5 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+        >
+          <ShieldCheck className="h-5 w-5 text-[var(--color-community)]" aria-hidden="true" />
+          <p class="mt-4 text-lg font-semibold text-[var(--color-text-primary)]">
+            Healthy collaboration
+          </p>
+          <p class="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+            Contribution docs, code of conduct, support, and security reporting are all part of the
+            product surface.
+          </p>
+        </div>
+        <div
+          class="rounded-[26px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-5 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+        >
+          <GitBranch className="h-5 w-5 text-[var(--color-community)]" aria-hidden="true" />
+          <p class="mt-4 text-lg font-semibold text-[var(--color-text-primary)]">
+            Roadmap visibility
+          </p>
+          <p class="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+            Contributors can see what the platform is building next and which improvements make the
+            biggest difference.
+          </p>
+        </div>
+        <div
+          class="rounded-[26px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-5 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+        >
+          <Trophy className="h-5 w-5 text-[var(--color-community)]" aria-hidden="true" />
+          <p class="mt-4 text-lg font-semibold text-[var(--color-text-primary)]">
+            Contributor recognition
+          </p>
+          <p class="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+            The project should visibly credit the people improving curriculum, UX, docs, and
+            platform quality.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-10">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p class="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+            Contribution lanes
+          </p>
+          <h2 class="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+            There is more than one good way to help.
+          </h2>
+        </div>
+        <p class="max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+          AIByDM needs curriculum builders, UX polishers, content operators, reviewer energy, and
+          community momentum.
+        </p>
+      </div>
+      <div class="mt-6 grid gap-4 xl:grid-cols-2">
+        {
+          contributionLanes.map((lane) => {
+            const Icon = lane.icon;
+            return (
+              <article class="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_18px_50px_rgba(2,8,23,0.14)]">
+                <div class="flex items-start gap-4">
+                  <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[rgba(20,184,166,0.28)] bg-[rgba(20,184,166,0.12)] text-[var(--color-community)]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h3 class="text-2xl font-semibold text-[var(--color-text-primary)]">
+                      {lane.title}
+                    </h3>
+                    <p class="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                      {lane.description}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="mt-10 grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <div
+        class="rounded-[30px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+      >
+        <p class="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+          Operating rhythm
+        </p>
+        <h2 class="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+          How the community moves
+        </h2>
+        <div class="mt-6 space-y-3">
+          {
+            rituals.map((ritual) => (
+              <a
+                href={ritual.href}
+                target="_blank"
+                rel="noreferrer"
+                class="block rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                <h3 class="text-xl font-semibold text-[var(--color-text-primary)]">
+                  {ritual.title}
+                </h3>
+                <p class="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                  {ritual.description}
+                </p>
+                <span class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
+                  {ritual.cta}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div
+        class="rounded-[30px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_20rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+      >
+        <p class="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+          Recognition and support
+        </p>
+        <h2 class="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+          Keep the community visible
+        </h2>
+        <p class="mt-4 text-sm leading-8 text-[var(--color-text-secondary)]">
+          A premium open-source product feels cared for. That includes recognizing contributors,
+          documenting support paths, and making it easy for new builders to understand how to join
+          in.
+        </p>
+        <div class="mt-6 space-y-3">
+          <a
+            href={contributorsUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="flex items-center justify-between gap-4 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+          >
+            <div>
+              <p class="text-lg font-semibold text-[var(--color-text-primary)]">
+                Contributor graph
+              </p>
+              <p class="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                See who is already helping shape AIByDM.
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-[var(--color-text-tertiary)]" aria-hidden="true" />
+          </a>
+          <a
+            href={supportUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="flex items-center justify-between gap-4 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+          >
+            <div>
+              <p class="text-lg font-semibold text-[var(--color-text-primary)]">Support policy</p>
+              <p class="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                Know where to ask for help, how to report issues, and how to keep collaboration
+                moving.
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-[var(--color-text-tertiary)]" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </section>
+  </section>
+</BaseLayout>

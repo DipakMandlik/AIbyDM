@@ -1916,6 +1916,19 @@ function buildLesson(
   const primaryConcept = lessonSeed.concepts[0] || lessonSeed.title.toLowerCase();
   const secondaryConcept = lessonSeed.concepts[1] || moduleLabel;
   const nextTrack = trackSeed.nextTracks[0]?.replace(/-/g, ' ');
+  const primaryTool = trackSeed.tooling[0] || 'your core toolchain';
+  const supportingTool = trackSeed.tooling[1] || secondaryConcept;
+  const leadingOutcome = trackSeed.outcomes[0] || 'a reliable workflow';
+  const capstoneDeliverable = trackSeed.capstone.deliverables[0] || 'final artifact';
+  const stageLabel = learningStageMeta[trackSeed.stage].title.toLowerCase();
+  const practiceArtifact =
+    lessonSeed.format === 'Lab'
+      ? 'prototype'
+      : lessonSeed.format === 'Project'
+        ? 'delivery brief'
+        : lessonSeed.format === 'System Design'
+          ? 'design review'
+          : 'working note';
   const output = buildLessonOutput(trackSeed, lessonSeed, primaryConcept, secondaryConcept);
 
   return {
@@ -1970,22 +1983,35 @@ function buildLesson(
     keyTerms: buildKeyTerms(trackSeed, moduleSeed, lessonSeed),
     examples: [
       'Walk through a compact ' + trackLabel + ' scenario that highlights ' + primaryConcept + '.',
+      'Use ' +
+        primaryTool +
+        (supportingTool !== primaryTool ? ' with ' + supportingTool : '') +
+        ' to model the workflow before you automate it.',
       'Compare a reliable implementation path with a weaker shortcut inside ' +
         moduleSeed.title +
         '.',
-      'Annotate the exact points where quality checks, review, or measurement should happen.',
+      'Annotate the exact points where quality checks, review, or measurement should happen before the work reaches the ' +
+        capstoneDeliverable +
+        '.',
     ],
     buildIt: [
-      'Create a compact artifact that demonstrates ' + primaryConcept + '.',
+      'Create a compact ' + practiceArtifact + ' that demonstrates ' + primaryConcept + '.',
       'Annotate the inputs, outputs, and assumptions that shape the workflow.',
+      'Capture the first success signal that tells you whether the work is moving toward ' +
+        leadingOutcome.toLowerCase() +
+        '.',
     ],
     useIt: [
       'Use the artifact to explain the workflow to a teammate or stakeholder.',
       'Compare one stronger and one weaker implementation choice using evidence from the lesson.',
+      'Point to where this lesson will show up again inside the ' + capstoneDeliverable + '.',
     ],
     shipIt: [
       'Write the quality checks that should run before this pattern is used in a real product.',
       'Capture the limits, fallback plan, and next experiment in your notes.',
+      'Decide what handoff note, demo, or review evidence belongs in the ' +
+        stageLabel +
+        ' roadmap after this lesson.',
     ],
     qualityChecks: [
       'The workflow clearly names the input, output, and review signal before implementation grows.',
@@ -1993,10 +2019,14 @@ function buildLesson(
         primaryConcept +
         ' is documented well enough for another teammate to follow.',
       'A likely failure mode and the first fallback or retry path are written down before shipping.',
+      'The artifact uses ' +
+        primaryTool +
+        ' intentionally instead of treating tooling choices as an afterthought.',
     ],
     exercises: [
       'Rebuild the lesson artifact from scratch without looking at the notes.',
       'Write one failure case that would change your implementation choice.',
+      'Turn the lesson into a ten-minute walkthrough for a teammate using ' + primaryTool + '.',
     ],
     interviewQuestions: [
       'How would you explain ' +
@@ -2005,10 +2035,14 @@ function buildLesson(
         trackSeed.title +
         '?',
       'What tradeoffs matter most when using this pattern in production?',
+      'How would you prove this lesson is ready to support the ' + capstoneDeliverable + '?',
     ],
     nextSteps: dedupe([
       'Review the next lesson in ' + moduleSeed.title + ' to reinforce the workflow.',
       nextTrack ? 'Move toward ' + nextTrack + ' once the current concepts feel stable.' : '',
+      'Add the artifact, review notes, or failure case to your own ' +
+        trackSeed.title +
+        ' working library.',
       'Add one measurable checkpoint to your own practice notes before continuing.',
     ]),
     keywords: dedupe([
@@ -2023,9 +2057,309 @@ function buildLesson(
   };
 }
 
-function buildProjects(trackSeed: TrackSeed): LearningProject[] {
+function buildExtensionModules(trackSeed: TrackSeed): ModuleSeed[] {
   const firstModule = trackSeed.modules[0];
   const secondModule = trackSeed.modules[1] || firstModule;
+  const firstLesson = firstModule.lessons[0];
+  const secondLesson = secondModule.lessons[0] || firstLesson;
+  const firstConcept =
+    firstLesson?.concepts[0] || firstLesson?.title.toLowerCase() || trackSeed.title.toLowerCase();
+  const secondConcept =
+    secondLesson?.concepts[0] || secondLesson?.title.toLowerCase() || firstConcept;
+  const firstOutcome = trackSeed.outcomes[0] || 'reliable delivery';
+  const secondOutcome = trackSeed.outcomes[1] || firstOutcome;
+  const primaryTool = trackSeed.tooling[0] || trackSeed.title;
+  const secondaryTool = trackSeed.tooling[1] || secondConcept;
+
+  switch (trackSeed.stage) {
+    case 'core':
+      return [
+        {
+          slug: 'practice-studio',
+          title: 'Practice Studio',
+          summary:
+            'Turn the early ' +
+            trackSeed.title +
+            ' concepts into repeatable drills, worked examples, and small builds.',
+          signal:
+            'You can recreate the core workflow from memory and connect it to ' +
+            firstOutcome.toLowerCase() +
+            '.',
+          lessons: [
+            {
+              slug: 'worked-examples',
+              title: trackSeed.title + ' Worked Examples',
+              summary:
+                'Break ' +
+                firstConcept +
+                ' into smaller practice drills you can solve quickly before moving to larger systems.',
+              duration: '35 min',
+              format: 'Lab',
+              concepts: [firstConcept, primaryTool, 'worked examples'],
+              keywords: ['practice drills', 'worked examples', trackSeed.slug],
+            },
+            {
+              slug: 'mini-build-review',
+              title: trackSeed.title + ' Mini Build Review',
+              summary:
+                'Use ' +
+                primaryTool +
+                ' to turn ' +
+                secondConcept +
+                ' into a compact build with a clear reflection loop.',
+              duration: '40 min',
+              format: 'Project',
+              concepts: [secondConcept, secondaryTool, 'reflection loop'],
+              keywords: ['mini build', 'review loop', trackSeed.slug],
+            },
+          ],
+        },
+        {
+          slug: 'readiness-checks',
+          title: 'Readiness Checks',
+          summary:
+            'Pressure-test understanding with common mistakes, checkpoint reviews, and short explanations.',
+          signal:
+            'You can explain what usually breaks and what makes the next lesson easier to absorb.',
+          lessons: [
+            {
+              slug: 'common-mistakes',
+              title: 'Common ' + trackSeed.title + ' Mistakes',
+              summary:
+                'Study the shortcuts that make ' +
+                firstConcept +
+                ' look right while quietly weakening the actual workflow.',
+              duration: '30 min',
+              format: 'Lesson',
+              concepts: [firstConcept, 'failure patterns', secondOutcome],
+              keywords: ['mistakes', 'failure patterns', trackSeed.slug],
+            },
+            {
+              slug: 'readiness-checkpoint',
+              title: trackSeed.title + ' Readiness Checkpoint',
+              summary:
+                'Wrap the track into a short readiness review before you move on to the next major capability.',
+              duration: '35 min',
+              format: 'System Design',
+              concepts: [secondConcept, 'readiness review', firstOutcome],
+              keywords: ['checkpoint', 'study plan', trackSeed.slug],
+            },
+          ],
+        },
+      ];
+    case 'builder':
+      return [
+        {
+          slug: 'experiment-studio',
+          title: 'Experiment Studio',
+          summary:
+            'Build sharper experiments, baselines, and evaluation loops around the core builder concepts.',
+          signal:
+            'You can scope a clean experiment and explain what signal would justify the next iteration.',
+          lessons: [
+            {
+              slug: 'experiment-scoping',
+              title: trackSeed.title + ' Experiment Scoping',
+              summary:
+                'Use ' +
+                primaryTool +
+                ' to frame a compact experiment around ' +
+                firstConcept +
+                ' before you scale the build.',
+              duration: '45 min',
+              format: 'Lab',
+              concepts: [firstConcept, 'baseline design', primaryTool],
+              keywords: ['experiment scoping', 'baselines', trackSeed.slug],
+            },
+            {
+              slug: 'failure-analysis',
+              title: trackSeed.title + ' Failure Analysis',
+              summary:
+                'Review where ' +
+                secondConcept +
+                ' breaks down and how better evaluation tightens the next model or workflow choice.',
+              duration: '45 min',
+              format: 'Lesson',
+              concepts: [secondConcept, 'failure analysis', secondOutcome],
+              keywords: ['error analysis', 'evaluation loop', trackSeed.slug],
+            },
+          ],
+        },
+        {
+          slug: 'builder-portfolio',
+          title: 'Builder Portfolio',
+          summary:
+            'Turn the track into demo-ready artifacts, stretch milestones, and reusable explanations.',
+          signal:
+            'You can demo the work, defend the tradeoffs, and name the next stretch milestone clearly.',
+          lessons: [
+            {
+              slug: 'demo-walkthrough',
+              title: trackSeed.title + ' Demo Walkthrough',
+              summary:
+                'Package the strongest lesson artifacts into a short walkthrough another builder can understand quickly.',
+              duration: '35 min',
+              format: 'Project',
+              concepts: [firstOutcome, 'demo narrative', primaryTool],
+              keywords: ['demo', 'artifact review', trackSeed.slug],
+            },
+            {
+              slug: 'stretch-milestones',
+              title: trackSeed.title + ' Stretch Milestones',
+              summary:
+                'Plan the next capability leap using stronger datasets, tougher evals, or more realistic system constraints.',
+              duration: '40 min',
+              format: 'System Design',
+              concepts: [secondOutcome, 'roadmap planning', secondaryTool],
+              keywords: ['stretch goals', 'roadmap', trackSeed.slug],
+            },
+          ],
+        },
+      ];
+    case 'systems':
+      return [
+        {
+          slug: 'reliability-studio',
+          title: 'Reliability Studio',
+          summary:
+            'Focus on failure modes, fallback behavior, and review loops before scaling the system.',
+          signal:
+            'You can explain what breaks first, how you would detect it, and what the first fallback should be.',
+          lessons: [
+            {
+              slug: 'failure-modes-and-fallbacks',
+              title: trackSeed.title + ' Failure Modes and Fallbacks',
+              summary:
+                'Map the fragile edges around ' +
+                firstConcept +
+                ' and design the first fallback path before a customer finds the bug.',
+              duration: '45 min',
+              format: 'System Design',
+              concepts: [firstConcept, 'fallback paths', firstOutcome],
+              keywords: ['failure modes', 'fallbacks', trackSeed.slug],
+            },
+            {
+              slug: 'telemetry-review-loops',
+              title: trackSeed.title + ' Telemetry and Review Loops',
+              summary:
+                'Use ' +
+                primaryTool +
+                ' and ' +
+                secondaryTool +
+                ' to define the signals, dashboards, or logs that keep the workflow honest.',
+              duration: '40 min',
+              format: 'Lab',
+              concepts: [secondConcept, 'telemetry', 'review loops'],
+              keywords: ['monitoring', 'telemetry', trackSeed.slug],
+            },
+          ],
+        },
+        {
+          slug: 'launch-readiness',
+          title: 'Launch Readiness',
+          summary:
+            'Turn the track into rollout checklists, handoff notes, and operational improvement loops.',
+          signal:
+            'You can ship the workflow with a clear handoff, a launch checklist, and the next operational backlog.',
+          lessons: [
+            {
+              slug: 'launch-checklists',
+              title: trackSeed.title + ' Launch Checklists',
+              summary:
+                'Convert the strongest lessons in the track into a launch checklist that another team could follow.',
+              duration: '35 min',
+              format: 'Project',
+              concepts: [firstOutcome, 'launch checklist', secondOutcome],
+              keywords: ['launch', 'handoff', trackSeed.slug],
+            },
+            {
+              slug: 'operational-iteration-backlog',
+              title: trackSeed.title + ' Operational Iteration Backlog',
+              summary:
+                'Prioritize the first post-launch improvements so the system keeps getting stronger under real usage.',
+              duration: '35 min',
+              format: 'Lesson',
+              concepts: [secondOutcome, 'iteration backlog', 'operational review'],
+              keywords: ['backlog', 'iteration', trackSeed.slug],
+            },
+          ],
+        },
+      ];
+    case 'enterprise':
+      return [
+        {
+          slug: 'operating-model-studio',
+          title: 'Operating Model Studio',
+          summary:
+            'Translate the track into decision forums, stakeholder alignment, and portfolio-level tradeoffs.',
+          signal:
+            'You can explain who decides, what gets reviewed, and how value or risk is surfaced across teams.',
+          lessons: [
+            {
+              slug: 'stakeholder-alignment',
+              title: trackSeed.title + ' Stakeholder Alignment',
+              summary:
+                'Use ' +
+                firstConcept +
+                ' and ' +
+                firstOutcome.toLowerCase() +
+                ' to build alignment across leaders, operators, and delivery teams.',
+              duration: '35 min',
+              format: 'Lesson',
+              concepts: [firstConcept, 'stakeholder alignment', firstOutcome],
+              keywords: ['stakeholders', 'alignment', trackSeed.slug],
+            },
+            {
+              slug: 'portfolio-tradeoffs',
+              title: trackSeed.title + ' Portfolio Tradeoffs',
+              summary:
+                'Frame the tradeoffs between speed, control, adoption, and measurement before the portfolio expands.',
+              duration: '40 min',
+              format: 'System Design',
+              concepts: [secondConcept, 'portfolio review', secondOutcome],
+              keywords: ['portfolio', 'tradeoffs', trackSeed.slug],
+            },
+          ],
+        },
+        {
+          slug: 'rollout-governance',
+          title: 'Rollout and Governance',
+          summary:
+            'Prepare the rollout path with enablement, controls, and scaling reviews that survive real operations.',
+          signal:
+            'You can name the adoption plan, the governance checkpoints, and the conditions for safe scale-up.',
+          lessons: [
+            {
+              slug: 'adoption-readiness',
+              title: trackSeed.title + ' Adoption Readiness',
+              summary:
+                'Design the enablement plan, communication rhythm, and learning loop that helps the operating model stick.',
+              duration: '35 min',
+              format: 'Project',
+              concepts: [firstOutcome, 'adoption readiness', primaryTool],
+              keywords: ['adoption', 'enablement', trackSeed.slug],
+            },
+            {
+              slug: 'scaling-risk-review',
+              title: trackSeed.title + ' Scaling Risk Review',
+              summary:
+                'Run the risk review that decides whether the portfolio is ready to scale without losing trust or control.',
+              duration: '40 min',
+              format: 'System Design',
+              concepts: [secondOutcome, 'risk review', secondaryTool],
+              keywords: ['scaling', 'risk review', trackSeed.slug],
+            },
+          ],
+        },
+      ];
+    default:
+      return [];
+  }
+}
+
+function buildProjects(trackSeed: TrackSeed, moduleSeeds = trackSeed.modules): LearningProject[] {
+  const firstModule = moduleSeeds[0];
+  const secondModule = moduleSeeds[1] || firstModule;
   const firstLesson = firstModule.lessons[0];
   const secondLesson = secondModule.lessons[0] || firstLesson;
   const titleBase = trackSeed.title;
@@ -2043,10 +2377,11 @@ function buildProjects(trackSeed: TrackSeed): LearningProject[] {
   ]).slice(0, 4);
 
   const advancedSkills = dedupe([
-    ...firstModule.lessons.flatMap((lessonEntry) => lessonEntry.concepts).slice(0, 2),
-    ...secondModule.lessons.flatMap((lessonEntry) => lessonEntry.concepts).slice(0, 2),
+    ...moduleSeeds
+      .flatMap((moduleEntry) => moduleEntry.lessons.flatMap((lessonEntry) => lessonEntry.concepts))
+      .slice(0, 5),
     trackSeed.stage,
-  ]).slice(0, 5);
+  ]).slice(0, 6);
 
   return [
     {
@@ -2105,14 +2440,20 @@ function buildProjects(trackSeed: TrackSeed): LearningProject[] {
   ];
 }
 
-export const learningTracks: LearningTrack[] = trackSeeds.map((trackSeed) => ({
-  ...trackSeed,
-  modules: trackSeed.modules.map((moduleSeed) => ({
-    ...moduleSeed,
-    lessons: moduleSeed.lessons.map((lessonSeed) => buildLesson(trackSeed, moduleSeed, lessonSeed)),
-  })),
-  projects: buildProjects(trackSeed),
-}));
+export const learningTracks: LearningTrack[] = trackSeeds.map((trackSeed) => {
+  const moduleSeeds = [...trackSeed.modules, ...buildExtensionModules(trackSeed)];
+
+  return {
+    ...trackSeed,
+    modules: moduleSeeds.map((moduleSeed) => ({
+      ...moduleSeed,
+      lessons: moduleSeed.lessons.map((lessonSeed) =>
+        buildLesson(trackSeed, moduleSeed, lessonSeed),
+      ),
+    })),
+    projects: buildProjects(trackSeed, moduleSeeds),
+  };
+});
 
 export const learningTrackMap = new Map(learningTracks.map((entry) => [entry.slug, entry]));
 

@@ -1,810 +1,592 @@
-import type { CSSProperties } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import {
   ArrowRight,
-  BarChart3,
-  Bell,
-  Blocks,
   BookOpen,
-  Bot,
-  BrainCircuit,
   CheckCircle2,
-  Code2,
-  Database,
-  ExternalLink,
-  FileText,
-  Gamepad2,
+  Compass,
   GitBranch,
-  GraduationCap,
-  Layers,
-  Network,
-  Shield,
+  LockKeyhole,
+  PlayCircle,
+  Radar,
+  Search,
   Sparkles,
-  Star,
-  Target,
   Users,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 
-const base = import.meta.env.BASE_URL;
-const withBase = (path: string) => `${base}${path.replace(/^\/+/, '')}`;
+import { useLearnProgressState } from '@components/learn/useLearnProgress';
+import { getContinueLearning, getProgressSummary } from '@data/learn/progress';
+import { getLearningTrack, getTrackHref } from '@data/learn/catalog';
+import { getRecommendedTracks, getTrackStatus } from '@data/learn/recommendations';
 
-// Cubic bezier as const so TypeScript infers a tuple, not number[]
-const EASE = [0.22, 1, 0.36, 1] as const;
+type TrackStatus = ReturnType<typeof getTrackStatus>;
+type StageKey = 'core' | 'builder' | 'systems' | 'enterprise';
 
-// Shared Framer Motion variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: EASE } },
-};
+interface ProductMetric {
+  label: string;
+  value: string;
+  detail: string;
+}
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
-};
-
-const inViewProps = { once: true, margin: '-80px' };
-
-// ─── Data ──────────────────────────────────────────────────────────────────
-
-const modules: {
+interface ProductArea {
   title: string;
-  text: string;
-  metric: string;
   href: string;
-  icon: LucideIcon;
-  tone: string;
-}[] = [
-  {
-    title: 'Learn',
-    text: 'Structured courses, roadmap & labs',
-    metric: '120+ Courses',
-    href: withBase('/learn/'),
-    icon: BookOpen,
-    tone: 'violet',
-  },
-  {
-    title: 'Tools',
-    text: 'Discover 500+ open-source AI tools',
-    metric: '500+ Tools',
-    href: withBase('/tools/'),
-    icon: Blocks,
-    tone: 'cyan',
-  },
-  {
-    title: 'Games',
-    text: 'Play & practice with AI-themed games',
-    metric: '25+ Games',
-    href: withBase('/games/'),
-    icon: Gamepad2,
-    tone: 'pink',
-  },
-  {
-    title: 'Exams',
-    text: 'Mock tests, MCQs & interview prep',
-    metric: '1000+ Questions',
-    href: withBase('/exams/'),
-    icon: GraduationCap,
-    tone: 'amber',
-  },
-  {
-    title: 'Newsletter',
-    text: 'Weekly AI news & curated resources',
-    metric: 'Weekly Updates',
-    href: withBase('/newsletter/'),
-    icon: Bell,
-    tone: 'blue',
-  },
-];
-
-const learningPaths = [
-  {
-    title: 'AI Engineer Path',
-    subtitle: 'Beginner to Advanced',
-    duration: '12 weeks',
-    difficulty: 'Intermediate',
-    courses: 24,
-    icon: BrainCircuit,
-    color: 'violet',
-  },
-  {
-    title: 'LLM Engineer Path',
-    subtitle: 'Build LLMs & Agents',
-    duration: '8 weeks',
-    difficulty: 'Advanced',
-    courses: 18,
-    icon: Bot,
-    color: 'cyan',
-  },
-  {
-    title: 'AI Governance Path',
-    subtitle: 'Responsible AI & Ethics',
-    duration: '6 weeks',
-    difficulty: 'Beginner',
-    courses: 12,
-    icon: Shield,
-    color: 'pink',
-  },
-  {
-    title: 'Data Scientist Path',
-    subtitle: 'ML, DL & Data Science',
-    duration: '10 weeks',
-    difficulty: 'Intermediate',
-    courses: 20,
-    icon: BarChart3,
-    color: 'amber',
-  },
-];
-
-const featuredTools = [
-  {
-    name: 'Hugging Face',
-    category: 'ML Platform',
-    description: 'The AI community platform for models, datasets, and spaces.',
-    stars: '450K',
-    icon: '🤗',
-  },
-  {
-    name: 'LangChain',
-    category: 'LLM Framework',
-    description: 'Build production-grade AI applications with LLMs and agents.',
-    stars: '95K',
-    icon: '⛓️',
-  },
-  {
-    name: 'Ollama',
-    category: 'Local LLMs',
-    description: 'Run large language models locally with a single command.',
-    stars: '88K',
-    icon: '🦙',
-  },
-  {
-    name: 'ChromaDB',
-    category: 'Vector DB',
-    description: 'The open-source embedding database built for AI workflows.',
-    stars: '14K',
-    icon: '🎨',
-  },
-  {
-    name: 'LiteLLM',
-    category: 'LLM Gateway',
-    description: '100+ LLM providers in one unified API interface.',
-    stars: '12K',
-    icon: '⚡',
-  },
-  {
-    name: 'Instructor',
-    category: 'Structured Output',
-    description: 'Structured LLM outputs using Pydantic — effortlessly.',
-    stars: '8K',
-    icon: '📐',
-  },
-];
-
-const featuredGames = [
-  {
-    title: 'Prompt Engineering Duel',
-    description: 'Craft perfect prompts to outsmart the AI judge. Compete in real-time.',
-    xp: '+150 XP',
-    difficulty: 'Medium',
-    players: '2.4K',
-    tag: '🔥 Daily Challenge',
-    featured: true,
-  },
-  {
-    title: 'AI Concept Quest',
-    description: 'Race through AI concepts in this knowledge battle against the clock.',
-    xp: '+100 XP',
-    difficulty: 'Beginner',
-    players: '5.1K',
-    tag: '⭐ Popular',
-    featured: false,
-  },
-  {
-    title: 'Model Matchup',
-    description: 'Identify AI models from their outputs and climb the competitive ladder.',
-    xp: '+200 XP',
-    difficulty: 'Hard',
-    players: '1.8K',
-    tag: '🏆 Competitive',
-    featured: false,
-  },
-];
-
-const examCategories = [
-  {
-    title: 'Mock Tests',
-    description: 'Full-length AI certification exam simulations',
-    count: '50+',
-    icon: FileText,
-    color: 'violet',
-  },
-  {
-    title: 'Question Bank',
-    description: 'Curated MCQs across all AI engineering domains',
-    count: '1000+',
-    icon: Database,
-    color: 'cyan',
-  },
-  {
-    title: 'Interview Prep',
-    description: 'Real ML and AI engineer interview questions',
-    count: '200+',
-    icon: Target,
-    color: 'pink',
-  },
-  {
-    title: 'Flashcards',
-    description: 'Quick-review AI concepts and key terminology',
-    count: '500+',
-    icon: Layers,
-    color: 'amber',
-  },
-];
-
-const newsletterIssues = [
-  { title: 'OpenAI Releases GPT-5 Turbo — What Changed?', date: 'Jun 10, 2026', tag: '🔥 Hot' },
-  {
-    title: 'Top 10 Open Source LLMs You Should Know in 2026',
-    date: 'Jun 3, 2026',
-    tag: '⭐ Featured',
-  },
-  {
-    title: 'AI Agents Are Changing the Engineering Game',
-    date: 'May 27, 2026',
-    tag: '📚 Deep Dive',
-  },
-];
-
-const stats: { value: string; label: string; icon: LucideIcon }[] = [
-  { value: '50K+', label: 'Learners', icon: Users },
-  { value: '500+', label: 'Open Source Tools', icon: Blocks },
-  { value: '100+', label: 'Hands-on Projects', icon: Code2 },
-  { value: '25+', label: 'Exciting Games', icon: Gamepad2 },
-  { value: '1000+', label: 'Exam Questions', icon: GraduationCap },
-  { value: '100+', label: 'Contributors', icon: GitBranch },
-];
-
-// ─── Root component ────────────────────────────────────────────────────────
-
-export default function ProductHome() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const glowX = useSpring(mouseX, { stiffness: 80, damping: 25 });
-  const glowY = useSpring(mouseY, { stiffness: 80, damping: 25 });
-  const glowStyle = {
-    left: useTransform(glowX, (value: number) => `${value}px`),
-    top: useTransform(glowY, (value: number) => `${value}px`),
-  };
-
-  return (
-    <div
-      className="lp-wrap"
-      onMouseMove={(e) => {
-        mouseX.set(e.clientX);
-        mouseY.set(e.clientY);
-      }}
-    >
-      <motion.div className="cursor-glow" style={glowStyle} aria-hidden="true" />
-      <HeroSection />
-      <ModuleNav />
-      <FeaturedPaths />
-      <FeaturedTools />
-      <FeaturedGames />
-      <FeaturedExams />
-      <NewsletterSection />
-      <CommunitySection />
-      <StatsSection />
-    </div>
-  );
+  metric: string;
+  description: string;
+  accent: string;
+  eyebrow: string;
+  cta: string;
 }
 
-// ─── Hero ──────────────────────────────────────────────────────────────────
+interface TrackPreview {
+  slug: string;
+  title: string;
+  strapline: string;
+  difficulty: string;
+  estimatedWeeks: string;
+  lessons: number;
+  projects: number;
+}
 
-function HeroSection() {
+interface StagePreview {
+  stage: StageKey;
+  eyebrow: string;
+  title: string;
+  summary: string;
+  tracks: TrackPreview[];
+}
+
+interface ProductHomeProps {
+  repoUrl: string;
+  discussionUrl: string;
+  communityHref: string;
+  roadmapHref: string;
+  searchHref: string;
+  learnHref: string;
+  modules: ProductArea[];
+  metrics: ProductMetric[];
+  stages: StagePreview[];
+}
+
+function statusLabel(status: TrackStatus): string {
+  switch (status) {
+    case 'complete':
+      return 'Complete';
+    case 'in-progress':
+      return 'In progress';
+    case 'ready':
+      return 'Ready';
+    case 'locked':
+      return 'Locked';
+    default:
+      return 'Not started';
+  }
+}
+
+function statusTone(status: TrackStatus): string {
+  switch (status) {
+    case 'complete':
+      return 'border-[rgba(52,211,153,0.28)] bg-[rgba(52,211,153,0.12)] text-[var(--color-text-primary)]';
+    case 'in-progress':
+      return 'border-[rgba(56,189,248,0.28)] bg-[rgba(56,189,248,0.12)] text-[var(--color-text-primary)]';
+    case 'ready':
+      return 'border-[rgba(245,158,11,0.24)] bg-[rgba(245,158,11,0.12)] text-[var(--color-text-primary)]';
+    case 'locked':
+      return 'border-[var(--color-border)] bg-[var(--color-bg-panel)] text-[var(--color-text-secondary)]';
+    default:
+      return 'border-[var(--color-border)] bg-[var(--color-bg-panel)] text-[var(--color-text-secondary)]';
+  }
+}
+
+function stageAccent(stage: StageKey): string {
+  switch (stage) {
+    case 'core':
+      return 'var(--color-learn)';
+    case 'builder':
+      return 'var(--color-tools)';
+    case 'systems':
+      return 'var(--color-games)';
+    case 'enterprise':
+      return 'var(--color-community)';
+    default:
+      return 'var(--color-accent)';
+  }
+}
+
+function stageTrackStatus(
+  trackSlug: string,
+  progressState: ReturnType<typeof useLearnProgressState>,
+): TrackStatus {
+  const track = getLearningTrack(trackSlug);
+  return track ? getTrackStatus(progressState, track) : 'not-started';
+}
+
+function statusIcon(status: TrackStatus) {
+  switch (status) {
+    case 'complete':
+      return <CheckCircle2 className="h-4 w-4 text-[var(--color-accent)]" aria-hidden="true" />;
+    case 'in-progress':
+      return <PlayCircle className="h-4 w-4 text-[var(--color-learn)]" aria-hidden="true" />;
+    case 'locked':
+      return (
+        <LockKeyhole className="h-4 w-4 text-[var(--color-text-tertiary)]" aria-hidden="true" />
+      );
+    default:
+      return <Compass className="h-4 w-4 text-[var(--color-text-tertiary)]" aria-hidden="true" />;
+  }
+}
+
+export default function ProductHome({
+  repoUrl,
+  discussionUrl,
+  communityHref,
+  roadmapHref,
+  searchHref,
+  learnHref,
+  modules,
+  metrics,
+  stages,
+}: ProductHomeProps) {
+  const progressState = useLearnProgressState();
+  const progressSummary = getProgressSummary(progressState);
+  const continueItem = getContinueLearning(progressState);
+  const recommendedTracks = getRecommendedTracks(progressState, 3);
+  const firstTrack = stages[0]?.tracks[0];
+  const primaryHref =
+    continueItem?.href ?? (firstTrack ? getTrackHref(firstTrack.slug) : learnHref);
+  const primaryLabel = continueItem ? 'Continue learning' : 'Start with foundations';
+  const openTrackCount = stages
+    .flatMap((stage) => stage.tracks)
+    .filter((track) => {
+      const status = stageTrackStatus(track.slug, progressState);
+      return status === 'ready' || status === 'in-progress' || status === 'complete';
+    }).length;
+
   return (
-    <section className="lp-hero">
-      <div className="mesh-bg" aria-hidden="true" />
-      <div className="particle-field" aria-hidden="true">
-        {Array.from({ length: 14 }).map((_, i) => (
-          <span key={i} style={{ '--i': i } as CSSProperties} />
-        ))}
-      </div>
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <section
+        className="relative overflow-hidden rounded-[36px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24rem),radial-gradient(circle_at_bottom_right,rgba(52,211,153,0.14),transparent_24rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_32px_120px_rgba(2,8,23,0.32)] sm:p-8 lg:p-10"
+       
+      >
+        <div className="relative grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+          <div>
+            <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(148,163,184,0.22)] bg-[rgba(7,12,22,0.62)] px-4 text-sm text-[var(--color-text-secondary)]">
+              <Sparkles className="h-4 w-4 text-[var(--color-accent)]" aria-hidden="true" />
+              Learn AI. Build AI. Master AI.
+            </div>
+            <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
+              AIByDM is a guided AI learning product, not a pile of tabs.
+            </h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--color-text-secondary)] sm:text-lg">
+              Follow a connected path from foundations to production AI with structured tracks,
+              project ladders, roadmap unlocks, local progress tracking, and an open-source
+              community that helps you keep shipping.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href={primaryHref}
+                className="command-button border border-transparent bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+              >
+                <BookOpen className="h-5 w-5" aria-hidden="true" />
+                {primaryLabel}
+              </a>
+              <a
+                href={roadmapHref}
+                className="command-button border border-[var(--color-border)] bg-[rgba(7,12,22,0.52)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                <GitBranch className="h-5 w-5" aria-hidden="true" />
+                Explore roadmap
+              </a>
+              <a
+                href={searchHref}
+                className="command-button border border-[var(--color-border)] bg-[rgba(7,12,22,0.52)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                <Search className="h-5 w-5" aria-hidden="true" />
+                Search curriculum
+              </a>
+              <a
+                href={communityHref}
+                className="command-button border border-[var(--color-border)] bg-[rgba(7,12,22,0.52)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                <Users className="h-5 w-5" aria-hidden="true" />
+                Join community
+              </a>
+            </div>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {metrics.map((metric) => (
+                <div
+                  key={metric.label}
+                  className="rounded-[24px] border border-[var(--color-border)] bg-[rgba(7,12,22,0.52)] p-4 backdrop-blur"
+                >
+                  <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+                    {metric.label}
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[var(--color-text-primary)]">
+                    {metric.value}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+                    {metric.detail}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      <div className="lp-hero-inner">
-        {/* Left: copy */}
-        <motion.div className="lp-hero-copy" variants={stagger} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp} className="lp-eyebrow">
-            <span className="lp-eyebrow-dot" aria-hidden="true" />
-            Open Source · Free Forever · Community Driven
-          </motion.div>
+          <div className="rounded-[32px] border border-[var(--color-border)] bg-[rgba(2,8,23,0.64)] p-5 shadow-[0_24px_80px_rgba(2,8,23,0.24)] backdrop-blur sm:p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+                  Learning cockpit
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
+                  Know where you are and what to do next.
+                </h2>
+              </div>
+              <Radar className="h-7 w-7 text-[var(--color-learn)]" aria-hidden="true" />
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+                <p className="text-sm text-[var(--color-text-secondary)]">Lessons done</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+                  {progressSummary.completedLessons}
+                  <span className="ml-1 text-lg text-[var(--color-text-tertiary)]">
+                    / {progressSummary.totalLessons}
+                  </span>
+                </p>
+              </div>
+              <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+                <p className="text-sm text-[var(--color-text-secondary)]">Tracks open</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+                  {openTrackCount}
+                </p>
+              </div>
+              <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+                <p className="text-sm text-[var(--color-text-secondary)]">Current streak</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+                  {progressSummary.streakDays}d
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 rounded-[24px] border border-[var(--color-border)] bg-[linear-gradient(180deg,rgba(56,189,248,0.12),transparent),var(--color-bg-panel)] p-5">
+              <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+                Continue path
+              </p>
+              <p className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
+                {continueItem?.lessonTitle ?? firstTrack?.title ?? 'AI Foundations'}
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                {continueItem
+                  ? `${continueItem.trackTitle} / ${continueItem.moduleTitle}`
+                  : 'Start with the first stage, then unlock each next system in sequence.'}
+              </p>
+              <a
+                href={primaryHref}
+                className="command-button mt-4 border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                Open current step
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {stages.map((stage) => (
+                <span
+                  key={stage.stage}
+                  className="inline-flex min-h-11 items-center rounded-full border px-4 text-sm"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${stageAccent(stage.stage)} 24%, transparent)`,
+                    background: `color-mix(in srgb, ${stageAccent(stage.stage)} 10%, transparent)`,
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  {stage.title}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <motion.h1 variants={fadeInUp} className="lp-headline">
-            <span>Learn AI.</span>
-            <span>Build AI.</span>
-            <span className="hero-accent">Master AI.</span>
-          </motion.h1>
-
-          <motion.p variants={fadeInUp} className="lp-subheadline">
-            Master AI engineering through structured learning paths, open-source tools, interactive
-            challenges, and real-world projects — all for free.
-          </motion.p>
-
-          <motion.div variants={fadeInUp} className="lp-hero-ctas">
-            <motion.a
-              href={withBase('/learn/')}
-              className="primary-action"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
+      <section className="mt-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+              Recommended route
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+              The next best milestones are already waiting.
+            </h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+            AIByDM uses your local progress and prerequisites to surface the clearest next tracks
+            instead of leaving you to assemble a learning journey alone.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 xl:grid-cols-3">
+          {recommendedTracks.map((entry) => (
+            <a
+              key={entry.track.slug}
+              href={entry.href}
+              className="group rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_20px_60px_rgba(2,8,23,0.16)] transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
             >
-              Start Learning <ArrowRight size={18} />
-            </motion.a>
-            <motion.a
-              href={withBase('/tools/')}
-              className="secondary-action"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Explore Tools
-            </motion.a>
-          </motion.div>
-
-          <motion.div variants={fadeInUp} className="lp-trust-row">
-            {['500+ Tools', '100+ Projects', '1000+ Questions', 'Open Source'].map((item) => (
-              <span key={item} className="lp-trust-chip">
-                <CheckCircle2 size={13} />
-                {item}
-              </span>
-            ))}
-          </motion.div>
-        </motion.div>
-
-        {/* Right: ecosystem visual */}
-        <motion.div
-          className="lp-hero-visual"
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.85, delay: 0.2, ease: EASE }}
-        >
-          <AiEcosystem />
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-function AiEcosystem() {
-  const nodes: [string, LucideIcon, string][] = [
-    ['LLM', BrainCircuit, 'node-a'],
-    ['Agents', Bot, 'node-b'],
-    ['RAG', Network, 'node-c'],
-    ['Vector DBs', Database, 'node-d'],
-    ['Code', Code2, 'node-e'],
-    ['Vision', Sparkles, 'node-f'],
-  ];
-
-  return (
-    <div className="ecosystem reveal" aria-label="Animated AI ecosystem visualization">
-      <svg className="network-lines" viewBox="0 0 620 520" aria-hidden="true">
-        <path d="M310 260 C160 120 120 170 110 250" />
-        <path d="M310 260 C450 110 510 160 520 245" />
-        <path d="M310 260 C180 340 170 420 250 450" />
-        <path d="M310 260 C430 350 455 420 380 455" />
-        <path d="M310 260 C285 110 350 85 420 120" />
-        <path d="M310 260 C280 390 240 425 175 390" />
-      </svg>
-      <div className="orbital-core">
-        <BrainCircuit size={72} />
-        <span />
-      </div>
-      {nodes.map(([label, Icon, cls], i) => (
-        <motion.div
-          className={`eco-node ${cls}`}
-          key={label}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 4 + i * 0.3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Icon size={22} />
-          <span>{label}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Module nav ────────────────────────────────────────────────────────────
-
-function ModuleNav() {
-  return (
-    <section className="lp-section lp-modules" aria-label="Platform modules">
-      <motion.div
-        className="module-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        {modules.map((m) => (
-          <motion.a
-            key={m.title}
-            className={`premium-card module-card tone-${m.tone} reveal`}
-            href={m.href}
-            variants={fadeInUp}
-            whileHover={{ y: -6 }}
-          >
-            <span className="icon-tile">
-              <m.icon size={22} />
-            </span>
-            <span className="module-title">{m.title}</span>
-            <span className="module-copy">{m.text}</span>
-            <span className="card-link">
-              {m.metric} <ArrowRight size={16} />
-            </span>
-          </motion.a>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Featured Paths ────────────────────────────────────────────────────────
-
-function FeaturedPaths() {
-  return (
-    <section className="lp-section">
-      <SectionHeader
-        badge="Learning"
-        badgeTone="violet"
-        title="Featured Learning Paths"
-        subtitle="Structured journeys from beginner to AI engineer. Real projects, real skills, zero cost."
-        href={withBase('/learn/')}
-        linkText="View all paths"
-      />
-      <motion.div
-        className="lp-paths-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        {learningPaths.map((path) => (
-          <motion.a
-            key={path.title}
-            className="lp-path-card"
-            href={withBase('/learn/')}
-            variants={fadeInUp}
-            whileHover={{ y: -8, transition: { duration: 0.25 } }}
-          >
-            <div className="lp-path-card-header">
-              <span className={`icon-tile tone-${path.color}`}>
-                <path.icon size={20} />
-              </span>
-              <span className={`lp-diff-badge diff-${path.color}`}>{path.difficulty}</span>
-            </div>
-            <h3 className="lp-path-title">{path.title}</h3>
-            <p className="lp-path-subtitle">{path.subtitle}</p>
-            <div className="lp-path-meta">
-              <span>⏱ {path.duration}</span>
-              <span>📁 {path.courses} courses</span>
-            </div>
-            <div className="lp-path-footer">
-              <span className="lp-start-btn">
-                Start Path <ArrowRight size={15} />
-              </span>
-            </div>
-          </motion.a>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Featured Tools ────────────────────────────────────────────────────────
-
-function FeaturedTools() {
-  return (
-    <section className="lp-section lp-tools-section">
-      <SectionHeader
-        badge="Tools"
-        badgeTone="cyan"
-        title="500+ Open Source AI Tools"
-        subtitle="Discover, compare, and integrate the best open-source AI tools — curated for engineers by engineers."
-        href={withBase('/tools/')}
-        linkText="Browse all tools"
-      />
-      <motion.div
-        className="lp-tools-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        {featuredTools.map((tool) => (
-          <motion.a
-            key={tool.name}
-            className="lp-tool-card"
-            href={withBase('/tools/')}
-            variants={fadeInUp}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-          >
-            <div className="lp-tool-header">
-              <span className="lp-tool-icon">{tool.icon}</span>
-              <span className="lp-tool-category">{tool.category}</span>
-            </div>
-            <h3 className="lp-tool-name">{tool.name}</h3>
-            <p className="lp-tool-desc">{tool.description}</p>
-            <div className="lp-tool-footer">
-              <span className="lp-tool-stars">
-                <Star size={13} /> {tool.stars}
-              </span>
-              <span className="lp-tool-link">
-                View Tool <ExternalLink size={13} />
-              </span>
-            </div>
-          </motion.a>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Featured Games ────────────────────────────────────────────────────────
-
-function FeaturedGames() {
-  return (
-    <section className="lp-section">
-      <SectionHeader
-        badge="Games"
-        badgeTone="pink"
-        title="Learn by Playing"
-        subtitle="Gamified AI challenges that make learning addictive. Earn XP, unlock achievements, climb leaderboards."
-        href={withBase('/games/')}
-        linkText="Play all games"
-      />
-      <motion.div
-        className="lp-games-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        {featuredGames.map((game) => (
-          <motion.a
-            key={game.title}
-            className={game.featured ? 'lp-game-card lp-game-featured' : 'lp-game-card'}
-            href={withBase('/games/')}
-            variants={fadeInUp}
-            whileHover={{ y: -8, transition: { duration: 0.2 } }}
-          >
-            <div className="lp-game-tag">{game.tag}</div>
-            <div className="lp-game-icon">
-              <Gamepad2 size={28} />
-            </div>
-            <h3 className="lp-game-title">{game.title}</h3>
-            <p className="lp-game-desc">{game.description}</p>
-            <div className="lp-game-footer">
-              <span className="lp-xp-badge">{game.xp}</span>
-              <span className="lp-game-meta">
-                <Users size={13} /> {game.players} players
-              </span>
-            </div>
-          </motion.a>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Featured Exams ────────────────────────────────────────────────────────
-
-function FeaturedExams() {
-  return (
-    <section className="lp-section">
-      <SectionHeader
-        badge="Exams"
-        badgeTone="amber"
-        title="AI Certification Prep"
-        subtitle="Prepare for AI roles with full mock tests, curated question banks, and interview simulations."
-        href={withBase('/exams/')}
-        linkText="Start preparing"
-      />
-      <motion.div
-        className="lp-exams-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        {examCategories.map((cat) => (
-          <motion.a
-            key={cat.title}
-            className="lp-exam-card"
-            href={withBase('/exams/')}
-            variants={fadeInUp}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-          >
-            <div className="lp-exam-header">
-              <span className={`icon-tile tone-${cat.color}`}>
-                <cat.icon size={20} />
-              </span>
-              <span className="lp-exam-count">{cat.count}</span>
-            </div>
-            <h3 className="lp-exam-title">{cat.title}</h3>
-            <p className="lp-exam-desc">{cat.description}</p>
-          </motion.a>
-        ))}
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Newsletter ────────────────────────────────────────────────────────────
-
-function NewsletterSection() {
-  return (
-    <section className="lp-section">
-      <SectionHeader
-        badge="Newsletter"
-        badgeTone="blue"
-        title="Stay Ahead in AI"
-        subtitle="Weekly curated AI news, tool discoveries, and tutorials — delivered to your inbox."
-        href={withBase('/newsletter/')}
-        linkText="View all issues"
-      />
-      <motion.div
-        className="lp-newsletter-inner"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
-      >
-        <motion.div className="lp-newsletter-issues" variants={fadeInUp}>
-          {newsletterIssues.map((issue) => (
-            <a key={issue.title} className="lp-nl-item" href={withBase('/newsletter/')}>
-              <span className="lp-nl-icon" aria-hidden="true">
-                <Sparkles size={18} />
-              </span>
-              <span className="lp-nl-body">
-                <b>{issue.title}</b>
-                <small>{issue.date}</small>
-              </span>
-              <span className="lp-nl-tag">{issue.tag}</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full border px-3 py-1 text-sm ${statusTone(entry.status)}`}
+                >
+                  {statusLabel(entry.status)}
+                </span>
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {entry.track.stage}
+                </span>
+              </div>
+              <div className="mt-5 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+                    {entry.track.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                    {entry.reason}
+                  </p>
+                </div>
+                <ArrowRight
+                  className="mt-1 h-5 w-5 shrink-0 text-[var(--color-text-tertiary)] transition group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {entry.track.difficulty}
+                </span>
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {entry.track.estimatedWeeks}
+                </span>
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {entry.percentage}% complete
+                </span>
+              </div>
             </a>
           ))}
-        </motion.div>
-
-        <motion.div className="lp-newsletter-subscribe" variants={fadeInUp}>
-          <Bell size={32} />
-          <h3>Join 50,000+ AI Engineers</h3>
-          <p>Get the latest AI insights, tool discoveries, and learning resources every week.</p>
-          <form className="lp-subscribe-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="your@email.com" aria-label="Email address" />
-            <button type="submit">Subscribe Free</button>
-          </form>
-          <small>No spam. Unsubscribe anytime.</small>
-        </motion.div>
-      </motion.div>
-    </section>
-  );
-}
-
-// ─── Community CTA ─────────────────────────────────────────────────────────
-
-function CommunitySection() {
-  return (
-    <section className="lp-section">
-      <motion.div
-        className="lp-community-card"
-        initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={inViewProps}
-        transition={{ duration: 0.7, ease: EASE }}
-      >
-        <div className="lp-community-bg" aria-hidden="true" />
-        <svg
-          width="36"
-          height="36"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-        </svg>
-        <h2>Built Open Source, Together</h2>
-        <p>
-          AIByDM is 100% open source. Contribute tools, courses, games, and ideas. Join 100+
-          contributors shaping the future of AI education.
-        </p>
-        <div className="lp-community-actions">
-          <motion.a
-            href="https://github.com/DipakMandlik/AIbyDM"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="primary-action"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-            Star on GitHub
-          </motion.a>
-          <motion.a
-            href="https://github.com/DipakMandlik/AIbyDM/discussions"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="secondary-action"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Join Discussions
-          </motion.a>
         </div>
-      </motion.div>
-    </section>
-  );
-}
+      </section>
 
-// ─── Stats ─────────────────────────────────────────────────────────────────
+      <section className="mt-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+              Curriculum architecture
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+              Four stages, visible prerequisites, no dead ends.
+            </h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+            Each stage makes your current position obvious, keeps track status visible, and shows
+            the next unlock before you arrive there.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 xl:grid-cols-2">
+          {stages.map((stage) => (
+            <div
+              key={stage.stage}
+              className="rounded-[30px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-6 shadow-[0_18px_50px_rgba(2,8,23,0.14)]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+                    {stage.eyebrow}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-semibold text-[var(--color-text-primary)]">
+                    {stage.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                    {stage.summary}
+                  </p>
+                </div>
+                <span
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border text-sm font-semibold"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${stageAccent(stage.stage)} 28%, transparent)`,
+                    background: `color-mix(in srgb, ${stageAccent(stage.stage)} 12%, transparent)`,
+                    color: stageAccent(stage.stage),
+                  }}
+                >
+                  {String(stage.tracks.length).padStart(2, '0')}
+                </span>
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {stage.tracks.reduce((total, track) => total + track.lessons, 0)} lessons
+                </span>
+                <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-sm text-[var(--color-text-secondary)]">
+                  {stage.tracks.reduce((total, track) => total + track.projects, 0)} projects
+                </span>
+              </div>
+              <div className="mt-5 space-y-3">
+                {stage.tracks.map((track) => {
+                  const status = stageTrackStatus(track.slug, progressState);
+                  return (
+                    <a
+                      key={track.slug}
+                      href={getTrackHref(track.slug)}
+                      className="flex items-start justify-between gap-4 rounded-[22px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1">{statusIcon(status)}</div>
+                        <div>
+                          <p className="text-base font-semibold text-[var(--color-text-primary)]">
+                            {track.title}
+                          </p>
+                          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                            {track.estimatedWeeks} / {track.difficulty}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+                            {track.strapline}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`rounded-full border px-3 py-1 text-sm ${statusTone(status)}`}
+                      >
+                        {statusLabel(status)}
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-function StatsSection() {
-  return (
-    <section className="lp-section" aria-label="AIByDM platform statistics">
-      <motion.div
-        className="lp-stats-grid"
-        variants={stagger}
-        initial="hidden"
-        whileInView="visible"
-        viewport={inViewProps}
+      <section className="mt-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+              Platform surfaces
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+              One system to learn, search, practice, assess, and collaborate.
+            </h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-7 text-[var(--color-text-secondary)]">
+            AIByDM is organized like a product ecosystem. Every surface supports the same journey
+            instead of competing for your attention.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {modules.map((module, index) => (
+            <a
+              key={module.title}
+              href={module.href}
+              className={[
+                'group rounded-[28px] border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-5 shadow-[0_18px_48px_rgba(2,8,23,0.12)] transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]',
+                index === 0 ? 'xl:col-span-2' : '',
+                module.title === 'Community' ? 'lg:col-span-2 xl:col-span-2' : '',
+              ].join(' ')}
+              style={{
+                boxShadow: `0 18px 48px rgba(2, 8, 23, 0.12), inset 0 1px 0 color-mix(in srgb, ${module.accent} 16%, transparent)`,
+              }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span
+                  className="inline-flex min-h-11 items-center rounded-full border px-4 text-sm"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${module.accent} 28%, transparent)`,
+                    background: `color-mix(in srgb, ${module.accent} 12%, transparent)`,
+                    color: module.accent,
+                  }}
+                >
+                  {module.eyebrow}
+                </span>
+                <span className="text-sm text-[var(--color-text-tertiary)]">{module.metric}</span>
+              </div>
+              <h3 className="mt-6 text-2xl font-semibold text-[var(--color-text-primary)]">
+                {module.title}
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-[var(--color-text-secondary)]">
+                {module.description}
+              </p>
+              <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-text-primary)]">
+                {module.cta}
+                <ArrowRight
+                  className="h-4 w-4 transition group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="mt-10 rounded-[34px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_22rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_24px_90px_rgba(2,8,23,0.2)] sm:p-8 lg:p-10"
+       
       >
-        {stats.map(({ value, label, icon: Icon }) => (
-          <motion.div key={label} className="lp-stat-item" variants={fadeInUp}>
-            <span className="icon-tile">
-              <Icon size={20} />
-            </span>
-            <b className="lp-stat-value">{value}</b>
-            <small className="lp-stat-label">{label}</small>
-          </motion.div>
-        ))}
-      </motion.div>
-    </section>
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
+              Open-source by design
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)] sm:text-4xl">
+              Learn in public. Improve the platform together.
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-8 text-[var(--color-text-secondary)] sm:text-base">
+              The platform is built to grow with contributors. Curriculum, tooling guides, games,
+              exams, launch storytelling, and product UX all have visible lanes for contribution.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href={repoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="command-button border border-transparent bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+              >
+                View repository
+              </a>
+              <a
+                href={discussionUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                Join discussions
+              </a>
+              <a
+                href={communityHref}
+                className="command-button border border-[var(--color-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+              >
+                Community hub
+              </a>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5">
+              <p className="text-lg font-semibold text-[var(--color-text-primary)]">
+                Contributor-ready
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                Documentation, roadmap, release notes, and contribution guides are visible from the
+                repo.
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5">
+              <p className="text-lg font-semibold text-[var(--color-text-primary)]">Static-first</p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                GitHub Pages compatibility, SEO, and local-first progress keep the experience fast
+                and portable.
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5">
+              <p className="text-lg font-semibold text-[var(--color-text-primary)]">
+                Progress with context
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                Every major screen answers where you are, what you can do, and what to learn next.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
-// ─── Shared section header ─────────────────────────────────────────────────
 
-function SectionHeader({
-  badge,
-  badgeTone,
-  title,
-  subtitle,
-  href,
-  linkText,
-}: {
-  badge: string;
-  badgeTone: string;
-  title: string;
-  subtitle: string;
-  href?: string;
-  linkText?: string;
-}) {
-  return (
-    <motion.div
-      className="lp-section-header"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={inViewProps}
-      transition={{ duration: 0.55, ease: EASE }}
-    >
-      <span className={`lp-badge tone-${badgeTone}`}>{badge}</span>
-      <h2 className="lp-section-title">{title}</h2>
-      <p className="lp-section-subtitle">{subtitle}</p>
-      {href && linkText && (
-        <a className="lp-see-all" href={href}>
-          {linkText} <ArrowRight size={16} />
-        </a>
-      )}
-    </motion.div>
-  );
-}
+
