@@ -6,14 +6,14 @@ AIByDM deploys as a static site on GitHub Pages.
 
 - Host: GitHub Pages
 - Source: GitHub Actions workflow
-- Live URL: <https://dipakmandlik.github.io/AIbyDM/>
+- Live URL: <https://dipakmandlik.github.io/AIByDM/>
 
 ## Environment Variables
 
 | Variable    | Purpose                        | Default                          |
 | ----------- | ------------------------------ | -------------------------------- |
 | `SITE_URL`  | Canonical site host            | `https://dipakmandlik.github.io` |
-| `BASE_PATH` | Base path for Pages deployment | `/AIbyDM`                        |
+| `BASE_PATH` | Base path for Pages deployment | `/AIByDM`                        |
 
 ## Deployment Workflow
 

@@ -214,7 +214,7 @@ If Pagefind proves insufficient:
 ```
 1. Apply for Algolia DocSearch (free for OSS)
 2. Replace Pagefind UI component with Algolia InstantSearch
-3. Configure Algolia crawler for aibydm.github.io
+3. Configure Algolia crawler for dipakmandlik.github.io/AIByDM
 4. Keep Pagefind as offline fallback
 5. A/B test search quality metrics
 ```

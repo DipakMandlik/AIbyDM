@@ -224,6 +224,17 @@ export default function LearnControlCenter() {
         </div>
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
           <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
+            Modules cleared
+          </p>
+          <p className="mt-3 text-3xl font-semibold text-[var(--color-text-primary)]">
+            {progressSummary.completedModules}
+          </p>
+          <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+            Out of {progressSummary.totalModules} module milestones stored locally.
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+          <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
             Tracks finished
           </p>
           <p className="mt-3 text-3xl font-semibold text-[var(--color-text-primary)]">

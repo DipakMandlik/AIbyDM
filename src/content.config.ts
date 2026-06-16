@@ -7,21 +7,32 @@ import { z } from 'astro/zod';
 /* ------------------------------------------------------------------ */
 
 const trackEnum = z.enum([
+  // Legacy authored content buckets still present in src/content.
   'foundations',
-  'machine-learning',
-  'deep-learning',
-  'computer-vision',
-  'nlp',
-  'transformers',
-  'llm-engineering',
   'rag',
   'agents',
-  'ai-security',
   'governance',
   'lineage',
   'metadata',
   'llmops',
   'production-ai',
+  // Current Learn catalog track slugs used by routed pages.
+  'ai-foundations',
+  'python-for-ai',
+  'mathematics-for-ai',
+  'machine-learning',
+  'deep-learning',
+  'computer-vision',
+  'nlp',
+  'transformers',
+  'generative-ai',
+  'llm-engineering',
+  'rag-engineering',
+  'agent-engineering',
+  'ai-governance',
+  'ai-security',
+  'mlops',
+  'production-ai-systems',
   'enterprise-ai',
 ]);
 

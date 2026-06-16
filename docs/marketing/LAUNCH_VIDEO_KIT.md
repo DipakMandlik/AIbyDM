@@ -99,7 +99,7 @@ Motion style: side pans, push-ins, focus shifts, masked reveals, card stacks, sc
 
 Product truth: show the live AIByDM modules as real product UI. Show advanced learning map items such as machine learning, deep learning, transformers, LLM engineering, RAG, agents, project dashboards, and progress states as stylized roadmap overlays unless the UI is shipped.
 
-End with the AIByDM logo, the line "Learn AI. Build AI. Master AI.", the website URL https://dipakmandlik.github.io/AIbyDM/ and the GitHub URL https://github.com/DipakMandlik/AIByDM.
+End with the AIByDM logo, the line "Learn AI. Build AI. Master AI.", the website URL https://dipakmandlik.github.io/AIByDM/ and the GitHub URL https://github.com/DipakMandlik/AIByDM.
 ```
 
 ## Scene Plan

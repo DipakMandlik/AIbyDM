@@ -1,7 +1,12 @@
 import { ArrowRight, Compass, Sparkles } from 'lucide-react';
 
 import { getLearningTrack, getLessonHref } from '@data/learn/catalog';
-import { getCurrentStreak, getTrackProgress, isLessonCompleted } from '@data/learn/progress';
+import {
+  getCurrentStreak,
+  getTrackModuleProgress,
+  getTrackProgress,
+  isLessonCompleted,
+} from '@data/learn/progress';
 
 import { useLearnProgressState } from '@components/learn/useLearnProgress';
 
@@ -16,6 +21,7 @@ export default function TrackProgressPanel({ trackSlug }: Props) {
   if (!trackEntry) return null;
 
   const progress = getTrackProgress(progressState, trackSlug);
+  const moduleProgress = getTrackModuleProgress(progressState, trackSlug);
   const nextLesson = trackEntry.modules
     .flatMap((moduleEntry) =>
       moduleEntry.lessons.map((lessonEntry) => ({ moduleEntry, lessonEntry })),
@@ -41,13 +47,22 @@ export default function TrackProgressPanel({ trackSlug }: Props) {
           style={{ width: progress.percentage + '%' }}
         />
       </div>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
           <p className="text-sm text-[var(--color-text-secondary)]">Lessons done</p>
           <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
             {progress.completed}
             <span className="ml-1 text-lg text-[var(--color-text-tertiary)]">
               / {progress.total}
+            </span>
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+          <p className="text-sm text-[var(--color-text-secondary)]">Modules cleared</p>
+          <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+            {moduleProgress.completed}
+            <span className="ml-1 text-lg text-[var(--color-text-tertiary)]">
+              / {moduleProgress.total}
             </span>
           </p>
         </div>

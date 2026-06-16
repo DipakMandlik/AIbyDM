@@ -1,11 +1,11 @@
-﻿blank_issues_enabled: false
+blank_issues_enabled: false
 contact_links:
   - name: Questions and community discussion
-    url: https://github.com/DipakMandlik/AIbyDM/discussions
+    url: https://github.com/DipakMandlik/AIByDM/discussions
     about: Ask questions, share ideas, or discuss larger proposals before opening an issue.
   - name: Private security disclosure
-    url: https://github.com/DipakMandlik/AIbyDM/security/advisories/new
+    url: https://github.com/DipakMandlik/AIByDM/security/advisories/new
     about: Report vulnerabilities privately. Do not open public issues for sensitive security reports.
   - name: Contribution guide
-    url: https://github.com/DipakMandlik/AIbyDM/blob/main/CONTRIBUTING.md
+    url: https://github.com/DipakMandlik/AIByDM/blob/main/CONTRIBUTING.md
     about: Read setup instructions, contribution types, and review expectations.

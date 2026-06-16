@@ -1,8 +1,8 @@
 # AIByDM — GitHub Repository Design
 
-**Version:** 1.0
-**Date:** 2026-06-15
-**Status:** Draft
+**Version:** 1.1
+**Date:** 2026-06-16
+**Status:** Active
 
 ---
 
@@ -31,6 +31,58 @@
 - Module gets 10+ active contributors who only touch that module
 - Build time exceeds 10 minutes and module isolation would help
 - Independent versioning needed (e.g., games become a standalone product)
+
+---
+
+## Current Repo Snapshot
+
+The repo now has a concrete Learn implementation that combines routed pages, React islands, authored
+content, and TypeScript catalog data. Contributors working on current code should orient to these
+folders first:
+
+```text
+src/
+  components/
+    learn/
+      LearnDashboard.tsx
+      LearnControlCenter.tsx
+      LearningAtlas.tsx
+      TrackRoadmap.tsx
+      TrackProgressPanel.tsx
+      LessonRail.tsx
+      SearchExperience.tsx
+      LessonProgressButton.tsx
+      useLearnProgress.ts
+  content/
+    learn/
+      foundations/
+        python-basics.mdx
+        math-for-ai.mdx
+  data/
+    learn/
+      catalog.ts
+      discovery.ts
+      progress.ts
+      recommendations.ts
+      search.ts
+  pages/
+    learn/
+      index.astro
+      catalog/index.astro
+      glossary/index.astro
+      resources/index.astro
+      roadmap/index.astro
+      [track]/index.astro
+      [track]/[lesson].astro
+      [track]/projects/[project].astro
+    search/
+      index.astro
+```
+
+- `src/data/learn/catalog.ts` is the live Learn source of truth for routed curriculum.
+- `src/content/learn/` currently acts as authored lesson enrichment, not the only Learn storage
+  layer.
+- `src/data/learn/progress.ts` is the shared client-side progress contract consumed by the Learn UI.
 
 ---
 

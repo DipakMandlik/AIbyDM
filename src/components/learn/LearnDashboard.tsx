@@ -175,13 +175,22 @@ export default function LearnDashboard() {
               </div>
               <Radar className="h-8 w-8 text-[var(--color-learn)]" aria-hidden="true" />
             </div>
-            <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
                 <p className="text-sm text-[var(--color-text-secondary)]">Lessons completed</p>
                 <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
                   {progressSummary.completedLessons}
                   <span className="ml-1 text-lg text-[var(--color-text-tertiary)]">
                     / {progressSummary.totalLessons}
+                  </span>
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-4">
+                <p className="text-sm text-[var(--color-text-secondary)]">Modules cleared</p>
+                <p className="mt-2 text-3xl font-semibold text-[var(--color-text-primary)]">
+                  {progressSummary.completedModules}
+                  <span className="ml-1 text-lg text-[var(--color-text-tertiary)]">
+                    / {progressSummary.totalModules}
                   </span>
                 </p>
               </div>

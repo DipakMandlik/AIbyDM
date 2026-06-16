@@ -27,6 +27,22 @@ flowchart LR
     Deploy --> Pages
 ```
 
+## Current Implementation Snapshot
+
+As of 2026-06-16, the Learn platform is the most mature module in the repo and is implemented as
+a hybrid Astro, React, and TypeScript catalog system.
+
+| Area           | Current repo state                                                                                                                                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Curriculum     | `src/data/learn/catalog.ts` defines 17 tracks across core, builder, systems, and enterprise stages.                                                                                                                  |
+| Routes         | Learn currently ships `/learn/`, `/learn/catalog/`, `/learn/roadmap/`, `/learn/resources/`, `/learn/glossary/`, `/learn/[track]/`, `/learn/[track]/[lesson]/`, `/learn/[track]/projects/[project]/`, and `/search/`. |
+| Learning UI    | `src/components/learn/` contains the dashboard, control center, roadmap, lesson rail, progress panel, and search experience.                                                                                         |
+| Progress state | `src/data/learn/progress.ts` stores lesson completion, module completion, streaks, recents, and last-visited state in local storage.                                                                                 |
+| Scale          | The current Learn catalog generates 136 lesson routes and 68 project routes inside a 234-page static build.                                                                                                          |
+
+Authored MDX content in `src/content/learn/` is still supported, but it now acts as an enrichment
+layer for selected lessons rather than the only Learn source of truth.
+
 ## Core Layers
 
 | Layer               | Responsibility                                                    |

@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://dipakmandlik.github.io/AIbyDM/"><img src="https://img.shields.io/badge/Live%20Demo-AIByDM-16a34a?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live Demo"></a>
+  <a href="https://dipakmandlik.github.io/AIByDM/"><img src="https://img.shields.io/badge/Live%20Demo-AIByDM-16a34a?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live Demo"></a>
   <a href="./docs/README.md"><img src="https://img.shields.io/badge/Documentation-Read%20the%20docs-0f172a?style=for-the-badge&logo=gitbook&logoColor=white" alt="Documentation"></a>
   <a href="./ROADMAP.md"><img src="https://img.shields.io/badge/Roadmap-Open%20roadmap-1d4ed8?style=for-the-badge&logo=githubprojects&logoColor=white" alt="Roadmap"></a>
   <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/Contribute-Start%20here-f59e0b?style=for-the-badge&logo=git&logoColor=white" alt="Contribute"></a>
@@ -22,15 +22,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/DipakMandlik/AIbyDM/actions/workflows/validate.yml"><img src="https://github.com/DipakMandlik/AIbyDM/actions/workflows/validate.yml/badge.svg" alt="Build Status"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/actions/workflows/deploy.yml"><img src="https://github.com/DipakMandlik/AIbyDM/actions/workflows/deploy.yml/badge.svg" alt="Deploy Status"></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/DipakMandlik/AIbyDM" alt="License"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/stargazers"><img src="https://img.shields.io/github/stars/DipakMandlik/AIbyDM?style=social" alt="GitHub Stars"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/graphs/contributors"><img src="https://img.shields.io/github/contributors/DipakMandlik/AIbyDM" alt="Contributors"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/issues"><img src="https://img.shields.io/github/issues/DipakMandlik/AIbyDM" alt="Open Issues"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/pulls"><img src="https://img.shields.io/github/issues-pr/DipakMandlik/AIbyDM" alt="Pull Requests"></a>
-  <a href="https://github.com/DipakMandlik/AIbyDM/commits/main/"><img src="https://img.shields.io/github/last-commit/DipakMandlik/AIbyDM" alt="Last Commit"></a>
-  <a href="https://dipakmandlik.github.io/AIbyDM/"><img src="https://img.shields.io/badge/GitHub%20Pages-Live-22c55e?logo=githubpages&logoColor=white" alt="GitHub Pages"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/actions/workflows/validate.yml"><img src="https://github.com/DipakMandlik/AIByDM/actions/workflows/validate.yml/badge.svg" alt="Build Status"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/actions/workflows/deploy.yml"><img src="https://github.com/DipakMandlik/AIByDM/actions/workflows/deploy.yml/badge.svg" alt="Deploy Status"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/DipakMandlik/AIByDM" alt="License"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/stargazers"><img src="https://img.shields.io/github/stars/DipakMandlik/AIByDM?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/graphs/contributors"><img src="https://img.shields.io/github/contributors/DipakMandlik/AIByDM" alt="Contributors"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/issues"><img src="https://img.shields.io/github/issues/DipakMandlik/AIByDM" alt="Open Issues"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/pulls"><img src="https://img.shields.io/github/issues-pr/DipakMandlik/AIByDM" alt="Pull Requests"></a>
+  <a href="https://github.com/DipakMandlik/AIByDM/commits/main/"><img src="https://img.shields.io/github/last-commit/DipakMandlik/AIByDM" alt="Last Commit"></a>
+  <a href="https://dipakmandlik.github.io/AIByDM/"><img src="https://img.shields.io/badge/GitHub%20Pages-Live-22c55e?logo=githubpages&logoColor=white" alt="GitHub Pages"></a>
 </p>
 
 <p align="center">
@@ -62,9 +62,9 @@ AIByDM brings those pieces into one open-source system:
 If AIByDM helps you learn faster, teach more clearly, or ship better AI systems, star the repository.
 That signal helps the project attract contributors, reviewers, and new learners.
 
-- Repository: [github.com/DipakMandlik/AIbyDM](https://github.com/DipakMandlik/AIbyDM)
-- Live website: [dipakmandlik.github.io/AIbyDM](https://dipakmandlik.github.io/AIbyDM/)
-- Discussions: [Join the community](https://github.com/DipakMandlik/AIbyDM/discussions)
+- Repository: [github.com/DipakMandlik/AIByDM](https://github.com/DipakMandlik/AIByDM)
+- Live website: [dipakmandlik.github.io/AIByDM](https://dipakmandlik.github.io/AIByDM/)
+- Discussions: [Join the community](https://github.com/DipakMandlik/AIByDM/discussions)
 
 ## Product Showcase
 
@@ -160,8 +160,8 @@ Read the deeper architecture docs in [ARCHITECTURE.md](./ARCHITECTURE.md) and
 ### Run Locally
 
 ```bash
-git clone https://github.com/DipakMandlik/AIbyDM.git
-cd AIbyDM
+git clone https://github.com/DipakMandlik/AIByDM.git
+cd AIByDM
 pnpm install
 pnpm dev
 ```
@@ -201,7 +201,7 @@ AIByDM ships as a static site and is currently configured for GitHub Pages.
 1. Push to `main`.
 2. GitHub Actions runs validation and build jobs.
 3. The Pages workflow publishes `dist/`.
-4. The live site updates at [dipakmandlik.github.io/AIbyDM](https://dipakmandlik.github.io/AIbyDM/).
+4. The live site updates at [dipakmandlik.github.io/AIByDM](https://dipakmandlik.github.io/AIByDM/).
 
 Deployment details live in [docs/deployment/README.md](./docs/deployment/README.md).
 

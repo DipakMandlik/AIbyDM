@@ -8,7 +8,7 @@ Use this checklist to keep AIByDM aligned with its flagship open-source position
 - Tagline: `Learn AI. Build AI. Master AI.`
 - Description:
   `Open-source AI learning platform featuring structured learning paths, projects, roadmaps, AI tools, challenges, exams, and community-driven learning.`
-- Website URL: `https://dipakmandlik.github.io/AIbyDM/`
+- Website URL: `https://dipakmandlik.github.io/AIByDM/`
 
 ## Topics
 
@@ -38,7 +38,7 @@ Apply these repository topics:
 ## GitHub Pages
 
 1. Keep the Pages source on `GitHub Actions`.
-2. Confirm the live URL is `https://dipakmandlik.github.io/AIbyDM/`.
+2. Confirm the live URL is `https://dipakmandlik.github.io/AIByDM/`.
 3. Validate that the deploy workflow publishes after pushes to `main`.
 
 ## Repository Features

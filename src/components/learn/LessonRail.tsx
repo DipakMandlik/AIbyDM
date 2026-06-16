@@ -1,7 +1,7 @@
 import { CheckCircle2, Circle, PlayCircle } from 'lucide-react';
 
 import { getLearningTrack, getLessonHref } from '@data/learn/catalog';
-import { getModuleProgress, isLessonCompleted } from '@data/learn/progress';
+import { getModuleProgress, isLessonCompleted, isModuleCompleted } from '@data/learn/progress';
 
 import { useLearnProgressState } from '@components/learn/useLearnProgress';
 
@@ -20,6 +20,7 @@ export default function LessonRail({ trackSlug, currentLessonSlug }: Props) {
     <div className="space-y-4">
       {trackEntry.modules.map((moduleEntry) => {
         const moduleProgress = getModuleProgress(progressState, trackSlug, moduleEntry.slug);
+        const moduleCompleted = isModuleCompleted(progressState, trackSlug, moduleEntry.slug);
         return (
           <div
             key={moduleEntry.slug}
@@ -34,11 +35,18 @@ export default function LessonRail({ trackSlug, currentLessonSlug }: Props) {
                   {moduleProgress.completed} / {moduleProgress.total} complete
                 </p>
               </div>
-              <div className="h-2 w-16 overflow-hidden rounded-full bg-[rgba(148,163,184,0.16)]">
-                <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-learn),var(--color-accent))]"
-                  style={{ width: moduleProgress.percentage + '%' }}
-                />
+              <div className="flex flex-col items-end gap-2">
+                {moduleCompleted && (
+                  <span className="rounded-full border border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.12)] px-2 py-1 text-[10px] font-medium tracking-[0.18em] text-[var(--color-text-primary)] uppercase">
+                    Module clear
+                  </span>
+                )}
+                <div className="h-2 w-16 overflow-hidden rounded-full bg-[rgba(148,163,184,0.16)]">
+                  <div
+                    className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-learn),var(--color-accent))]"
+                    style={{ width: moduleProgress.percentage + '%' }}
+                  />
+                </div>
               </div>
             </div>
             <div className="mt-4 space-y-2">

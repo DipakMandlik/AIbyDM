@@ -1,8 +1,53 @@
 # AIByDM — Technical Architecture
 
-**Version:** 1.0
-**Date:** 2026-06-15
-**Status:** Draft
+**Version:** 1.1
+**Date:** 2026-06-16
+**Status:** Active
+
+---
+
+## Current Repo Snapshot
+
+The initial draft below still explains the technical direction correctly, but the Learn
+implementation in the repo has already evolved into this concrete structure:
+
+```text
+src/pages/learn/
+  index.astro
+  catalog/index.astro
+  glossary/index.astro
+  resources/index.astro
+  roadmap/index.astro
+  [track]/index.astro
+  [track]/[lesson].astro
+  [track]/projects/[project].astro
+src/pages/search/index.astro
+
+src/components/learn/
+  LearnDashboard.tsx
+  LearnControlCenter.tsx
+  LearningAtlas.tsx
+  TrackRoadmap.tsx
+  TrackProgressPanel.tsx
+  LessonRail.tsx
+  SearchExperience.tsx
+  LessonProgressButton.tsx
+  useLearnProgress.ts
+
+src/data/learn/
+  catalog.ts
+  discovery.ts
+  progress.ts
+  recommendations.ts
+  search.ts
+```
+
+- Learn pages are generated from the TypeScript catalog, not a single `learn/[...slug].astro`
+  catch-all route.
+- `src/content/learn/` remains available for authored MDX deep dives and is attached to lessons via
+  `contentEntryId` where present.
+- Local progress is an explicit data layer and currently tracks completed lessons, completed
+  modules, streaks, recent lessons, and last-visited state.
 
 ---
 

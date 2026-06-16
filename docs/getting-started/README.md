@@ -8,8 +8,8 @@
 ## Local Setup
 
 ```bash
-git clone https://github.com/DipakMandlik/AIbyDM.git
-cd AIbyDM
+git clone https://github.com/DipakMandlik/AIByDM.git
+cd AIByDM
 pnpm install
 pnpm dev
 ```

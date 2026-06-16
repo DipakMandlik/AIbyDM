@@ -1,15 +1,57 @@
 # AIByDM — Information Architecture
 
-**Version:** 1.0
-**Date:** 2026-06-15
-**Status:** Draft
+**Version:** 1.1
+**Date:** 2026-06-16
+**Status:** Active
+
+---
+
+## Current Repo Snapshot
+
+The Learn information architecture in the live repo is now centered on dedicated route families,
+not just a generic content tree.
+
+```text
+/learn/
+/learn/catalog/
+/learn/roadmap/
+/learn/resources/
+/learn/glossary/
+/learn/[track]/
+/learn/[track]/[lesson]/
+/learn/[track]/projects/[project]/
+/search/
+```
+
+Current track slugs in the routed Learn experience:
+
+- `ai-foundations`
+- `python-for-ai`
+- `mathematics-for-ai`
+- `machine-learning`
+- `deep-learning`
+- `computer-vision`
+- `nlp`
+- `transformers`
+- `generative-ai`
+- `llm-engineering`
+- `rag-engineering`
+- `agent-engineering`
+- `ai-governance`
+- `ai-security`
+- `mlops`
+- `production-ai-systems`
+- `enterprise-ai`
+
+Use the route patterns above when contributing. The broader module sitemap below remains useful as a
+planning reference, but the Learn examples in it predate the current track expansion.
 
 ---
 
 ## 1. Site Map
 
 ```
-aibydm.github.io/
+dipakmandlik.github.io/AIByDM/
 │
 ├── /                           # Homepage
 │

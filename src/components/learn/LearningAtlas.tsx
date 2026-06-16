@@ -1,18 +1,24 @@
 import { startTransition, useDeferredValue, useMemo, useState } from 'react';
 import {
   ArrowRight,
+  CheckCircle2,
   BookMarked,
   BookOpen,
+  ChevronDown,
+  ChevronUp,
+  Circle,
   Clock3,
   Compass,
   ExternalLink,
   Layers3,
+  LockKeyhole,
   Search,
   Sparkles,
 } from 'lucide-react';
 
 import {
   getLessonHref,
+  getProjectHref,
   getTrackHref,
   learningStageGroups,
   type LearningStage,
@@ -25,12 +31,18 @@ import {
   learnResourceEntries,
   type LearnGlossaryKind,
 } from '@data/learn/discovery';
-import { getTrackProgress, isLessonCompleted, type LearnProgressState } from '@data/learn/progress';
+import {
+  getModuleProgress,
+  getTrackProgress,
+  isLessonCompleted,
+  isModuleCompleted,
+  type LearnProgressState,
+} from '@data/learn/progress';
 import { getTrackStatus } from '@data/learn/recommendations';
 
 import { useLearnProgressState } from '@components/learn/useLearnProgress';
 
-type AtlasView = 'catalog' | 'roadmap' | 'resources' | 'glossary';
+type AtlasView = 'catalog' | 'contents' | 'roadmap' | 'resources' | 'glossary';
 type AtlasStatusFilter = 'all' | 'ready' | 'in-progress' | 'complete' | 'locked';
 type StageFilter = 'all' | LearningStage;
 type ResourceFilter = 'all' | ResourceKind;
@@ -53,7 +65,8 @@ interface TrackInsight {
 }
 
 const atlasTabs: Array<{ id: AtlasView; label: string; icon: typeof Layers3 }> = [
-  { id: 'catalog', label: 'Catalog', icon: Layers3 },
+  { id: 'catalog', label: 'Tracks', icon: Layers3 },
+  { id: 'contents', label: 'Contents', icon: BookOpen },
   { id: 'roadmap', label: 'Roadmap', icon: Compass },
   { id: 'resources', label: 'Resources', icon: BookMarked },
   { id: 'glossary', label: 'Glossary', icon: BookOpen },
@@ -344,7 +357,277 @@ function CatalogCard({
   );
 }
 
-export default function LearningAtlas({ initialView = 'catalog', initialQuery = '' }: Props) {
+function ContentsTrackCard({
+  entry,
+  insight,
+  progressState,
+  expanded,
+  onToggle,
+}: {
+  entry: (typeof learnCatalogEntries)[number];
+  insight: TrackInsight;
+  progressState: LearnProgressState;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const firstIncompleteLesson = entry.track.modules
+    .flatMap((moduleEntry) =>
+      moduleEntry.lessons.map((lessonEntry) => ({ moduleEntry, lessonEntry })),
+    )
+    .find((item) => !isLessonCompleted(progressState, entry.track.slug, item.lessonEntry.slug));
+
+  return (
+    <article className="rounded-[26px] border border-[var(--color-border)] bg-[var(--color-bg-panel)] p-5 shadow-[0_18px_44px_rgba(2,8,23,0.14)]">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="max-w-3xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-secondary)]">
+              {statusLabel(insight.status)}
+            </span>
+            <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-secondary)]">
+              {entry.track.stage}
+            </span>
+            <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-secondary)]">
+              {entry.track.difficulty}
+            </span>
+          </div>
+          <h3 className="mt-4 text-2xl font-semibold text-[var(--color-text-primary)]">
+            {entry.track.title}
+          </h3>
+          <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+            {entry.track.strapline}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-surface)] px-4 text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+        >
+          {expanded ? (
+            <ChevronUp className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="h-4 w-4" aria-hidden="true" />
+          )}
+          {expanded ? 'Hide hierarchy' : 'Expand hierarchy'}
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-4">
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-3">
+          <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
+            Modules
+          </p>
+          <p className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
+            {entry.moduleCount}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-3">
+          <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
+            Lessons
+          </p>
+          <p className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
+            {entry.lessonCount}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-3">
+          <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
+            Projects
+          </p>
+          <p className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
+            {entry.projectCount}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-3">
+          <p className="text-xs tracking-[0.18em] text-[var(--color-text-tertiary)] uppercase">
+            Time
+          </p>
+          <p className="mt-2 text-xl font-semibold text-[var(--color-text-primary)]">
+            {Math.round(entry.minutes / 60)}h
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-4">
+        <div className="flex items-center justify-between gap-3 text-sm text-[var(--color-text-secondary)]">
+          <span>Track progress</span>
+          <span>
+            {insight.progress.completed}/{insight.progress.total}
+          </span>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(148,163,184,0.16)]">
+          <div
+            className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-learn),var(--color-accent))]"
+            style={{ width: insight.progress.percentage + '%' }}
+          />
+        </div>
+      </div>
+
+      {firstIncompleteLesson && (
+        <div className="mt-5 rounded-2xl border border-[var(--color-border)] bg-[rgba(56,189,248,0.08)] p-4">
+          <p className="font-mono text-xs tracking-[0.24em] text-[var(--color-text-tertiary)] uppercase">
+            Next checkpoint
+          </p>
+          <p className="mt-2 text-base font-semibold text-[var(--color-text-primary)]">
+            {firstIncompleteLesson.lessonEntry.title}
+          </p>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            {firstIncompleteLesson.moduleEntry.title}
+          </p>
+        </div>
+      )}
+
+      {expanded && (
+        <div className="mt-6 space-y-4">
+          {entry.track.modules.map((moduleEntry, moduleIndex) => {
+            const moduleProgress = getModuleProgress(
+              progressState,
+              entry.track.slug,
+              moduleEntry.slug,
+            );
+            const moduleCompleted = isModuleCompleted(
+              progressState,
+              entry.track.slug,
+              moduleEntry.slug,
+            );
+
+            return (
+              <section
+                key={moduleEntry.slug}
+                className="rounded-[24px] border border-[var(--color-border)] bg-[rgba(2,6,23,0.36)] p-4"
+              >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-secondary)]">
+                        Module {String(moduleIndex + 1).padStart(2, '0')}
+                      </span>
+                      {moduleCompleted && (
+                        <span className="rounded-full border border-[rgba(34,197,94,0.28)] bg-[rgba(34,197,94,0.12)] px-3 py-1 text-xs text-[var(--color-text-primary)]">
+                          Cleared
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="mt-3 text-xl font-semibold text-[var(--color-text-primary)]">
+                      {moduleEntry.title}
+                    </h4>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
+                      {moduleEntry.summary}
+                    </p>
+                  </div>
+                  <div className="min-w-[14rem] rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-3">
+                    <div className="flex items-center justify-between gap-3 text-sm text-[var(--color-text-secondary)]">
+                      <span>Module progress</span>
+                      <span>
+                        {moduleProgress.completed}/{moduleProgress.total}
+                      </span>
+                    </div>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgba(148,163,184,0.16)]">
+                      <div
+                        className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-learn),var(--color-accent))]"
+                        style={{ width: moduleProgress.percentage + '%' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  {moduleEntry.lessons.map((lessonEntry) => {
+                    const completed = isLessonCompleted(
+                      progressState,
+                      entry.track.slug,
+                      lessonEntry.slug,
+                    );
+                    const isNextLesson =
+                      firstIncompleteLesson?.lessonEntry.slug === lessonEntry.slug;
+
+                    return (
+                      <a
+                        key={lessonEntry.slug}
+                        href={getLessonHref(entry.track.slug, lessonEntry.slug)}
+                        className="block rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] p-4 transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+                      >
+                        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div className="flex items-start gap-3">
+                            {completed ? (
+                              <CheckCircle2
+                                className="mt-1 h-5 w-5 text-[var(--color-accent)]"
+                                aria-hidden="true"
+                              />
+                            ) : isNextLesson ? (
+                              <Compass
+                                className="mt-1 h-5 w-5 text-[var(--color-learn)]"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <Circle
+                                className="mt-1 h-5 w-5 text-[var(--color-text-tertiary)]"
+                                aria-hidden="true"
+                              />
+                            )}
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-base font-semibold text-[var(--color-text-primary)]">
+                                  {lessonEntry.title}
+                                </p>
+                                {isNextLesson && (
+                                  <span className="rounded-full border border-[rgba(56,189,248,0.28)] bg-[rgba(56,189,248,0.12)] px-2 py-1 text-[11px] text-[var(--color-text-primary)]">
+                                    Up next
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                                {lessonEntry.format} / {lessonEntry.duration}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--color-border)] px-3 text-sm text-[var(--color-text-secondary)]">
+                            <Clock3 className="h-4 w-4" aria-hidden="true" />
+                            {lessonEntry.output.kind}
+                          </span>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <a
+          href={insight.actionHref}
+          className="command-button border border-transparent bg-[var(--color-accent)] text-[var(--color-accent-contrast)] hover:bg-[var(--color-accent-hover)]"
+        >
+          {insight.actionLabel}
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </a>
+        <a
+          href={entry.href}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-border)] px-4 text-sm text-[var(--color-text-secondary)] transition hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)]"
+        >
+          {insight.status === 'locked' ? (
+            <LockKeyhole className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <Compass className="h-4 w-4" aria-hidden="true" />
+          )}
+          Overview
+        </a>
+        <a
+          href={getProjectHref(entry.track.slug, entry.track.projects[0].slug)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-border)] px-4 text-sm text-[var(--color-text-secondary)] transition hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)]"
+        >
+          <Clock3 className="h-4 w-4" aria-hidden="true" />
+          Project ladder
+        </a>
+      </div>
+    </article>
+  );
+}
+
+export default function LearningAtlas({ initialView = 'contents', initialQuery = '' }: Props) {
   const progressState = useLearnProgressState();
   const [view, setView] = useState<AtlasView>(initialView);
   const [query, setQuery] = useState(initialQuery);
@@ -352,6 +635,7 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
   const [statusFilter, setStatusFilter] = useState<AtlasStatusFilter>('all');
   const [resourceFilter, setResourceFilter] = useState<ResourceFilter>('all');
   const [glossaryFilter, setGlossaryFilter] = useState<GlossaryFilter>('all');
+  const [expandedTrackSlugs, setExpandedTrackSlugs] = useState<string[]>([]);
   const deferredQuery = useDeferredValue(query);
 
   const trackInsights = useMemo(
@@ -380,6 +664,16 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
           entry.track.strapline,
           entry.track.summary,
           entry.track.weeklyRhythm,
+          ...entry.track.modules.map((moduleEntry) => moduleEntry.title),
+          ...entry.track.modules.map((moduleEntry) => moduleEntry.summary),
+          ...entry.track.modules.flatMap((moduleEntry) =>
+            moduleEntry.lessons.map((lessonEntry) => lessonEntry.title),
+          ),
+          ...entry.track.modules.flatMap((moduleEntry) =>
+            moduleEntry.lessons.flatMap((lessonEntry) => lessonEntry.concepts),
+          ),
+          ...entry.track.projects.map((projectEntry) => projectEntry.title),
+          ...entry.track.projects.flatMap((projectEntry) => projectEntry.skills),
           ...entry.technologies,
           ...entry.track.outcomes,
           ...entry.prerequisites.map((prerequisite) => prerequisite.title),
@@ -438,6 +732,10 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
   const unlockedTrackCount = Array.from(trackInsights.values()).filter(
     (entry) => entry.status !== 'locked',
   ).length;
+  const visibleTrackSlugs = filteredCatalogEntries.map((entry) => entry.track.slug);
+  const allVisibleExpanded =
+    visibleTrackSlugs.length > 0 &&
+    visibleTrackSlugs.every((slug) => expandedTrackSlugs.includes(slug));
 
   return (
     <section
@@ -552,6 +850,7 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
           </label>
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-surface)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
             {view === 'catalog' && filteredCatalogEntries.length + ' tracks shown'}
+            {view === 'contents' && filteredCatalogEntries.length + ' track hierarchies shown'}
             {view === 'roadmap' && filteredCatalogEntries.length + ' roadmap milestones shown'}
             {view === 'resources' &&
               visibleResources.length +
@@ -566,7 +865,7 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
           </div>
         </div>
 
-        {(view === 'catalog' || view === 'roadmap') && (
+        {(view === 'catalog' || view === 'contents' || view === 'roadmap') && (
           <>
             <div className="mt-4 flex flex-wrap gap-2">
               {stageFilters.map((filterEntry) => (
@@ -596,6 +895,30 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
                 />
               ))}
             </div>
+            {view === 'contents' && filteredCatalogEntries.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    startTransition(() => {
+                      setExpandedTrackSlugs((current) =>
+                        allVisibleExpanded
+                          ? current.filter((slug) => !visibleTrackSlugs.includes(slug))
+                          : Array.from(new Set([...current, ...visibleTrackSlugs])),
+                      );
+                    });
+                  }}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-panel)] px-4 text-sm text-[var(--color-text-primary)] transition hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-hover)]"
+                >
+                  {allVisibleExpanded ? (
+                    <ChevronUp className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {allVisibleExpanded ? 'Collapse visible tracks' : 'Expand visible tracks'}
+                </button>
+              </div>
+            )}
           </>
         )}
         {view === 'resources' && (
@@ -644,6 +967,39 @@ export default function LearningAtlas({ initialView = 'catalog', initialQuery = 
           ) : (
             <div className="rounded-[24px] border border-dashed border-[var(--color-border)] bg-[var(--color-bg-panel)] p-6 text-sm leading-7 text-[var(--color-text-secondary)] xl:col-span-2">
               No tracks matched those filters. Try searching by concept, technology, or track name.
+            </div>
+          )}
+        </div>
+      )}
+
+      {view === 'contents' && (
+        <div className="mt-6 space-y-4">
+          {filteredCatalogEntries.length > 0 ? (
+            filteredCatalogEntries.map((entry) => {
+              const insight = trackInsights.get(entry.track.slug);
+              return insight ? (
+                <ContentsTrackCard
+                  key={entry.track.slug}
+                  entry={entry}
+                  insight={insight}
+                  progressState={progressState}
+                  expanded={expandedTrackSlugs.includes(entry.track.slug)}
+                  onToggle={() => {
+                    startTransition(() => {
+                      setExpandedTrackSlugs((current) =>
+                        current.includes(entry.track.slug)
+                          ? current.filter((slug) => slug !== entry.track.slug)
+                          : [...current, entry.track.slug],
+                      );
+                    });
+                  }}
+                />
+              ) : null;
+            })
+          ) : (
+            <div className="rounded-[24px] border border-dashed border-[var(--color-border)] bg-[var(--color-bg-panel)] p-6 text-sm leading-7 text-[var(--color-text-secondary)]">
+              No track contents matched those filters. Try searching by module name, lesson title,
+              concept, or project.
             </div>
           )}
         </div>

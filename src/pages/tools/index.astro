@@ -9,7 +9,7 @@ const tools = entries.sort((a, b) => a.data.name.localeCompare(b.data.name));
 const categories = [...new Set(tools.map((tool) => tool.data.category))];
 const openSourceCount = tools.filter((tool) => tool.data.openSource).length;
 const featuredCount = tools.filter((tool) => tool.data.featured).length;
-const repoIssueUrl = 'https://github.com/DipakMandlik/AIbyDM/issues/new/choose';
+const repoIssueUrl = 'https://github.com/DipakMandlik/AIByDM/issues/new/choose';
 ---
 
 <BaseLayout

@@ -8,6 +8,7 @@ import mdx from '@astrojs/mdx';
 
 const site = env.SITE_URL ?? 'https://dipakmandlik.github.io';
 const base = env.BASE_PATH ?? '/AIByDM';
+const vitePlugins = /** @type {any} */ ([tailwindcss()]);
 
 export default defineConfig({
   site,
@@ -15,7 +16,8 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [react(), sitemap(), mdx()],
   vite: {
-    plugins: [tailwindcss()],
+    // Keep config type-checking stable across npm/pnpm installs where Vite can resolve from different trees.
+    plugins: vitePlugins,
   },
   markdown: {
     shikiConfig: {

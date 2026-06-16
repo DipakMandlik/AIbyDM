@@ -7,9 +7,9 @@ project direction, and a welcoming place for learners and builders to participat
 
 | Channel                                                                  | Purpose                                                          |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| [GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions) | Questions, ideas, launch notes, and long-form collaboration      |
-| [GitHub Issues](https://github.com/DipakMandlik/AIbyDM/issues)           | Bugs, feature requests, documentation requests, and content work |
-| [Pull Requests](https://github.com/DipakMandlik/AIbyDM/pulls)            | Proposed code, content, and documentation changes                |
+| [GitHub Discussions](https://github.com/DipakMandlik/AIByDM/discussions) | Questions, ideas, launch notes, and long-form collaboration      |
+| [GitHub Issues](https://github.com/DipakMandlik/AIByDM/issues)           | Bugs, feature requests, documentation requests, and content work |
+| [Pull Requests](https://github.com/DipakMandlik/AIByDM/pulls)            | Proposed code, content, and documentation changes                |
 | [SUPPORT.md](./SUPPORT.md)                                               | Where to ask for help                                            |
 | [SECURITY.md](./SECURITY.md)                                             | Private vulnerability reporting                                  |
 
@@ -65,7 +65,7 @@ We want contributors to feel visible and appreciated.
 
 ### Project Contributors
 
-- See the live contributors graph: [AIByDM contributors](https://github.com/DipakMandlik/AIbyDM/graphs/contributors)
+- See the live contributors graph: [AIByDM contributors](https://github.com/DipakMandlik/AIByDM/graphs/contributors)
 - Early public contributors will be highlighted in milestone release notes.
 
 ## Community Standards

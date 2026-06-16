@@ -4,6 +4,7 @@ import {
   getLearningTrack,
   getLessonHref,
   getTrackLessonCount,
+  getTrackModuleCount,
   learningTracks,
 } from '@data/learn/catalog';
 
@@ -12,6 +13,7 @@ export const LEARN_PROGRESS_EVENT = 'aibydm:learn-progress';
 
 export interface LearnProgressState {
   completedLessonKeys: string[];
+  completedModuleKeys: string[];
   recentLessonKeys: string[];
   lastLessonKey?: string;
   lastVisitedAtByLesson: Record<string, string>;
@@ -20,6 +22,8 @@ export interface LearnProgressState {
 export interface LearnProgressSummary {
   completedLessons: number;
   totalLessons: number;
+  completedModules: number;
+  totalModules: number;
   completedTracks: number;
   streakDays: number;
 }
@@ -47,6 +51,7 @@ function dedupe<T>(values: T[]): T[] {
 function defaultProgressState(): LearnProgressState {
   return {
     completedLessonKeys: [],
+    completedModuleKeys: [],
     recentLessonKeys: [],
     lastLessonKey: undefined,
     lastVisitedAtByLesson: {},
@@ -60,6 +65,9 @@ function sanitizeProgressState(value: unknown): LearnProgressState {
   return {
     completedLessonKeys: Array.isArray(record.completedLessonKeys)
       ? record.completedLessonKeys.filter((item): item is string => typeof item === 'string')
+      : [],
+    completedModuleKeys: Array.isArray(record.completedModuleKeys)
+      ? record.completedModuleKeys.filter((item): item is string => typeof item === 'string')
       : [],
     recentLessonKeys: Array.isArray(record.recentLessonKeys)
       ? record.recentLessonKeys.filter((item): item is string => typeof item === 'string')
@@ -91,6 +99,51 @@ export function makeLessonKey(trackSlug: string, lessonSlug: string): string {
   return trackSlug + ':' + lessonSlug;
 }
 
+export function makeModuleKey(trackSlug: string, moduleSlug: string): string {
+  return trackSlug + ':' + moduleSlug;
+}
+
+function syncDerivedProgressState(progressState: LearnProgressState): LearnProgressState {
+  const validLessonKeys = new Set(
+    getAllLearningLessons().map((entry) => makeLessonKey(entry.track.slug, entry.lesson.slug)),
+  );
+  const completedLessonKeys = dedupe(progressState.completedLessonKeys).filter((entry) =>
+    validLessonKeys.has(entry),
+  );
+  const recentLessonKeys = dedupe(progressState.recentLessonKeys)
+    .filter((entry) => validLessonKeys.has(entry))
+    .slice(0, 12);
+  const lastVisitedAtByLesson = Object.fromEntries(
+    Object.entries(progressState.lastVisitedAtByLesson).filter(([lessonKey]) =>
+      validLessonKeys.has(lessonKey),
+    ),
+  );
+  const lastLessonKey =
+    progressState.lastLessonKey && validLessonKeys.has(progressState.lastLessonKey)
+      ? progressState.lastLessonKey
+      : undefined;
+  const completedLessonSet = new Set(completedLessonKeys);
+  const completedModuleKeys = learningTracks.flatMap((trackEntry) =>
+    trackEntry.modules
+      .filter(
+        (moduleEntry) =>
+          moduleEntry.lessons.length > 0 &&
+          moduleEntry.lessons.every((lessonEntry) =>
+            completedLessonSet.has(makeLessonKey(trackEntry.slug, lessonEntry.slug)),
+          ),
+      )
+      .map((moduleEntry) => makeModuleKey(trackEntry.slug, moduleEntry.slug)),
+  );
+
+  return {
+    completedLessonKeys,
+    completedModuleKeys,
+    recentLessonKeys,
+    lastLessonKey,
+    lastVisitedAtByLesson,
+  };
+}
+
 function splitLessonKey(lessonKey: string): { trackSlug: string; lessonSlug: string } | undefined {
   const [trackSlug, lessonSlug] = lessonKey.split(':');
   if (!trackSlug || !lessonSlug) return undefined;
@@ -103,14 +156,21 @@ export function readLearnProgress(): LearnProgressState {
   try {
     const raw = localStorage.getItem(LEARN_PROGRESS_STORAGE_KEY);
     if (!raw) return defaultProgressState();
-    return sanitizeProgressState(JSON.parse(raw));
+    const parsed = sanitizeProgressState(JSON.parse(raw));
+    const synced = syncDerivedProgressState(parsed);
+
+    if (JSON.stringify(parsed) !== JSON.stringify(synced)) {
+      localStorage.setItem(LEARN_PROGRESS_STORAGE_KEY, JSON.stringify(synced));
+    }
+
+    return synced;
   } catch {
     return defaultProgressState();
   }
 }
 
 export function writeLearnProgress(nextState: LearnProgressState): LearnProgressState {
-  const cleanState = sanitizeProgressState(nextState);
+  const cleanState = syncDerivedProgressState(sanitizeProgressState(nextState));
 
   if (isBrowser()) {
     localStorage.setItem(LEARN_PROGRESS_STORAGE_KEY, JSON.stringify(cleanState));
@@ -168,6 +228,14 @@ export function isLessonCompleted(
   return progressState.completedLessonKeys.includes(makeLessonKey(trackSlug, lessonSlug));
 }
 
+export function isModuleCompleted(
+  progressState: LearnProgressState,
+  trackSlug: string,
+  moduleSlug: string,
+): boolean {
+  return progressState.completedModuleKeys.includes(makeModuleKey(trackSlug, moduleSlug));
+}
+
 export function getTrackProgress(
   progressState: LearnProgressState,
   trackSlug: string,
@@ -217,9 +285,33 @@ export function getModuleProgress(
   };
 }
 
+export function getTrackModuleProgress(
+  progressState: LearnProgressState,
+  trackSlug: string,
+): { completed: number; total: number; percentage: number } {
+  const trackEntry = getLearningTrack(trackSlug);
+  if (!trackEntry) return { completed: 0, total: 0, percentage: 0 };
+
+  const total = getTrackModuleCount(trackEntry);
+  const completed = trackEntry.modules.filter((moduleEntry) =>
+    isModuleCompleted(progressState, trackSlug, moduleEntry.slug),
+  ).length;
+
+  return {
+    completed,
+    total,
+    percentage: total === 0 ? 0 : Math.round((completed / total) * 100),
+  };
+}
+
 export function getProgressSummary(progressState: LearnProgressState): LearnProgressSummary {
   const totalLessons = getAllLearningLessons().length;
   const completedLessons = progressState.completedLessonKeys.length;
+  const totalModules = learningTracks.reduce(
+    (sum, trackEntry) => sum + getTrackModuleCount(trackEntry),
+    0,
+  );
+  const completedModules = progressState.completedModuleKeys.length;
   const completedTracks = learningTracks.filter((trackEntry) => {
     const progress = getTrackProgress(progressState, trackEntry.slug);
     return progress.total > 0 && progress.completed === progress.total;
@@ -228,6 +320,8 @@ export function getProgressSummary(progressState: LearnProgressState): LearnProg
   return {
     completedLessons,
     totalLessons,
+    completedModules,
+    totalModules,
     completedTracks,
     streakDays: getCurrentStreak(progressState),
   };

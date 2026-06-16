@@ -81,9 +81,9 @@ jobs:
         uses: treosh/lighthouse-ci-action@v11
         with:
           urls: |
-            https://aibydm.github.io/
-            https://aibydm.github.io/learn/
-            https://aibydm.github.io/tools/
+            https://dipakmandlik.github.io/AIByDM/
+            https://dipakmandlik.github.io/AIByDM/learn/
+            https://dipakmandlik.github.io/AIByDM/tools/
           budgetPath: .github/lighthouse-budget.json
 
   deploy:
@@ -131,7 +131,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🔗 Preview: https://aibydm.github.io/pr-preview/pr-${{ github.event.number }}/'
+              body: '🔗 Preview: https://dipakmandlik.github.io/AIByDM/pr-preview/pr-${{ github.event.number }}/'
             })
 ```
 
@@ -242,7 +242,7 @@ jobs:
 ```
 User-agent: *
 Allow: /
-Sitemap: https://aibydm.github.io/sitemap.xml
+Sitemap: https://dipakmandlik.github.io/AIByDM/sitemap.xml
 
 # Block non-content paths
 Disallow: /api/
@@ -304,8 +304,8 @@ Disallow: /_astro/
 
 ## 7. Environment Strategy
 
-| Environment    | URL                                   | Deploy Trigger    | Purpose     |
-| -------------- | ------------------------------------- | ----------------- | ----------- |
-| **Production** | `aibydm.github.io`                    | Push to `main`    | Live site   |
-| **Preview**    | `aibydm.github.io/pr-preview/pr-{N}/` | PR opened/updated | PR review   |
-| **Local**      | `localhost:4321`                      | `pnpm dev`        | Development |
+| Environment    | URL                                                | Deploy Trigger    | Purpose     |
+| -------------- | -------------------------------------------------- | ----------------- | ----------- |
+| **Production** | `dipakmandlik.github.io/AIByDM/`                   | Push to `main`    | Live site   |
+| **Preview**    | `dipakmandlik.github.io/AIByDM/pr-preview/pr-{N}/` | PR opened/updated | PR review   |
+| **Local**      | `localhost:4321`                                   | `pnpm dev`        | Development |

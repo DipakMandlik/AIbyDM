@@ -29,8 +29,8 @@ ship new workflows, or review pull requests, there is a clear path to help.
 ## Quick Start
 
 ```bash
-git clone https://github.com/DipakMandlik/AIbyDM.git
-cd AIbyDM
+git clone https://github.com/DipakMandlik/AIByDM.git
+cd AIByDM
 pnpm install
 pnpm dev
 ```
@@ -122,7 +122,7 @@ New contributors should look for:
 - `type:content`
 
 If you do not see a good fit yet, open a discussion in
-[GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions).
+[GitHub Discussions](https://github.com/DipakMandlik/AIByDM/discussions).
 
 ## Review Expectations
 

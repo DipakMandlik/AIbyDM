@@ -1,9 +1,9 @@
 # AIByDM — Product Requirement Document (PRD)
 
-**Version:** 1.0
-**Date:** 2026-06-15
+**Version:** 1.1
+**Date:** 2026-06-16
 **Author:** AIByDM Core Team
-**Status:** Draft
+**Status:** Active
 
 ---
 
@@ -54,24 +54,25 @@ The platform targets the growing demand for accessible, production-grade AI engi
 
 **Purpose:** Structured AI engineering education from fundamentals to production.
 
-**Topics (16 tracks):**
+**Topics (17 tracks):**
 
-1. Fundamentals (Math, Stats, Python, Data Structures)
-2. Machine Learning
-3. Deep Learning
-4. Computer Vision
-5. Natural Language Processing (NLP)
-6. Transformers
-7. LLM Engineering
-8. RAG Engineering
-9. Agent Engineering
-10. AI Security
-11. AI Governance
-12. Data Lineage
-13. Metadata Management
-14. LLMOps
-15. Production AI
-16. Enterprise AI
+1. AI Foundations
+2. Python for AI
+3. Mathematics for AI
+4. Machine Learning
+5. Deep Learning
+6. Computer Vision
+7. Natural Language Processing (NLP)
+8. Transformers
+9. Generative AI
+10. LLM Engineering
+11. RAG Engineering
+12. Agent Engineering
+13. AI Governance
+14. AI Security
+15. MLOps
+16. Production AI Systems
+17. Enterprise AI
 
 **Per-topic content structure:**
 
@@ -88,9 +89,20 @@ The platform targets the growing demand for accessible, production-grade AI engi
 | Resources                  | Curated links, papers, videos             |
 | Further Reading            | Advanced materials                        |
 
+**Current implementation snapshot (repo, 2026-06-16):**
+
+- 17 track landings are generated from `src/data/learn/catalog.ts`.
+- The current curriculum publishes 136 lesson routes and 68 project routes.
+- Supporting discovery surfaces are live at `/learn/catalog/`, `/learn/roadmap/`,
+  `/learn/resources/`, `/learn/glossary/`, and `/search/`.
+- Local progress stores lesson completion, module completion, streaks, recents, and last visited
+  state in the browser.
+
 **Success Metrics:**
 
-- 16 tracks with at least 5 topics each at launch
+- 17 connected tracks published with stage-aware progression
+- 136+ lesson routes and 68+ project routes kept searchable and internally linked
+- Progress remains portable across lessons, modules, and continue-learning flows
 - Average time-on-page > 4 minutes
 - Return visitor rate > 30%
 

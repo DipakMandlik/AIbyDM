@@ -2,6 +2,26 @@
 
 These documents capture the deeper planning and system thinking behind AIByDM.
 
+## Current Repo Snapshot
+
+The architecture pack started as a planning set on 2026-06-15. The repo has already moved ahead in
+the Learn module, so read the implementation snapshot sections in these files first when you need
+the current structure:
+
+- [../../ARCHITECTURE.md](../../ARCHITECTURE.md)
+- [01-PRD.md](./01-PRD.md)
+- [02-Technical-Architecture.md](./02-Technical-Architecture.md)
+- [03-Information-Architecture.md](./03-Information-Architecture.md)
+- [05-GitHub-Repository-Design.md](./05-GitHub-Repository-Design.md)
+
+Current Learn implementation highlights:
+
+- `src/data/learn/catalog.ts` defines the live 17-track curriculum.
+- `src/pages/learn/` contains dedicated dashboard, catalog, roadmap, resources, glossary, track,
+  lesson, and project routes.
+- `src/components/learn/` owns the progress, roadmap, dashboard, and search experiences.
+- `src/data/learn/progress.ts` tracks lesson and module completion locally.
+
 ## Document Set
 
 | File                                                               | Focus                             |

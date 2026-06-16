@@ -8,7 +8,7 @@ const entries = await getCollection('games');
 const games = entries.sort((a, b) => a.data.name.localeCompare(b.data.name));
 const gameTypes = [...new Set(games.map((game) => game.data.type))];
 const relatedTopicCount = new Set(games.flatMap((game) => game.data.relatedTopics)).size;
-const repoIssueUrl = 'https://github.com/DipakMandlik/AIbyDM/issues/new/choose';
+const repoIssueUrl = 'https://github.com/DipakMandlik/AIByDM/issues/new/choose';
 ---
 
 <BaseLayout
