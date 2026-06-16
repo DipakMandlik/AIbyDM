@@ -162,10 +162,7 @@ export default function ProductHome({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-      <section
-        className="relative overflow-hidden rounded-[36px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24rem),radial-gradient(circle_at_bottom_right,rgba(52,211,153,0.14),transparent_24rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_32px_120px_rgba(2,8,23,0.32)] sm:p-8 lg:p-10"
-       
-      >
+      <section className="relative overflow-hidden rounded-[36px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24rem),radial-gradient(circle_at_bottom_right,rgba(52,211,153,0.14),transparent_24rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_32px_120px_rgba(2,8,23,0.32)] sm:p-8 lg:p-10">
         <div className="relative grid gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
           <div>
             <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[rgba(148,163,184,0.22)] bg-[rgba(7,12,22,0.62)] px-4 text-sm text-[var(--color-text-secondary)]">
@@ -515,10 +512,7 @@ export default function ProductHome({
         </div>
       </section>
 
-      <section
-        className="mt-10 rounded-[34px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_22rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_24px_90px_rgba(2,8,23,0.2)] sm:p-8 lg:p-10"
-       
-      >
+      <section className="mt-10 rounded-[34px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.16),transparent_22rem),linear-gradient(180deg,rgba(255,255,255,0.03),transparent),var(--color-bg-surface)] p-6 shadow-[0_24px_90px_rgba(2,8,23,0.2)] sm:p-8 lg:p-10">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div>
             <p className="text-xs tracking-[0.22em] text-[var(--color-text-tertiary)] uppercase">
@@ -587,6 +581,3 @@ export default function ProductHome({
     </div>
   );
 }
-
-
-
