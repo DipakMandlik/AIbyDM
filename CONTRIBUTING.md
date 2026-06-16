@@ -1,37 +1,32 @@
-﻿# Contributing to AIByDM
+# Contributing to AIByDM
 
-Thank you for your interest in contributing to AIByDM! This guide will help you get started.
+AIByDM is built for contributors. Whether you write curriculum, add tool entries, improve the UI,
+ship new workflows, or review pull requests, there is a clear path to help.
 
-## Ways to Contribute
+## Contribution Lanes
 
-### Content (No Coding Required)
+### Content
 
-- **Learning Topics** — Write educational content for any track
-- **Tool Entries** — Add or update AI tool listings
-- **Exam Questions** — Create MCQs with explanations
-- **Newsletter Issues** — Write curated AI updates
+- Add or improve learning lessons.
+- Expand tool entries and comparisons.
+- Write exam questions and explanations.
+- Draft newsletter issues and editorial summaries.
 
-### Code
+### Product and Code
 
-- **Bug Fixes** — Fix issues from the issue tracker
-- **Features** — Implement new functionality
-- **Games** — Build interactive learning games
-- **UI/UX** — Improve design and accessibility
+- Improve Astro and React experiences.
+- Build search, progress, and future lab workflows.
+- Refine responsive layout, accessibility, and interactions.
+- Strengthen CI, release, and deployment workflows.
 
-### Other
+### Community and Docs
 
-- **Review** — Review PRs for accuracy and quality
-- **Triage** — Help categorize and prioritize issues
-- **Documentation** — Improve guides and docs
+- Improve onboarding docs.
+- Triage issues and propose roadmap clarifications.
+- Review screenshots, README polish, and release notes.
+- Help shape contributor recognition and governance processes.
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js v22+
-- pnpm v10.33.0+
-
-### Setup
+## Quick Start
 
 ```bash
 git clone https://github.com/DipakMandlik/AIbyDM.git
@@ -40,126 +35,110 @@ pnpm install
 pnpm dev
 ```
 
-Before opening a pull request, run the local validation command:
+Before you open a pull request, run:
 
 ```bash
 pnpm validate
 ```
 
-### Project Structure
+## Repository Workflow
 
-```
-src/content/    — All authored content (MDX, YAML, JSON)
-src/components/ — UI components (Astro + React)
-src/layouts/    — Page layout templates
-src/pages/      — File-based routing
-templates/      — Templates for new content
-```
+1. Find or open an issue.
+2. Comment before starting larger work so maintainers can confirm scope.
+3. Create a focused branch from `main`.
+4. Make the smallest complete change that solves the problem well.
+5. Run validation locally.
+6. Open a pull request with context, screenshots, and linked issues when relevant.
 
-## Content Contribution Guide
+## Branch Naming
 
-### Adding a Learn Topic
+Use a short branch name that describes the work.
 
-1. Copy `templates/learn-topic.mdx` to `src/content/learn/<track>/`
-2. Fill in all frontmatter fields
-3. Write content following the section structure
-4. Submit a PR
-
-### Adding a Tool
-
-1. Copy `templates/tool-entry.yaml` to `src/content/tools/`
-2. Fill in all fields
-3. Add tool logo (SVG preferred) to `public/logos/`
-4. Submit a PR
-
-### Adding Exam Questions
-
-1. Add questions to the relevant JSON file in `src/content/exams/`
-2. Follow the question schema (id, question, options, correct, explanation)
-3. Submit a PR
-
-## Code Contribution Guide
-
-### Finding Work
-
-1. Look for issues labeled `good first issue`, `help wanted`, or a module label
-   such as `type:content`, `type:tool`, `type:game`, or `type:docs`.
-2. Comment on the issue before starting larger work so maintainers can confirm
-   the approach.
-3. For major features or architecture changes, start with a GitHub Discussion or
-   proposal issue before writing code.
-
-### Branch Naming
-
-```
-<type>/<short-description>
-
-Types: feature, content, fix, docs, chore, game, exam, tool
-Example: content/add-transformer-basics
+```text
+feature/learn-search
+fix/mobile-nav
+docs/open-source-readme
+content/add-rag-lesson
 ```
 
-### Commit Messages
+## Commit Messages
 
-Write clear, concise commit messages:
+Use clear, scoped commit messages.
 
+```text
+feat: add exams repository landing page
+fix: correct footer navigation links
+docs: rewrite open source onboarding guides
+content: add python foundations lesson
 ```
-feat: add quiz engine component
-content: add supervised learning topic
-fix: resolve mobile nav overflow
-docs: update contributing guide
-```
 
-### Pull Request Process
+## What Good Contributions Look Like
 
-1. Create a branch from `main` for review-oriented work.
-2. Make your changes.
-3. Run `pnpm validate`.
-4. Submit a PR using the PR template.
-5. Wait for review (aim for 48h first response).
+### For Content
 
-### Direct Push Workflow
+- Keep explanations practical and clear.
+- Prefer examples that connect learning to real AI workflows.
+- Include accurate metadata, tags, and summaries.
+- Keep files small enough to review comfortably.
 
-If you are a maintainer and the change is intentionally being shipped without a
-PR review step, work on a current branch, run `pnpm validate`, then push the
-result directly to `main` after confirming it is safe to publish.
+### For Code
 
-### Pull Request Expectations
+- Preserve the static-first architecture unless interactivity is necessary.
+- Use React only for interactive islands.
+- Follow the existing design tokens and layout language.
+- Keep accessibility and mobile behavior in scope.
 
-- Keep PRs focused on one content area, bug, or feature when possible.
-- Link the related issue with `Fixes #123` or `Refs #123`.
-- Include screenshots for visual changes.
-- Do not include secrets, private data, or generated build output.
-- Be ready to make revisions after review.
+### For Docs
 
-## Code Style
+- Write for first-time contributors as well as maintainers.
+- Link to the exact file or workflow a contributor should read next.
+- Prefer concrete steps over abstract guidance.
 
-- **TypeScript** — Strict mode, no `any`
-- **Astro** — Prefer `.astro` components for static content
-- **React** — Use for interactive islands only
-- **CSS** — Tailwind utility classes, reference design tokens
-- **Formatting** — Prettier handles this; run `pnpm format`
+## Content System
 
-## Review Process
+If you are contributing platform content, start here:
 
-- Content PRs need 1 approval
-- Code, CI, and architecture PRs need maintainer approval
-- All PRs must pass CI checks
-- CODEOWNERS will request reviewers by area once GitHub teams are configured
+- [docs/content-system/README.md](./docs/content-system/README.md)
+- [docs/design-system/README.md](./docs/design-system/README.md)
+- [docs/architecture/08-Content-Architecture.md](./docs/architecture/08-Content-Architecture.md)
 
-## Issue Triage
+## Pull Request Checklist
 
-Maintainers and reviewers use these labels to route work:
+Before requesting review, make sure your change:
 
-- `status:needs-triage` for new issues that need review
-- `good first issue` for beginner-friendly contribution tasks
-- `help wanted` for community-ready work
-- `type:bug`, `type:feature`, `type:content`, `type:docs`, `type:tool`,
-  `type:exam`, and `type:game` for area classification
+- Solves one clear problem or completes one clear slice of work.
+- Includes screenshots for UI or README updates.
+- Updates docs if behavior or workflow changed.
+- Passes `pnpm validate`.
+- Does not include secrets, local build output, or unrelated edits.
 
-## Code of Conduct
+## Good First Issues
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+New contributors should look for:
 
-## Questions?
+- `good first issue`
+- `help wanted`
+- `type:docs`
+- `type:content`
 
-Open a [GitHub Discussion](https://github.com/DipakMandlik/AIbyDM/discussions) for questions or ideas.
+If you do not see a good fit yet, open a discussion in
+[GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions).
+
+## Review Expectations
+
+- Focus on correctness, clarity, and contributor experience.
+- Keep review comments actionable and respectful.
+- Smaller PRs move faster than broad refactors.
+- Maintainers aim to respond quickly, but AIByDM is still volunteer-led.
+
+## Release and Changelog Process
+
+- Update `CHANGELOG.md` whenever a change materially affects contributors, product surface, or deployment.
+- Version tags follow semantic versioning, starting with `v0.1.0` for the first public release.
+- GitHub release notes are grouped through `.github/release.yml`.
+
+## Community Standards
+
+By participating, you agree to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+If you need help, start with [SUPPORT.md](./SUPPORT.md) or [COMMUNITY.md](./COMMUNITY.md).

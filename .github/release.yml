@@ -1,0 +1,34 @@
+changelog:
+  exclude:
+    labels:
+      - skip-changelog
+    authors:
+      - dependabot
+      - github-actions
+  categories:
+    - title: 'New Features'
+      labels:
+        - type:feature
+        - enhancement
+    - title: 'Content'
+      labels:
+        - type:content
+        - type:tool
+        - type:exam
+        - type:game
+    - title: 'Bug Fixes'
+      labels:
+        - type:bug
+        - bug
+    - title: 'Documentation'
+      labels:
+        - type:docs
+        - documentation
+    - title: 'Infrastructure'
+      labels:
+        - type:chore
+        - dependencies
+        - ci
+    - title: 'Other Changes'
+      labels:
+        - '*'

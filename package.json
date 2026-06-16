@@ -1,7 +1,36 @@
 {
   "name": "aibydm",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "Open-source AI learning platform featuring structured learning paths, projects, roadmaps, AI tools, challenges, exams, and community-driven learning.",
+  "homepage": "https://dipakmandlik.github.io/AIbyDM/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DipakMandlik/AIbyDM.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DipakMandlik/AIbyDM/issues"
+  },
+  "author": "Dipak Mandlik (https://github.com/DipakMandlik)",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "artificial-intelligence",
+    "machine-learning",
+    "deep-learning",
+    "llm",
+    "rag",
+    "agents",
+    "learning-platform",
+    "education",
+    "open-source",
+    "developer-tools",
+    "genai",
+    "ai-engineering",
+    "prompt-engineering",
+    "mlops",
+    "roadmap"
+  ],
   "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22.12.0"
@@ -16,7 +45,8 @@
     "lint:content": "markdownlint-cli2 \"src/content/**/*.md\" \"src/content/**/*.mdx\"",
     "format": "prettier --write .",
     "validate": "pnpm check && pnpm lint && pnpm lint:content && pnpm build",
-    "astro": "astro"
+    "astro": "astro",
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.3",

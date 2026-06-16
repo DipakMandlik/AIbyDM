@@ -1,0 +1,210 @@
+{
+  "project": "AIByDM Launch Video",
+  "updatedAt": "2026-06-16",
+  "message": "One platform to learn, build, practice, and master AI.",
+  "format": {
+    "resolution": "1920x1080",
+    "fps": 60,
+    "aspectRatio": "16:9",
+    "masterDurationSec": 120,
+    "readmeCutSec": 30,
+    "socialCutSec": 15,
+    "output": "mp4"
+  },
+  "brand": {
+    "websiteUrl": "https://dipakmandlik.github.io/AIbyDM/",
+    "githubUrl": "https://github.com/DipakMandlik/AIByDM",
+    "colors": {
+      "bgBase": "#070a0f",
+      "bgSurface": "#0c111b",
+      "textPrimary": "#f8fafc",
+      "textSecondary": "#cbd5e1",
+      "accent": "#22c55e",
+      "learn": "#38bdf8",
+      "tools": "#22c55e",
+      "games": "#f59e0b",
+      "exams": "#a78bfa",
+      "newsletter": "#fb7185"
+    },
+    "fonts": {
+      "sans": "IBM Plex Sans",
+      "mono": "JetBrains Mono"
+    }
+  },
+  "productTruth": {
+    "liveModules": ["homepage", "learn", "tools", "games", "exams", "newsletter", "github"],
+    "visionOnlyUnlessShipped": [
+      "full track map beyond foundations",
+      "project dashboards",
+      "progress tracking ui",
+      "achievement systems",
+      "roadmap completion states"
+    ]
+  },
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Opening",
+      "startSec": 0,
+      "endSec": 8,
+      "mode": "brand",
+      "sources": ["logo", "motion graphics"],
+      "onscreen": ["Learn AI. Build AI. Master AI.", "The Open Source AI Learning Platform"],
+      "voiceover": "AI is moving fast. Learning it should not feel fragmented, slow, or closed.",
+      "visuals": [
+        "dark particle field",
+        "soft grid texture",
+        "logo bloom",
+        "headline on layered depth planes"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Problem",
+      "startSec": 8,
+      "endSec": 18,
+      "mode": "motion graphics",
+      "sources": ["genericized tabs", "floating cards", "docs fragments"],
+      "onscreen": ["AI learning is fragmented.", "Too many resources. No roadmap. No build path."],
+      "voiceover": "Most people learn AI across random tabs, disconnected tutorials, and scattered advice.",
+      "visuals": ["fragmented browser tabs", "breaking card stacks", "dense but readable motion"]
+    },
+    {
+      "id": 3,
+      "title": "Platform Reveal",
+      "startSec": 18,
+      "endSec": 32,
+      "mode": "live-ui-composited",
+      "sources": ["/", "homepage panels", "module grid"],
+      "onscreen": ["We built AIByDM.", "One platform to learn, build, practice, and master AI."],
+      "voiceover": "AIByDM brings the journey into one command center: learning, tools, practice, exams, and community signal.",
+      "visuals": ["homepage hero push-in", "module highlights", "parallax card reveal"]
+    },
+    {
+      "id": 4,
+      "title": "Learn Platform",
+      "startSec": 32,
+      "endSec": 50,
+      "mode": "live-ui-composited",
+      "sources": ["/learn/"],
+      "onscreen": ["Structured learning", "Built for real AI builders"],
+      "voiceover": "Start with foundations, then move through connected lessons that keep theory, code, tools, and outcomes in the same system.",
+      "visuals": [
+        "lesson card isolation",
+        "track labels",
+        "runtime and metadata callouts",
+        "route-like connective motion"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Roadmap Engine",
+      "startSec": 50,
+      "endSec": 63,
+      "mode": "vision-overlay",
+      "sources": ["roadmap motion graphics"],
+      "onscreen": ["Know exactly what to learn next."],
+      "voiceover": "The roadmap makes progression visible, from fundamentals to machine learning, deep learning, transformers, LLM engineering, RAG, and agents.",
+      "visuals": [
+        "animated nodes",
+        "line tracing",
+        "glowing track labels",
+        "future-state route map"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Build By Doing",
+      "startSec": 63,
+      "endSec": 76,
+      "mode": "vision-overlay",
+      "sources": ["project concept cards", "code fragments", "architecture chips"],
+      "onscreen": ["Learn by building."],
+      "voiceover": "This is not passive content. It is a build-first system designed to turn reading into repetition and repetition into capability.",
+      "visuals": [
+        "project cards",
+        "short code flashes",
+        "system diagram labels",
+        "layered card sweep"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Tools Platform",
+      "startSec": 76,
+      "endSec": 90,
+      "mode": "live-ui-composited",
+      "sources": ["/tools/", "Ollama", "LangChain", "Qdrant"],
+      "onscreen": ["Discover the best open source AI tools."],
+      "voiceover": "The tools layer helps learners understand where frameworks, vector databases, and local model runtimes fit into real workflows.",
+      "visuals": [
+        "category chip zooms",
+        "tool card stacks",
+        "use case callouts",
+        "source and website link accents"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Games And Exams",
+      "startSec": 90,
+      "endSec": 104,
+      "mode": "live-ui-composited",
+      "sources": ["/games/", "/exams/"],
+      "onscreen": ["Practice. Test. Improve."],
+      "voiceover": "Quizzes, flashcards, and question banks close the loop with fast recall, explanations, and measurable progress.",
+      "visuals": [
+        "quiz card transitions",
+        "topic tags",
+        "answer-state pulses",
+        "exam metadata overlays"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Open Source",
+      "startSec": 104,
+      "endSec": 113,
+      "mode": "live-ui-composited",
+      "sources": ["GitHub repo", "README", "Discussions", "Issues"],
+      "onscreen": ["Built in public.", "Open source.", "Community driven."],
+      "voiceover": "Because AIByDM is open source, the platform grows with its community, not behind a paywall.",
+      "visuals": ["repo hero", "discussion cards", "readme headline", "contribution energy"]
+    },
+    {
+      "id": 10,
+      "title": "Closing",
+      "startSec": 113,
+      "endSec": 120,
+      "mode": "brand",
+      "sources": ["logo", "hero background"],
+      "onscreen": ["Learn AI.", "Build AI.", "Master AI.", "Start your journey"],
+      "voiceover": "Learn AI. Build AI. Master AI. Start your journey with AIByDM.",
+      "visuals": ["hero return", "logo lockup", "website and github url hold", "soft fade out"]
+    }
+  ],
+  "cutdowns": {
+    "readme30": {
+      "durationSec": 30,
+      "voiceover": "AIByDM is one platform to learn, build, practice, and master AI. Follow structured learning paths, discover practical open source tools, and reinforce progress with games and exams. Learn AI. Build AI. Master AI. Start your journey at AIByDM.",
+      "beats": [
+        "0-4 logo and hero",
+        "4-9 homepage and module grid",
+        "9-15 learn and roadmap overlays",
+        "15-21 tools montage",
+        "21-26 games and exams montage",
+        "26-30 closing lockup"
+      ]
+    },
+    "social15": {
+      "durationSec": 15,
+      "voiceover": "AIByDM is the open source platform to learn AI, build real skills, and practice with purpose. Start your journey with AIByDM.",
+      "beats": [
+        "0-3 logo and hero burst",
+        "3-7 homepage, learn, tools montage",
+        "7-11 games and exams",
+        "11-15 closing lockup"
+      ]
+    }
+  }
+}
