@@ -1,0 +1,196 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/06-probability-and-distributions",
+  "slug": "06-probability-and-distributions",
+  "phaseSlug": "01-math-foundations",
+  "number": "06",
+  "title": "Probability and Distributions",
+  "summary": "Probability is the language AI uses to express uncertainty.",
+  "motto": "Probability is the language AI uses to express uncertainty.",
+  "type": "Learn",
+  "languages": [],
+  "prerequisites": [],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Implement PMFs and PDFs from scratch for Bernoulli, categorical, Poisson, uniform, and normal distributions",
+    "Compute expected value, variance, and use the Central Limit Theorem to explain why Gaussians dominate",
+    "Build softmax and log-softmax functions with the numerical stability trick (subtract max logit)",
+    "Calculate cross-entropy loss from logits and connect it to negative log-likelihood"
+  ],
+  "exercises": [
+    "Implement inverse transform sampling for the exponential distribution. Verify by sampling 10,000 values and comparing the histogram to the true PDF.",
+    "Build a joint distribution table for two loaded dice. Compute the marginal distributions and check whether the dice are independent.",
+    "Compute the cross-entropy loss for a 5-class classifier that outputs logits [2.0, 0.5, -1.0, 3.0, 0.1] when the correct class is index 3. Then verify your answer with PyTorch's nn.CrossEntropyLoss.",
+    "Write a function that takes a list of log probabilities and returns the most likely sequence, the total log probability, and the equivalent raw probability. Test it with a sentence of 50 words where each word has probability 0.01."
+  ],
+  "topics": [
+    "Math Foundations",
+    "Learn",
+    "Probability",
+    "Distributions",
+    "Sample space",
+    "PMF",
+    "PDF",
+    "Conditional probability",
+    "Independence",
+    "Expected value",
+    "Variance",
+    "Normal distribution",
+    "Central Limit Theorem",
+    "Joint distribution",
+    "Marginal distribution",
+    "Log probability"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Probability is the language AI uses to express uncertainty."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Implement PMFs and PDFs from scratch for Bernoulli, categorical, Poisson, uniform, and normal distributions\n- Compute expected value, variance, and use the Central Limit Theorem to explain why Gaussians dominate\n- Build softmax and log-softmax functions with the numerical stability trick (subtract max logit)\n- Calculate cross-entropy loss from logits and connect it to negative log-likelihood"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A classifier outputs `[0.03, 0.91, 0.06]`. A language model picks the next word from 50,000 candidates. A diffusion model generates images by sampling from learned distributions. All of these are probability in action.\n\nEvery prediction a model makes is a probability distribution. Every loss function measures how far the predicted distribution is from the true one. Every training step adjusts parameters to make one distribution look more like another. Without probability, you cannot read a single ML paper, debug a single model, or understand why your training loss is NaN."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Events, Sample Spaces, and Probability\n\nThe sample space S is the set of all possible outcomes. An event is a subset of the sample space. Probability maps events to numbers between 0 and 1.\n\n```\nCoin flip:\n  S = {H, T}\n  P(H) = 0.5,  P(T) = 0.5\n\nSingle die roll:\n  S = {1, 2, 3, 4, 5, 6}\n  P(even) = P({2, 4, 6}) = 3/6 = 0.5\n```\n\nThree axioms define all of probability:\n1. P(A) >= 0 for any event A\n2. P(S) = 1 (something always happens)\n3. P(A or B) = P(A) + P(B) when A and B cannot both occur\n\nEverything else (Bayes' theorem, expectations, distributions) follows from these three rules.\n\n### Conditional Probability and Independence\n\nP(A|B) is the probability of A given that B happened.\n\n```\nP(A|B) = P(A and B) / P(B)\n\nExample: deck of cards\n  P(King | Face card) = P(King and Face card) / P(Face card)\n                      = (4/52) / (12/52)\n                      = 4/12 = 1/3\n```\n\nTwo events are independent when knowing one tells you nothing about the other:\n\n```\nIndependent:   P(A|B) = P(A)\nEquivalent to: P(A and B) = P(A) * P(B)\n```\n\nCoin flips are independent. Drawing cards without replacement is not.\n\n### Probability Mass Functions vs Probability Density Functions\n\nDiscrete random variables have a probability mass function (PMF). Each outcome has a specific probability that you can read off directly.\n\n```\nPMF: P(X = k)\n\nFair die:\n  P(X = 1) = 1/6\n  P(X = 2) = 1/6\n  ...\n  P(X = 6) = 1/6\n\n  Sum of all probabilities = 1\n```\n\nContinuous random variables have a probability density function (PDF). The density at a single point is not a probability. Probability comes from integrating the density over an interval.\n\n```\nPDF: f(x)\n\nP(a <= X <= b) = integral of f(x) from a to b\n\nf(x) can be greater than 1 (density, not probability)\nintegral from -inf to +inf of f(x) dx = 1\n```\n\nThis distinction matters in ML. Classification outputs are PMFs (discrete choices). VAE latent spaces use PDFs (continuous).\n\n### Common Distributions\n\n**Bernoulli:** one trial, two outcomes. Models binary classification.\n\n```\nP(X = 1) = p\nP(X = 0) = 1 - p\nMean = p,  Variance = p(1-p)\n```\n\n**Categorical:** one trial, k outcomes. Models multi-class classification (softmax output).\n\n```\nP(X = i) = p_i,  where sum of p_i = 1\nExample: P(cat) = 0.7,  P(dog) = 0.2,  P(bird) = 0.1\n```\n\n**Uniform:** all outcomes equally likely. Used for random initialization.\n\n```\nDiscrete: P(X = k) = 1/n for k in {1, ..., n}\nContinuous: f(x) = 1/(b-a) for x in [a, b]\n```\n\n**Normal (Gaussian):** the bell curve. Parameterized by mean (mu) and variance (sigma^2).\n\n```\nf(x) = (1 / sqrt(2*pi*sigma^2)) * exp(-(x - mu)^2 / (2*sigma^2))\n\nStandard normal: mu = 0, sigma = 1\n  68% of data within 1 sigma\n  95% within 2 sigma\n  99.7% within 3 sigma\n```\n\n**Poisson:** counts of rare events in a fixed interval. Models event rates.\n\n```\nP(X = k) = (lambda^k * e^(-lambda)) / k!\nMean = lambda,  Variance = lambda\n```\n\n### Expected Value and Variance\n\nExpected value is the weighted average outcome.\n\n```\nDiscrete:   E[X] = sum of x_i * P(X = x_i)\nContinuous: E[X] = integral of x * f(x) dx\n```\n\nVariance measures spread around the mean.\n\n```\nVar(X) = E[(X - E[X])^2] = E[X^2] - (E[X])^2\nStandard deviation = sqrt(Var(X))\n```\n\nIn ML, expected value appears as the loss function (average loss over the data distribution). Variance tells you about model stability. High variance in gradients means noisy training.\n\n### Joint and Marginal Distributions\n\nA joint distribution P(X, Y) describes two random variables together.\n\nJoint PMF example (X = weather, Y = umbrella):\n\n| | Y=0 (no umbrella) | Y=1 (umbrella) | Marginal P(X) |\n|---|---|---|---|\n| X=0 (sun) | 0.40 | 0.10 | P(X=0) = 0.50 |\n| X=1 (rain) | 0.05 | 0.45 | P(X=1) = 0.50 |\n| **Marginal P(Y)** | P(Y=0) = 0.45 | P(Y=1) = 0.55 | 1.00 |\n\nThe marginal distribution sums out the other variable:\n\n```\nP(X = x) = sum over all y of P(X = x, Y = y)\n```\n\nThe row and column totals in the table above are the marginals.\n\n### Why the Normal Distribution Shows Up Everywhere\n\nThe Central Limit Theorem: the sum (or average) of many independent random variables converges to a normal distribution, regardless of the original distribution.\n\n```\nRoll 1 die:  uniform distribution (flat)\nAverage of 2 dice:  triangular (peaked)\nAverage of 30 dice: nearly perfect bell curve\n\nThis works for ANY starting distribution.\n```\n\nThis is why:\n- Measurement errors are approximately normal (many small independent sources)\n- Weight initializations in neural networks use normal distributions\n- Gradient noise in SGD is approximately normal (sum of many sample gradients)\n- The normal distribution is the maximum entropy distribution for a given mean and variance\n\n### Log Probabilities\n\nRaw probabilities cause numerical problems. Multiplying many small probabilities together quickly underflows to zero.\n\n```\nP(sentence) = P(word1) * P(word2) * ... * P(word_n)\n            = 0.01 * 0.003 * 0.02 * ...\n            -> 0.0 (underflow after ~30 terms)\n```\n\nLog probabilities fix this. Multiplications become additions.\n\n```\nlog P(sentence) = log P(word1) + log P(word2) + ... + log P(word_n)\n                = -4.6 + -5.8 + -3.9 + ...\n                -> finite number (no underflow)\n```\n\nRules:\n- log(a * b) = log(a) + log(b)\n- log probabilities are always <= 0 (since 0 < P <= 1)\n- More negative = less likely\n- Cross-entropy loss is the negative log probability of the correct class\n\n### Softmax as a Probability Distribution\n\nNeural networks output raw scores (logits). Softmax converts them into a valid probability distribution.\n\n```\nsoftmax(z_i) = exp(z_i) / sum(exp(z_j) for all j)\n\nProperties:\n  - All outputs are in (0, 1)\n  - All outputs sum to 1\n  - Preserves relative ordering of inputs\n  - exp() amplifies differences between logits\n```\n\nThe softmax trick: subtract the max logit before exponentiating to prevent overflow.\n\n```\nz = [100, 101, 102]\nexp(102) = overflow\n\nz_shifted = z - max(z) = [-2, -1, 0]\nexp(0) = 1  (safe)\n\nSame result, no overflow.\n```\n\nLog-softmax combines softmax and log for numerical stability. PyTorch uses this internally for cross-entropy loss.\n\n### Sampling\n\nSampling means drawing random values from a distribution. In ML:\n- Dropout randomly samples which neurons to zero out\n- Data augmentation samples random transformations\n- Language models sample the next token from the predicted distribution\n- Diffusion models sample noise and progressively denoise\n\nSampling from arbitrary distributions requires techniques like inverse transform sampling, rejection sampling, or the reparameterization trick (used in VAEs).\n\n```figure\ngaussian-pdf\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Probability basics\n\n```python\nimport math\nimport random\n\ndef factorial(n):\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result\n\ndef combinations(n, k):\n    return factorial(n) // (factorial(k) * factorial(n - k))\n\ndef conditional_probability(p_a_and_b, p_b):\n    return p_a_and_b / p_b\n\np_king_given_face = conditional_probability(4/52, 12/52)\nprint(f\"P(King | Face card) = {p_king_given_face:.4f}\")\n```\n\n### Step 2: PMF and PDF from scratch\n\n```python\ndef bernoulli_pmf(k, p):\n    return p if k == 1 else (1 - p)\n\ndef categorical_pmf(k, probs):\n    return probs[k]\n\ndef poisson_pmf(k, lam):\n    return (lam ** k) * math.exp(-lam) / factorial(k)\n\ndef uniform_pdf(x, a, b):\n    if a <= x <= b:\n        return 1.0 / (b - a)\n    return 0.0\n\ndef normal_pdf(x, mu, sigma):\n    coeff = 1.0 / (sigma * math.sqrt(2 * math.pi))\n    exponent = -0.5 * ((x - mu) / sigma) ** 2\n    return coeff * math.exp(exponent)\n```\n\n### Step 3: Expected value and variance\n\n```python\ndef expected_value(values, probabilities):\n    return sum(v * p for v, p in zip(values, probabilities))\n\ndef variance(values, probabilities):\n    mu = expected_value(values, probabilities)\n    return sum(p * (v - mu) ** 2 for v, p in zip(values, probabilities))\n\ndie_values = [1, 2, 3, 4, 5, 6]\ndie_probs = [1/6] * 6\nmu = expected_value(die_values, die_probs)\nvar = variance(die_values, die_probs)\nprint(f\"Die: E[X] = {mu:.4f}, Var(X) = {var:.4f}, SD = {var**0.5:.4f}\")\n```\n\n### Step 4: Sampling from distributions\n\n```python\ndef sample_bernoulli(p, n=1):\n    return [1 if random.random() < p else 0 for _ in range(n)]\n\ndef sample_categorical(probs, n=1):\n    cumulative = []\n    total = 0\n    for p in probs:\n        total += p\n        cumulative.append(total)\n    samples = []\n    for _ in range(n):\n        r = random.random()\n        for i, c in enumerate(cumulative):\n            if r <= c:\n                samples.append(i)\n                break\n    return samples\n\ndef sample_normal_box_muller(mu, sigma, n=1):\n    samples = []\n    for _ in range(n):\n        u1 = random.random()\n        u2 = random.random()\n        z = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)\n        samples.append(mu + sigma * z)\n    return samples\n```\n\n### Step 5: Softmax and log probabilities\n\n```python\ndef softmax(logits):\n    max_logit = max(logits)\n    shifted = [z - max_logit for z in logits]\n    exps = [math.exp(z) for z in shifted]\n    total = sum(exps)\n    return [e / total for e in exps]\n\ndef log_softmax(logits):\n    max_logit = max(logits)\n    shifted = [z - max_logit for z in logits]\n    log_sum_exp = max_logit + math.log(sum(math.exp(z) for z in shifted))\n    return [z - log_sum_exp for z in logits]\n\ndef cross_entropy_loss(logits, target_index):\n    log_probs = log_softmax(logits)\n    return -log_probs[target_index]\n```\n\n### Step 6: Central Limit Theorem demonstration\n\n```python\ndef demonstrate_clt(dist_fn, n_samples, n_averages):\n    averages = []\n    for _ in range(n_averages):\n        samples = [dist_fn() for _ in range(n_samples)]\n        averages.append(sum(samples) / len(samples))\n    return averages\n```\n\n### Step 7: Visualization\n\n```python\nimport matplotlib.pyplot as plt\n\nxs = [mu + sigma * (i - 500) / 100 for i in range(1001)]\nys = [normal_pdf(x, mu, sigma) for x, mu, sigma in ...]\nplt.plot(xs, ys)\n```\n\nFull implementations with all visualizations are in `code/probability.py`."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "With NumPy and SciPy, everything above is one-liners:\n\n```python\nimport numpy as np\nfrom scipy import stats\n\nnormal = stats.norm(loc=0, scale=1)\nsamples = normal.rvs(size=10000)\nprint(f\"Mean: {np.mean(samples):.4f}, Std: {np.std(samples):.4f}\")\nprint(f\"P(X < 1.96) = {normal.cdf(1.96):.4f}\")\n\nlogits = np.array([2.0, 1.0, 0.1])\nfrom scipy.special import softmax, log_softmax\nprobs = softmax(logits)\nlog_probs = log_softmax(logits)\nprint(f\"Softmax: {probs}\")\nprint(f\"Log-softmax: {log_probs}\")\n```\n\nYou built these from scratch. Now you know what the library calls are doing."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Implement inverse transform sampling for the exponential distribution. Verify by sampling 10,000 values and comparing the histogram to the true PDF.\n\n2. Build a joint distribution table for two loaded dice. Compute the marginal distributions and check whether the dice are independent.\n\n3. Compute the cross-entropy loss for a 5-class classifier that outputs logits `[2.0, 0.5, -1.0, 3.0, 0.1]` when the correct class is index 3. Then verify your answer with PyTorch's `nn.CrossEntropyLoss`.\n\n4. Write a function that takes a list of log probabilities and returns the most likely sequence, the total log probability, and the equivalent raw probability. Test it with a sentence of 50 words where each word has probability 0.01."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Sample space | \"All the possibilities\" | The set S of every possible outcome of an experiment |\n| PMF | \"The probability function\" | A function that gives the exact probability of each discrete outcome, summing to 1 |\n| PDF | \"The probability curve\" | A density function for continuous variables. Integrate it over an interval to get probability |\n| Conditional probability | \"Probability given something\" | P(A\\|B) = P(A and B) / P(B). The foundation of Bayesian thinking and Bayes' theorem |\n| Independence | \"They don't affect each other\" | P(A and B) = P(A) * P(B). Knowing one event tells you nothing about the other |\n| Expected value | \"The average\" | The probability-weighted sum of all outcomes. The loss function is an expected value |\n| Variance | \"How spread out\" | The expected squared deviation from the mean. High variance = noisy, unstable estimates |\n| Normal distribution | \"The bell curve\" | f(x) = (1/sqrt(2*pi*sigma^2)) * exp(-(x-mu)^2/(2*sigma^2)). Appears everywhere due to the CLT |\n| Central Limit Theorem | \"Averages become normal\" | The mean of many independent samples converges to a normal distribution regardless of the source |\n| Joint distribution | \"Two variables together\" | P(X, Y) describes the probability of every combination of X and Y outcomes |\n| Marginal distribution | \"Sum out the other variable\" | P(X) = sum_y P(X, Y). Recovers one variable's distribution from the joint |\n| Log probability | \"Log of the probability\" | log P(x). Turns products into sums, preventing numerical underflow in long sequences |\n| Softmax | \"Turn scores into probabilities\" | softmax(z_i) = exp(z_i) / sum(exp(z_j)). Maps real-valued logits to a valid probability distribution |\n| Cross-entropy | \"The loss function\" | -sum(p_true * log(p_predicted)). Measures how different two distributions are. Lower is better |\n| Logits | \"Raw model outputs\" | Unnormalized scores before softmax. Named after the logistic function |\n| Sampling | \"Drawing random values\" | Generating values according to a probability distribution. How models generate output |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [3Blue1Brown: But what is the Central Limit Theorem?](https://www.youtube.com/watch?v=zeJD6dqJ5lo) - visual proof of why averages become normal\n- [Stanford CS229 Probability Review](https://cs229.stanford.edu/section/cs229-prob.pdf) - concise reference covering everything here and more\n- [The Log-Sum-Exp Trick](https://gregorygundersen.com/blog/2020/02/09/log-sum-exp/) - why numerical stability matters and how to achieve it"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is the difference between a probability mass function (PMF) and a probability density function (PDF)?",
+      "options": [
+        "PMFs are used for continuous variables, PDFs for discrete variables",
+        "PMFs give exact probabilities for discrete outcomes, while PDFs give densities for continuous variables that must be integrated over an interval to get probability",
+        "There is no difference; they are the same concept with different names",
+        "PMFs always sum to 0.5, PDFs integrate to 1"
+      ],
+      "correct": 1,
+      "explanation": "For discrete variables, the PMF gives P(X=k) directly. For continuous variables, the PDF f(x) is a density -- P(a<=X<=b) requires integrating f(x) from a to b. The density at a single point is not a probability."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does the Central Limit Theorem state?",
+      "options": [
+        "All data follows a normal distribution",
+        "The mean of many independent random samples converges to a normal distribution regardless of the source distribution",
+        "Large datasets always have low variance",
+        "The probability of rare events decreases as sample size increases"
+      ],
+      "correct": 1,
+      "explanation": "The CLT says that the average of many independent random variables approaches a Gaussian, no matter what the original distribution looks like. This explains why the normal distribution appears everywhere."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Why does softmax subtract the maximum logit before exponentiating (the 'softmax trick')?",
+      "options": [
+        "To make all probabilities equal",
+        "To prevent numerical overflow from exponentiating large numbers while producing mathematically identical results",
+        "To normalize the logits to have mean zero",
+        "To speed up the computation by reducing the number of exponentiations"
+      ],
+      "correct": 1,
+      "explanation": "exp(100) overflows to infinity. Subtracting max(logits) shifts all values so the largest is 0. exp(0)=1 is safe. The subtraction cancels out in the normalization, giving identical probabilities."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "Cross-entropy loss for classification simplifies to -log(q(true_class)). What does this mean intuitively?",
+      "options": [
+        "Multiply the predicted probabilities by the true labels",
+        "Penalize the model based on how low its predicted probability is for the correct class -- lower prediction means higher loss",
+        "Average the log probabilities across all classes",
+        "Compute the entropy of the true distribution"
+      ],
+      "correct": 1,
+      "explanation": "If the model predicts 0.9 for the correct class, loss = -log(0.9) = 0.105 (low). If it predicts 0.01, loss = -log(0.01) = 4.6 (high). The loss punishes low confidence in the correct answer."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "Why do language models work with log probabilities instead of raw probabilities?",
+      "options": [
+        "Log probabilities are easier to interpret visually",
+        "Multiplying many small probabilities causes numerical underflow to zero; log probabilities convert products to sums, avoiding this",
+        "Log probabilities are required by the transformer architecture",
+        "Raw probabilities cannot represent values less than 0.01"
+      ],
+      "correct": 1,
+      "explanation": "P(sentence) = P(word1) * P(word2) * ... quickly underflows to 0.0 with float64. Log P(sentence) = log P(word1) + log P(word2) + ... stays in a finite range. Products become sums."
+    }
+  ],
+  "resources": [
+    {
+      "label": "3Blue1Brown: But what is the Central Limit Theorem?",
+      "href": "https://www.youtube.com/watch?v=zeJD6dqJ5lo",
+      "kind": "Reading"
+    },
+    {
+      "label": "Stanford CS229 Probability Review",
+      "href": "https://cs229.stanford.edu/section/cs229-prob.pdf",
+      "kind": "Reading"
+    },
+    {
+      "label": "The Log-Sum-Exp Trick",
+      "href": "https://gregorygundersen.com/blog/2020/02/09/log-sum-exp/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Probability Reasoning",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/06-probability-and-distributions/outputs/skill-probability-reasoning.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.jl",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/06-probability-and-distributions/code/main.jl",
+      "kind": "Code"
+    },
+    {
+      "label": "probability.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/06-probability-and-distributions/code/probability.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/06-probability-and-distributions",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/06-probability-and-distributions"
+}

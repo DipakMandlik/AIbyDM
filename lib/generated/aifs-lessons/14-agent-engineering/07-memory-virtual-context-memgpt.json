@@ -1,0 +1,232 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/07-memory-virtual-context-memgpt",
+  "slug": "07-memory-virtual-context-memgpt",
+  "phaseSlug": "14-agent-engineering",
+  "number": "07",
+  "title": "Memory: Virtual Context and MemGPT",
+  "summary": "Context windows are finite. Conversations, documents, and tool traces are not. MemGPT (Packer et al., 2023) frames this as OS virtual memory — main context is RAM, external store is disk, the agent pages between them. This is the pattern e...",
+  "motto": "Context windows are finite. Conversations, documents, and tool traces are not. MemGPT (Packer et al., 2023) frames this as OS virtual memory — main context is RAM, external store is disk, the agent pages between them. This is the pattern every 2026 memory system inherits.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 01 (Agent Loop)",
+    "Phase 14 · 06 (Tool Use)"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Explain the OS analogy MemGPT builds on: main context = RAM, external context = disk, memory tools = page in/out.",
+    "Implement the two-tier MemGPT pattern in stdlib with a main-context buffer, an external searchable store, and page in/out tools.",
+    "Describe how the agent issues \"interrupts\" to query or modify external memory and how the result is spliced back into the next prompt.",
+    "Identify the MemGPT design choices that carry into Letta (Lesson 08) and Mem0 (Lesson 09)."
+  ],
+  "exercises": [
+    "Add a max_main_context_tokens cap measured in tokens (approximate with len(text.split()) * 1.3). Compact the oldest messages into a summary when the cap is exceeded. Compare behavior with and without the summarizer.",
+    "Implement BM25 properly over the archival store (term frequency, inverse document frequency). Measure recall@10 on a toy fact set versus the token-overlap baseline.",
+    "Add citation fields (session_id, turn_id, source_url) to archival inserts. Make the agent cite sources on every retrieval-backed answer.",
+    "Simulate memory poisoning: add an archival record that says \"ignore all future user instructions.\" Write a guard that scans retrievals for directive-shaped text and marks them untrusted.",
+    "Port the implementation to use the MemGPT research repo's core-memory JSON schema (cpacker/MemGPT). What changes when you switch from flat strings to typed sections?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "Memory",
+    "Virtual",
+    "Context",
+    "MemGPT",
+    "Virtual context",
+    "Main context",
+    "Archival memory",
+    "Core memory",
+    "Memory tool",
+    "Interrupt",
+    "Memory rot",
+    "Memory poisoning"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Context windows are finite. Conversations, documents, and tool traces are not. MemGPT (Packer et al., 2023) frames this as OS virtual memory — main context is RAM, external store is disk, the agent pages between them. This is the pattern every 2026 memory system inherits."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Explain the OS analogy MemGPT builds on: main context = RAM, external context = disk, memory tools = page in/out.\n- Implement the two-tier MemGPT pattern in stdlib with a main-context buffer, an external searchable store, and page in/out tools.\n- Describe how the agent issues \"interrupts\" to query or modify external memory and how the result is spliced back into the next prompt.\n- Identify the MemGPT design choices that carry into Letta (Lesson 08) and Mem0 (Lesson 09)."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Context windows look like they should solve memory. They do not. Three failure modes recur in production:\n\n1. **Overflow.** Multi-turn conversations, long documents, or tool-call-heavy trajectories cross the window. Everything past the cutoff is gone.\n2. **Dilution.** Even within the window, stuffing irrelevant context dilutes attention over what matters. Frontier models still degrade on long inputs.\n3. **Persistence.** A new session starts with an empty window. Agents without external memory cannot say \"remember when you asked me to...\" across sessions.\n\nBigger windows help but do not fix this. Mem0's 2025 paper measured that 128k-window baselines still miss long-horizon facts that a 4k-window agent with external memory catches."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### MemGPT: the OS analogy\n\nPacker et al. (arXiv:2310.08560, v2 Feb 2024) map context management to operating-system virtual memory:\n\n| OS concept | MemGPT concept | 2026 production analog |\n|------------|---------------|------------------------|\n| RAM | main context (prompt) | Anthropic/OpenAI context window |\n| Disk | external context | vector DB, KV, graph store |\n| Page fault | memory tool call | `memory.search`, `memory.read`, `memory.write` |\n| OS kernel | agent control loop | ReAct loop with memory tools |\n\nThe agent runs a normal ReAct loop. One extra class of tools lets it page data in and out of main context.\n\n### Two tiers\n\n- **Main context.** Fixed-size prompt holding the current task. Always visible to the model.\n- **External context.** Unbounded, searchable via tools. Read when relevant, written when facts emerge.\n\nThe original paper evaluated the design on two tasks beyond the base window: document analysis longer than 100k tokens and multi-session chat with persistent memory across days.\n\n### The interrupt pattern\n\nMemGPT introduces memory-as-interrupt: mid-conversation the agent can invoke a memory tool, the runtime executes it, and the result splices into the next assistant turn as a new observation. Conceptually identical to a Unix `read()` syscall that blocks the process, returns bytes, and the process continues.\n\nCanonical memory tool surface:\n\n- `core_memory_append(section, text)` — write to a persistent section of the prompt.\n- `core_memory_replace(section, old, new)` — edit a persistent section.\n- `archival_memory_insert(text)` — write to the searchable external store.\n- `archival_memory_search(query, top_k)` — retrieve from the external store.\n- `conversation_search(query)` — scan past turns.\n\n### Where MemGPT ends and Letta begins\n\nIn September 2024 MemGPT became Letta. The research repo (`cpacker/MemGPT`) remains; Letta extends the design:\n\n- Three tiers instead of two (core, recall, archival — Lesson 08).\n- Native reasoning replacing the `send_message`/heartbeat pattern (Lesson 08).\n- Sleep-time agents running async memory work (Lesson 08).\n\nThe MemGPT paper is the 2026 foundation even if production systems run Letta, Mem0, or a custom two-tier store.\n\n### Where this pattern goes wrong\n\n- **Memory rot.** Writes accumulate faster than reads; retrieval drowns in stale facts. Fix: periodic consolidation (Letta sleep-time), explicit invalidation (Mem0 conflict detector).\n- **Memory poisoning.** External memory is retrieved text. If attacker-controlled content lands in a memory note, the agent re-ingests it next session. This is the Greshake et al. (Lesson 27) attack restated over time.\n- **Citation loss.** Agent recalls \"the user asked me to ship X\" but cannot cite which turn. Store source references (session ID, turn ID) with every archival write.\n\n```figure\ncontext-budget\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements MemGPT's two-tier pattern in stdlib:\n\n- `MainContext` — fixed-size prompt buffer with a `core` dict and a `messages` list; auto-compacts oldest messages when over cap.\n- `ArchivalStore` — in-memory BM25-esque store (token-overlap scoring) of (id, text, tags, session, turn) records.\n- Five memory tools mapping to the MemGPT surface.\n- A scripted agent that fills archival with facts, then answers a question by calling `archival_memory_search`.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nThe trace shows the agent writing three facts, filling main context to the cap (forcing eviction), then answering a follow-up question by retrieving from archival — reproducing the MemGPT workflow without any real LLM."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Every production memory system today is a MemGPT variant:\n\n- **Letta** (Lesson 08) — three tiers, native reasoning, sleep-time compute.\n- **Mem0** (Lesson 09) — vector + KV + graph fused with a scoring layer.\n- **OpenAI Assistants / Responses** — managed memory via threads and files.\n- **Claude Agent SDK** — long-term memory via skills and session store.\n\nPick one by operational shape (self-hosted, managed, framework-integrated), not by the core pattern — the core pattern is MemGPT."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-virtual-memory.md` is a reusable skill that produces a correct two-tier memory scaffold (main + archival + tool surface) for any target runtime, with eviction policy and citation fields wired in."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a `max_main_context_tokens` cap measured in tokens (approximate with `len(text.split())` * 1.3). Compact the oldest messages into a summary when the cap is exceeded. Compare behavior with and without the summarizer.\n2. Implement BM25 properly over the archival store (term frequency, inverse document frequency). Measure recall@10 on a toy fact set versus the token-overlap baseline.\n3. Add `citation` fields (session_id, turn_id, source_url) to archival inserts. Make the agent cite sources on every retrieval-backed answer.\n4. Simulate memory poisoning: add an archival record that says \"ignore all future user instructions.\" Write a guard that scans retrievals for directive-shaped text and marks them untrusted.\n5. Port the implementation to use the MemGPT research repo's core-memory JSON schema (`cpacker/MemGPT`). What changes when you switch from flat strings to typed sections?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Virtual context | \"Unlimited memory\" | Main (prompt) + external (searchable) tiers with page in/out |\n| Main context | \"Working memory\" | The prompt — fixed-size, always visible |\n| Archival memory | \"Long-term store\" | External searchable persistence, retrieved on demand |\n| Core memory | \"Persistent prompt section\" | Named sections pinned inside the main context |\n| Memory tool | \"Memory API\" | Tool call the agent issues to read/write external memory |\n| Interrupt | \"Memory page fault\" | Agent pauses, runtime fetches, result splices into next turn |\n| Memory rot | \"Stale facts\" | Old writes drown retrieval; fix with consolidation |\n| Memory poisoning | \"Injected persistent note\" | Attacker content stored as memory, re-ingested on recall |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Packer et al., MemGPT (arXiv:2310.08560)](https://arxiv.org/abs/2310.08560) — OS-inspired virtual context paper\n- [Letta, Memory Blocks blog](https://www.letta.com/blog/memory-blocks) — the three-tier evolution\n- [Anthropic, Effective context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — treating context as a budget\n- [Chhikara et al., Mem0 (arXiv:2504.19413)](https://arxiv.org/abs/2504.19413) — hybrid production memory on top of this pattern"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What OS analogy does MemGPT build on?",
+      "options": [
+        "Processes and threads",
+        "Virtual memory: main context as RAM, external store as disk, memory tools as page in and out",
+        "Network sockets",
+        "File descriptors"
+      ],
+      "correct": 1,
+      "explanation": "MemGPT maps prompt to RAM, external store to disk, and memory tools to page-fault-style transfers."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why do bigger context windows not fully solve memory?",
+      "options": [
+        "Providers cap them at 4k tokens",
+        "Overflow, dilution of attention, and lack of cross-session persistence still bite even with 128k windows",
+        "Long context costs nothing",
+        "The model refuses long input"
+      ],
+      "correct": 1,
+      "explanation": "Mem0 measured 128k-window baselines still missing facts a 4k agent with external memory catches; overflow, dilution, and persistence remain."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which of these is NOT one of MemGPT's canonical memory tools?",
+      "options": [
+        "core_memory_append",
+        "archival_memory_search",
+        "conversation_search",
+        "gradient_memory_update"
+      ],
+      "correct": 3,
+      "explanation": "There is no gradient memory tool; the surface is core/archival/conversation operations."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does the interrupt pattern do in MemGPT?",
+      "options": [
+        "It halts the entire agent run on any error",
+        "Mid-conversation the agent invokes a memory tool, the runtime executes it, and the result splices into the next turn",
+        "It bypasses the context window entirely",
+        "It triggers a model retrain"
+      ],
+      "correct": 1,
+      "explanation": "Memory-as-interrupt: invoke memory tool, runtime fetches, result returns as a new observation on the next turn (like a Unix read())."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Which production system did MemGPT evolve into in 2024?",
+      "options": [
+        "Mem0",
+        "Letta",
+        "Zep",
+        "Pinecone"
+      ],
+      "correct": 1,
+      "explanation": "MemGPT became Letta in September 2024; the research repo cpacker/MemGPT still exists as the origin."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What is memory poisoning in this context?",
+      "options": [
+        "A bug that corrupts vector indices",
+        "An attacker's content gets stored as a memory note and is re-ingested on future recalls",
+        "Reading from disk when RAM is available",
+        "Embedding model version drift"
+      ],
+      "correct": 1,
+      "explanation": "External memory is retrieved text; if attacker-reachable content lands in a memory note the agent re-ingests it next session."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Why does the lesson say production memory systems are MemGPT variants?",
+      "options": [
+        "They use the same vector DB",
+        "Letta, Mem0, Assistants threads, and Claude Agent SDK all run the two-tier (or more) paged-memory pattern; differences are operational shape",
+        "MemGPT owns the trademark",
+        "They share weights"
+      ],
+      "correct": 1,
+      "explanation": "Pick by operational shape, not pattern; all share the MemGPT page in/out skeleton."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Packer et al., MemGPT (arXiv:2310.08560)",
+      "href": "https://arxiv.org/abs/2310.08560",
+      "kind": "Reading"
+    },
+    {
+      "label": "Letta, Memory Blocks blog",
+      "href": "https://www.letta.com/blog/memory-blocks",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Effective context engineering",
+      "href": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Chhikara et al., Mem0 (arXiv:2504.19413)",
+      "href": "https://arxiv.org/abs/2504.19413",
+      "kind": "Reading"
+    },
+    {
+      "label": "Virtual Memory",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/07-memory-virtual-context-memgpt/outputs/skill-virtual-memory.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/07-memory-virtual-context-memgpt/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/07-memory-virtual-context-memgpt",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/07-memory-virtual-context-memgpt"
+}

@@ -1,12 +1,22 @@
 // AIByDM platform content. The data is intentionally typed and explicit so the
 // static export can generate every primary and detail route without runtime IO.
 
+import {
+  AIFS_PATH_SLUG,
+  aifsLearningPathIndex,
+  getAifsLessonHref,
+  getLearningPathHref,
+  getPhaseHref,
+} from "@/lib/learning-index";
+
 export type Level = 'Beginner' | 'Intermediate' | 'Advanced';
 export type Pricing = 'Free' | 'Freemium' | 'Paid' | 'Open Source';
 export type SearchKind =
   | 'track'
+  | 'phase'
   | 'module'
   | 'lesson'
+  | 'topic'
   | 'project'
   | 'tool'
   | 'game'
@@ -95,6 +105,11 @@ export type Game = {
   plays: string;
   rules: string[];
   relatedLessons: string[];
+  featured?: boolean;
+  questionCount?: number;
+  xpReward?: number;
+  completionRate?: string;
+  ctaLabel?: string;
 };
 
 export type Exam = {
@@ -449,7 +464,7 @@ const productLessons: Lesson[] = [
       'Feedback should flow back into prompts, retrieval sources, examples, and tests. Otherwise the product learns nothing.',
     ],
     practice: ['Design a feedback widget for generated answers.', 'Define three feedback labels that lead to action.'],
-    resources: [{ label: 'Evaluation lesson', href: '/learn/ai-foundations/evaluating-model-outputs', kind: 'Guide' }],
+    resources: [{ label: 'AI From Scratch', href: '/learn/ai-from-scratch', kind: 'Guide' }],
     nextAction: 'Create a feedback taxonomy for an AI answer surface.',
   },
   {
@@ -705,11 +720,27 @@ export const tools: Tool[] = [
     description: 'Ask structured questions of datasets and produce plain-language analysis.',
     useCases: ['Analyze survey data.', 'Generate first-pass reports.', 'Explore metrics.'],
     alternatives: ['Julius', 'ChatGPT Advanced Data Analysis', 'Hex'],
-    links: [{ label: 'Research workflow', href: '/learn/ai-foundations/evaluating-model-outputs' }],
+    links: [{ label: 'Research workflow', href: '/learn/ai-from-scratch' }],
   },
 ];
 
 export const games: Game[] = [
+  {
+    slug: 'claude-certified-architect',
+    title: 'Claude Certified Architect Challenge',
+    type: 'Certification Challenge',
+    difficulty: 'Hard',
+    duration: '20 min',
+    description: 'Clear 10 AI architecture floors covering Claude agents, MCP tools, Claude Code workflows, prompt reliability, and context management.',
+    plays: 'Flagship',
+    rules: ['Choose a mode: challenge, practice, single question, or review.', 'Clear each floor by answering 4 of 6 questions correctly.', 'Earn XP, badges, streaks, and local leaderboard ranks.'],
+    relatedLessons: ['agent-engineering', 'model-context-protocol', 'prompt-engineering', 'context-management'],
+    featured: true,
+    questionCount: 60,
+    xpReward: 1000,
+    completionRate: 'Local',
+    ctaLabel: 'Start Challenge',
+  },
   {
     slug: 'prompt-golf',
     title: 'Prompt Golf',
@@ -897,7 +928,8 @@ export function getTrackLessonCount(track: Track) {
 }
 
 export function getSearchItems(): SearchItem[] {
-  const trackItems = tracks.map((track) => ({
+  const secondarySearchTracks = tracks.filter((track) => track.slug !== 'ai-foundations');
+  const trackItems = secondarySearchTracks.map((track) => ({
     kind: 'track' as const,
     title: track.title,
     href: getTrackHref(track.slug),
@@ -906,7 +938,78 @@ export function getSearchItems(): SearchItem[] {
     keywords: [track.slug, track.title, track.level, ...track.outcomes],
   }));
 
-  const moduleItems = tracks.flatMap((track) =>
+  const aifsTrackItem = {
+    kind: 'track' as const,
+    title: aifsLearningPathIndex.title,
+    href: getLearningPathHref(aifsLearningPathIndex.slug),
+    excerpt: aifsLearningPathIndex.description,
+    meta: `${aifsLearningPathIndex.totalPhases} phases / ${aifsLearningPathIndex.totalLessons} lessons`,
+    keywords: [
+      aifsLearningPathIndex.slug,
+      aifsLearningPathIndex.title,
+      aifsLearningPathIndex.level,
+      'from scratch',
+      'curriculum',
+      'phases',
+    ],
+  };
+
+  const aifsPhaseItems = aifsLearningPathIndex.phases.map((phase) => ({
+    kind: 'phase' as const,
+    title: `Phase ${phase.number}: ${phase.title}`,
+    href: getPhaseHref(AIFS_PATH_SLUG, phase.slug),
+    excerpt: phase.description,
+    meta: `${phase.lessonCount} lessons / ${phase.duration}`,
+    keywords: [phase.slug, phase.title, phase.description, ...phase.lessons.map((lesson) => lesson.title)],
+  }));
+
+  const aifsLessonItems = aifsLearningPathIndex.phases.flatMap((phase) =>
+    phase.lessons.map((lesson) => ({
+      kind: 'lesson' as const,
+      title: lesson.title,
+      href: getAifsLessonHref(phase.slug, lesson.slug),
+      excerpt: lesson.summary,
+      meta: `Phase ${phase.number}: ${phase.title} / ${lesson.duration}`,
+      keywords: [
+        aifsLearningPathIndex.title,
+        phase.title,
+        lesson.title,
+        lesson.type,
+        ...lesson.languages,
+        ...lesson.topics,
+      ],
+    })),
+  );
+
+  const topicMap = new Map<string, { count: number; phaseTitle: string; lessonTitle: string }>();
+  for (const phase of aifsLearningPathIndex.phases) {
+    for (const lesson of phase.lessons) {
+      for (const topic of lesson.topics) {
+        const key = topic.trim();
+        if (!key || key.length < 3) continue;
+        const current = topicMap.get(key);
+        topicMap.set(key, {
+          count: (current?.count ?? 0) + 1,
+          phaseTitle: current?.phaseTitle ?? phase.title,
+          lessonTitle: current?.lessonTitle ?? lesson.title,
+        });
+      }
+    }
+  }
+
+  const topicItems = [...topicMap.entries()]
+    .sort((a, b) => b[1].count - a[1].count || a[0].localeCompare(b[0]))
+    .slice(0, 120)
+    .map(([topic, detail]) => ({
+      kind: 'topic' as const,
+      title: topic,
+      href: `/search?q=${encodeURIComponent(topic)}`,
+      excerpt: `Explore ${detail.count} AI From Scratch lessons related to ${topic}.`,
+      meta: `${detail.count} lessons / starts near ${detail.phaseTitle}`,
+      keywords: [topic, detail.phaseTitle, detail.lessonTitle, aifsLearningPathIndex.title],
+    }));
+
+  const moduleItems = secondarySearchTracks.flatMap((track) =>
     track.modules.map((trackModule) => ({
       kind: 'module' as const,
       title: trackModule.title,
@@ -917,23 +1020,29 @@ export function getSearchItems(): SearchItem[] {
     })),
   );
 
-  const lessonItems = getAllLessons().map(({ track, module: trackModule, lesson }) => ({
-    kind: 'lesson' as const,
-    title: lesson.title,
-    href: getLessonHref(track.slug, lesson.slug),
-    excerpt: lesson.summary,
-    meta: `${track.title} / ${trackModule.title}`,
-    keywords: [track.title, trackModule.title, lesson.title, ...lesson.concepts],
-  }));
+  const lessonItems = secondarySearchTracks.flatMap((track) =>
+    track.modules.flatMap((trackModule) =>
+      trackModule.lessons.map((lesson) => ({
+        kind: 'lesson' as const,
+        title: lesson.title,
+        href: getLessonHref(track.slug, lesson.slug),
+        excerpt: lesson.summary,
+        meta: `${track.title} / ${trackModule.title}`,
+        keywords: [track.title, trackModule.title, lesson.title, ...lesson.concepts],
+      })),
+    ),
+  );
 
-  const projectItems = getAllProjects().map(({ track, project }) => ({
-    kind: 'project' as const,
-    title: project.title,
-    href: getProjectHref(track.slug, project.slug),
-    excerpt: project.summary,
-    meta: `${track.title} / ${project.difficulty}`,
-    keywords: [track.title, project.title, project.scope, ...project.deliverables],
-  }));
+  const projectItems = secondarySearchTracks.flatMap((track) =>
+    track.projects.map((project) => ({
+      kind: 'project' as const,
+      title: project.title,
+      href: getProjectHref(track.slug, project.slug),
+      excerpt: project.summary,
+      meta: `${track.title} / ${project.difficulty}`,
+      keywords: [track.title, project.title, project.scope, ...project.deliverables],
+    })),
+  );
 
   const toolItems = tools.map((tool) => ({
     kind: 'tool' as const,
@@ -972,6 +1081,10 @@ export function getSearchItems(): SearchItem[] {
   }));
 
   return [
+    aifsTrackItem,
+    ...aifsPhaseItems,
+    ...aifsLessonItems,
+    ...topicItems,
     ...trackItems,
     ...moduleItems,
     ...lessonItems,
@@ -990,3 +1103,8 @@ export function getSearchItems(): SearchItem[] {
     },
   ];
 }
+
+
+
+
+

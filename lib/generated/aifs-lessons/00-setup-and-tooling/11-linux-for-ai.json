@@ -1,0 +1,192 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/11-linux-for-ai",
+  "slug": "11-linux-for-ai",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "11",
+  "title": "Linux for AI",
+  "summary": "Most AI runs on Linux. You need to know enough to not be stuck.",
+  "motto": "Most AI runs on Linux. You need to know enough to not be stuck.",
+  "type": "Learn",
+  "languages": [],
+  "prerequisites": [
+    "Phase 0",
+    "Lesson 01"
+  ],
+  "duration": "~30 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Navigate the Linux file system and perform essential file operations from the command line",
+    "Manage file permissions with chmod and chown to resolve \"Permission denied\" errors",
+    "Install system packages with apt and set up a fresh GPU box for AI work",
+    "Identify macOS-to-Linux differences that commonly trip up developers working on remote machines"
+  ],
+  "exercises": [
+    "SSH into any Linux machine (or open WSL2) and navigate to your home directory. Create a project folder, create three empty files inside it with touch, then list them with ls -la.",
+    "Install htop with apt, run it, and identify which process is using the most memory.",
+    "Start a tmux session, run sleep 300 inside it, detach, list sessions, and reattach.",
+    "Use df -h to check available disk space, then use du -sh ~/.cache/* to find what's taking up space in your cache.",
+    "Transfer a file from your local machine to a remote one using scp, then do the same transfer with rsync and compare the experience."
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Learn",
+    "Linux"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Most AI runs on Linux. You need to know enough to not be stuck."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Navigate the Linux file system and perform essential file operations from the command line\n- Manage file permissions with `chmod` and `chown` to resolve \"Permission denied\" errors\n- Install system packages with `apt` and set up a fresh GPU box for AI work\n- Identify macOS-to-Linux differences that commonly trip up developers working on remote machines"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You develop on macOS or Windows. But the moment you SSH into a cloud GPU box, rent a Lambda instance, or spin up an EC2 machine, you land in Ubuntu. The terminal is your only interface. There is no Finder, no Explorer, no GUI. If you can't navigate the file system, install packages, and manage processes from the command line, you're stuck paying for idle GPU hours while googling \"how to unzip a file in Linux.\"\n\nThis is a survival guide. It covers exactly what you need to operate on a remote Linux machine for AI work. Nothing more."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. SSH into any Linux machine (or open WSL2) and navigate to your home directory. Create a project folder, create three empty files inside it with `touch`, then list them with `ls -la`.\n2. Install `htop` with apt, run it, and identify which process is using the most memory.\n3. Start a tmux session, run `sleep 300` inside it, detach, list sessions, and reattach.\n4. Use `df -h` to check available disk space, then use `du -sh ~/.cache/*` to find what's taking up space in your cache.\n5. Transfer a file from your local machine to a remote one using `scp`, then do the same transfer with `rsync` and compare the experience."
+    },
+    {
+      "key": "file-system-layout",
+      "title": "File System Layout",
+      "markdown": "Linux organizes everything under a single root `/`. There is no `C:\\` or `/Volumes`. The directories you'll actually touch:\n\n```mermaid\ngraph TD\n    root[\"/\"] --> home[\"home/your-username/<br/>Your files — clone repos, run training\"]\n    root --> tmp[\"tmp/<br/>Temporary files, cleared on reboot\"]\n    root --> usr[\"usr/<br/>System programs and libraries\"]\n    root --> etc[\"etc/<br/>Config files\"]\n    root --> varlog[\"var/log/<br/>Logs — check when something breaks\"]\n    root --> mnt[\"mnt/ or /media/<br/>External drives and volumes\"]\n    root --> proc[\"proc/ and /sys/<br/>Virtual files — kernel and hardware info\"]\n```\n\nYour home directory is `~` or `/home/your-username`. Almost everything you do happens here."
+    },
+    {
+      "key": "essential-commands",
+      "title": "Essential Commands",
+      "markdown": "These are the 15 commands that cover 95% of what you'll do on a remote GPU box.\n\n### Moving Around\n\n```bash\npwd                         # Where am I?\nls                          # What's here?\nls -la                      # What's here, including hidden files with details?\ncd /path/to/dir             # Go there\ncd ~                        # Go home\ncd ..                       # Go up one level\n```\n\n### Files and Directories\n\n```bash\nmkdir my-project            # Create a directory\nmkdir -p a/b/c              # Create nested directories in one shot\n\ncp file.txt backup.txt      # Copy a file\ncp -r src/ src-backup/      # Copy a directory (recursive)\n\nmv old.txt new.txt          # Rename a file\nmv file.txt /tmp/           # Move a file\n\nrm file.txt                 # Delete a file (no trash, it's gone)\nrm -rf my-dir/              # Delete a directory and everything inside\n```\n\n`rm -rf` is permanent. There is no undo. Double-check the path before hitting enter.\n\n### Reading Files\n\n```bash\ncat file.txt                # Print entire file\nhead -20 file.txt           # First 20 lines\ntail -20 file.txt           # Last 20 lines\ntail -f log.txt             # Follow a log file in real time (Ctrl+C to stop)\nless file.txt               # Scroll through a file (q to quit)\n```\n\n### Searching\n\n```bash\ngrep \"error\" training.log           # Find lines containing \"error\"\ngrep -r \"learning_rate\" .           # Search all files in current directory\ngrep -i \"cuda\" config.yaml          # Case-insensitive search\n\nfind . -name \"*.py\"                 # Find all Python files under current dir\nfind . -name \"*.ckpt\" -size +1G     # Find checkpoint files larger than 1GB\n```"
+    },
+    {
+      "key": "permissions",
+      "title": "Permissions",
+      "markdown": "Every file in Linux has an owner and permission bits. You'll run into this when scripts won't execute or you can't write to a directory.\n\n```bash\nls -l train.py\n# -rwxr-xr-- 1 user group 2048 Mar 19 10:00 train.py\n#  ^^^             owner permissions: read, write, execute\n#     ^^^          group permissions: read, execute\n#        ^^        everyone else: read only\n```\n\nCommon fixes:\n\n```bash\nchmod +x train.sh           # Make a script executable\nchmod 755 deploy.sh         # Owner: full, others: read+execute\nchmod 644 config.yaml       # Owner: read+write, others: read only\n\nchown user:group file.txt   # Change who owns a file (needs sudo)\n```\n\nWhen something says \"Permission denied,\" it's almost always a permissions issue. `chmod +x` or `sudo` will fix most cases."
+    },
+    {
+      "key": "package-management-apt",
+      "title": "Package Management (apt)",
+      "markdown": "Ubuntu uses `apt`. This is how you install system-level software.\n\n```bash\nsudo apt update             # Refresh the package list (always do this first)\nsudo apt install -y htop    # Install a package (-y skips confirmation)\nsudo apt install -y build-essential  # C compiler, make, etc. Needed by many Python packages\nsudo apt install -y tmux    # Terminal multiplexer (keep sessions alive after disconnect)\n\napt list --installed        # What's installed?\nsudo apt remove htop        # Uninstall\n```\n\nCommon packages you'll install on a fresh GPU box:\n\n```bash\nsudo apt update && sudo apt install -y \\\n    build-essential \\\n    git \\\n    curl \\\n    wget \\\n    tmux \\\n    htop \\\n    unzip \\\n    python3-venv\n```"
+    },
+    {
+      "key": "users-and-sudo",
+      "title": "Users and sudo",
+      "markdown": "You're usually logged in as a regular user. Some operations need root (admin) access.\n\n```bash\nwhoami                      # What user am I?\nsudo command                # Run a single command as root\nsudo su                     # Become root (exit to go back, use sparingly)\n```\n\nOn cloud GPU instances, you're typically the only user and already have sudo access. Don't run everything as root. Use sudo only when needed."
+    },
+    {
+      "key": "processes-and-systemd",
+      "title": "Processes and systemd",
+      "markdown": "When your training hangs, or you need to check what's running:\n\n```bash\nhtop                        # Interactive process viewer (q to quit)\nps aux | grep python        # Find running Python processes\nkill 12345                  # Gracefully stop process with PID 12345\nkill -9 12345               # Force kill (use when graceful doesn't work)\nnvidia-smi                  # GPU processes and memory usage\n```\n\nsystemd manages services (background daemons). You'll use it if you run inference servers:\n\n```bash\nsudo systemctl start nginx          # Start a service\nsudo systemctl stop nginx           # Stop it\nsudo systemctl restart nginx        # Restart it\nsudo systemctl status nginx         # Check if it's running\nsudo systemctl enable nginx         # Start automatically on boot\n```"
+    },
+    {
+      "key": "disk-space",
+      "title": "Disk Space",
+      "markdown": "GPU boxes often have limited disk space. Models and datasets fill it fast.\n\n```bash\ndf -h                       # Disk usage for all mounted drives\ndf -h /home                 # Disk usage for /home specifically\n\ndu -sh *                    # Size of each item in current directory\ndu -sh ~/.cache             # Size of your cache (pip, huggingface models land here)\ndu -sh /data/checkpoints/   # Check how big your checkpoints are\n\n# Find the biggest space hogs\ndu -h --max-depth=1 / 2>/dev/null | sort -hr | head -20\n```\n\nCommon space savers:\n\n```bash\n# Clear pip cache\npip cache purge\n\n# Clear apt cache\nsudo apt clean\n\n# Remove old checkpoints you don't need\nrm -rf checkpoints/epoch_01/ checkpoints/epoch_02/\n```"
+    },
+    {
+      "key": "networking",
+      "title": "Networking",
+      "markdown": "You'll download models, transfer files, and hit APIs from the command line.\n\n```bash\n# Download files\nwget https://example.com/model.bin                   # Download a file\ncurl -O https://example.com/data.tar.gz              # Same thing with curl\ncurl -s https://api.example.com/health | python3 -m json.tool  # Hit an API, pretty-print JSON\n\n# Transfer files between machines\nscp model.bin user@remote:/data/                     # Copy file to remote machine\nscp user@remote:/data/results.csv .                  # Copy file from remote to local\nscp -r user@remote:/data/checkpoints/ ./local-dir/   # Copy directory\n\n# Sync directories (faster than scp for large transfers, resumes on failure)\nrsync -avz --progress ./data/ user@remote:/data/\nrsync -avz --progress user@remote:/results/ ./results/\n```\n\nUse `rsync` over `scp` for anything large. It only transfers changed bytes and handles interrupted connections."
+    },
+    {
+      "key": "tmux-keep-sessions-alive",
+      "title": "tmux: Keep Sessions Alive",
+      "markdown": "When you SSH into a remote box, closing your laptop kills your training run. tmux prevents this.\n\n```bash\ntmux new -s train           # Start a new session named \"train\"\n# ... start your training, then:\n# Ctrl+B, then D            # Detach (training keeps running)\n\ntmux ls                     # List sessions\ntmux attach -t train        # Reattach to session\n\n# Inside tmux:\n# Ctrl+B, then %            # Split pane vertically\n# Ctrl+B, then \"            # Split pane horizontally\n# Ctrl+B, then arrow keys   # Switch between panes\n```\n\nAlways run long training jobs inside tmux. Always."
+    },
+    {
+      "key": "wsl2-for-windows-users",
+      "title": "WSL2 for Windows Users",
+      "markdown": "If you're on Windows, WSL2 gives you a real Linux environment without dual-booting.\n\n```bash\n# In PowerShell (admin)\nwsl --install -d Ubuntu-24.04\n\n# After restart, open Ubuntu from Start menu\nsudo apt update && sudo apt upgrade -y\n```\n\nWSL2 runs a real Linux kernel. Everything in this lesson works inside it. Your Windows files are at `/mnt/c/Users/YourName/` from inside WSL.\n\nGPU passthrough works with NVIDIA drivers installed on the Windows side. Install the Windows NVIDIA driver (not the Linux one), and CUDA will be available inside WSL2."
+    },
+    {
+      "key": "gotchas-macos-to-linux",
+      "title": "Gotchas: macOS to Linux",
+      "markdown": "Things that will trip you up if you're coming from macOS:\n\n| macOS | Linux | Notes |\n|-------|-------|-------|\n| `brew install` | `sudo apt install` | Different package names sometimes. `brew install htop` vs `sudo apt install htop` works the same, but `brew install readline` vs `sudo apt install libreadline-dev` does not. |\n| `open file.txt` | `xdg-open file.txt` | But you won't have a GUI on a remote box. Use `cat` or `less`. |\n| `pbcopy` / `pbpaste` | Not available | Pipe to/from clipboard doesn't exist over SSH. |\n| `~/.zshrc` | `~/.bashrc` | macOS defaults to zsh. Most Linux servers use bash. |\n| `/opt/homebrew/` | `/usr/bin/`, `/usr/local/bin/` | Binaries live in different places. |\n| `sed -i '' 's/a/b/' file` | `sed -i 's/a/b/' file` | macOS sed needs an empty string after `-i`. Linux does not. |\n| Case-insensitive filesystem | Case-sensitive filesystem | `Model.py` and `model.py` are two different files on Linux. |\n| Line endings `\\n` | Line endings `\\n` | Same. But Windows uses `\\r\\n`, which breaks bash scripts. Run `dos2unix` to fix. |"
+    },
+    {
+      "key": "quick-reference-card",
+      "title": "Quick Reference Card",
+      "markdown": "```\nNavigation:     pwd, ls, cd, find\nFiles:          cp, mv, rm, mkdir, cat, head, tail, less\nSearch:         grep, find\nPermissions:    chmod, chown, sudo\nPackages:       apt update, apt install\nProcesses:      htop, ps, kill, nvidia-smi\nServices:       systemctl start/stop/restart/status\nDisk:           df -h, du -sh\nNetwork:        curl, wget, scp, rsync\nSessions:       tmux new/attach/detach\n```"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does the '~' symbol represent in a Linux file path?",
+      "options": [
+        "The root directory of the file system",
+        "The current user's home directory",
+        "The temporary files directory",
+        "The directory where system programs are installed"
+      ],
+      "correct": 1,
+      "explanation": "The tilde (~) is a shortcut for the current user's home directory, typically /home/username on Linux. 'cd ~' takes you home from anywhere."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is the purpose of 'sudo' before a command?",
+      "options": [
+        "It speeds up the command execution",
+        "It runs the command with root (administrator) privileges",
+        "It runs the command in a sandboxed environment",
+        "It logs the command output to a system file"
+      ],
+      "correct": 1,
+      "explanation": "sudo (superuser do) temporarily elevates your privileges to root level for a single command. Required for system-level operations like installing packages with apt."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "You get 'Permission denied' when trying to run a shell script. What command fixes this?",
+      "options": [
+        "sudo rm script.sh",
+        "chmod +x script.sh",
+        "chown root script.sh",
+        "mv script.sh /usr/bin/"
+      ],
+      "correct": 1,
+      "explanation": "chmod +x adds execute permission to the file. Without the execute bit set, the shell refuses to run the script even if you own it."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "On a remote GPU box, your training data fills the disk. Which command shows the largest directories consuming space?",
+      "options": [
+        "ls -la /",
+        "du -h --max-depth=1 / | sort -hr | head -20",
+        "cat /proc/meminfo",
+        "free -h"
+      ],
+      "correct": 1,
+      "explanation": "du -h shows disk usage per directory, --max-depth=1 limits to top-level directories, and sort -hr sorts by size in descending order. This reveals which directories are consuming the most space."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "What is a key difference between the macOS and Linux versions of 'sed -i'?",
+      "options": [
+        "Linux sed is faster than macOS sed",
+        "macOS sed requires an empty string argument after -i ('sed -i \"\"'), while Linux does not",
+        "Linux sed does not support regular expressions",
+        "macOS sed cannot modify files in place"
+      ],
+      "correct": 1,
+      "explanation": "macOS uses BSD sed which requires 'sed -i \"\" pattern file', while Linux uses GNU sed which accepts 'sed -i pattern file'. This is a common gotcha when moving scripts between systems."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/11-linux-for-ai",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/11-linux-for-ai"
+}

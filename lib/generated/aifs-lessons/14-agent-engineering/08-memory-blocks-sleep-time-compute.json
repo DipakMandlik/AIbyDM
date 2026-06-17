@@ -1,0 +1,233 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/08-memory-blocks-sleep-time-compute",
+  "slug": "08-memory-blocks-sleep-time-compute",
+  "phaseSlug": "14-agent-engineering",
+  "number": "08",
+  "title": "Memory Blocks and Sleep-Time Compute (Letta)",
+  "summary": "MemGPT became Letta in 2024. The 2026 evolution adds two ideas: discrete functional memory blocks the model can edit directly, and a sleep-time agent that consolidates memory asynchronously while the primary agent is idle. This is how you...",
+  "motto": "MemGPT became Letta in 2024. The 2026 evolution adds two ideas: discrete functional memory blocks the model can edit directly, and a sleep-time agent that consolidates memory asynchronously while the primary agent is idle. This is how you scale memory beyond one conversation.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 07 (MemGPT)"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Name the three memory tiers Letta uses (core, recall, archival) and the role of each.",
+    "Explain the memory-block pattern: Human block, Persona block, and user-defined blocks as first-class typed objects.",
+    "Describe what sleep-time compute is, why it sits off the critical path, and why it can run a stronger model than the primary agent.",
+    "Implement a scripted two-agent loop where a primary agent serves responses and a sleep-time agent consolidates blocks between turns."
+  ],
+  "exercises": [
+    "Add a block_summarize tool that replaces the block value with a model-generated summary when near_limit returns true. Which trigger threshold minimizes both summarization calls and block overflow?",
+    "Implement sleep-time dedup over archival: two records whose text has >90% token overlap collapse to one. Do it only in the sleep pass, never on the critical path.",
+    "Version blocks. On every write record the old value and a diff. Expose block_history(label) so operators can debug \"why did the agent forget X.\"",
+    "Treat sleep-time agents as untrusted writers. When they touch the Persona or Safety block, require a second-agent review before committing.",
+    "Port the example to use the Letta API (letta_v1_agent). What changes in the block schema, and how does native reasoning alter the trace shape?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "Memory",
+    "Blocks",
+    "Sleep",
+    "Time",
+    "Compute",
+    "Letta",
+    "Memory block",
+    "Human block",
+    "Persona block",
+    "Sleep-time compute",
+    "Core / Recall / Archival",
+    "Block limit",
+    "Native reasoning",
+    "Learned context"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> MemGPT became Letta in 2024. The 2026 evolution adds two ideas: discrete functional memory blocks the model can edit directly, and a sleep-time agent that consolidates memory asynchronously while the primary agent is idle. This is how you scale memory beyond one conversation."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Name the three memory tiers Letta uses (core, recall, archival) and the role of each.\n- Explain the memory-block pattern: Human block, Persona block, and user-defined blocks as first-class typed objects.\n- Describe what sleep-time compute is, why it sits off the critical path, and why it can run a stronger model than the primary agent.\n- Implement a scripted two-agent loop where a primary agent serves responses and a sleep-time agent consolidates blocks between turns."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "MemGPT (Lesson 07) solved the virtual-memory control flow. Three production problems emerged:\n\n1. **Latency.** Every memory operation sits on the critical path. If the agent has to prune, summarize, or reconcile while the user waits, tail latency blows up.\n2. **Memory rot.** Writes accumulate. Contradicted facts stay. Retrieval drowns in stale content.\n3. **Structure loss.** A flat archival store cannot express \"the Human block is always in the prompt; the Persona block is always in the prompt; the Task block swaps per session.\"\n\nLetta (letta.com) is the 2026 rewrite. Memory blocks make structure explicit; sleep-time compute moves consolidation off the critical path."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Three tiers\n\n| Tier | Scope | Where it lives | Written by |\n|------|-------|----------------|------------|\n| Core | Always visible | Inside the main prompt | Agent tool call + sleep-time rewrites |\n| Recall | Conversation history | Retrievable | Automatic turn logging |\n| Archival | Arbitrary facts | Vector + KV + graph | Agent tool call + sleep-time ingest |\n\nCore is the MemGPT core. Recall is the conversation buffer with its evicted tail. Archival is the external store. The split cleans up MemGPT's two-tier overloading.\n\n### Memory blocks\n\nA block is a typed, persistent, editable section of the core tier. The original MemGPT paper defined two:\n\n- **Human block** — facts about the user (name, role, preferences, goals).\n- **Persona block** — the agent's self-concept (identity, tone, constraints).\n\nLetta generalizes to arbitrary user-defined blocks: a `Task` block for the current goal, a `Project` block for codebase facts, a `Safety` block for hard constraints. Each block has an `id`, `label`, `value`, `limit` (character cap), `description` (so the model knows when to edit it).\n\nBlocks are editable via the tool surface:\n\n- `block_append(label, text)`\n- `block_replace(label, old, new)`\n- `block_read(label)`\n- `block_summarize(label)` — condense a block that is near its limit.\n\n### Sleep-time compute\n\nThe 2025 Letta addition: run a second agent in background, off the critical path. Sleep-time agents process conversation transcripts and codebase context, write `learned_context` into shared blocks, and consolidate or invalidate archival records.\n\nProperties that fall out:\n\n- **No latency cost.** Primary responses do not wait for memory ops.\n- **Stronger model allowed.** The sleep-time agent can be a more expensive, slower model because it is not latency-constrained.\n- **Natural consolidation window.** Dedup, summarize, invalidate contradicted facts when the user is not waiting.\n\nThe shape matches how humans work: you do the task, you sleep on it, the long-term memory settles overnight.\n\n### Letta V1 and native reasoning\n\nLetta V1 (`letta_v1_agent`, 2026) deprecates `send_message`/heartbeat and inline `Thought:` tokens in favor of native reasoning. The Responses API (OpenAI) and the Messages API with extended thinking (Anthropic) emit reasoning on a separate channel, passed through turns (encrypted across providers in production). The control loop is still ReAct. The thought trace is structural, not prompt-shaped.\n\n### Where this pattern goes wrong\n\n- **Block bloat.** Infinite `block_append` hits the limit fast. Wire a block summarizer before the write that pushes over the cap.\n- **Silent drift.** Sleep-time agent rewrites a block and the primary agent never notices. Version blocks and surface diffs in the trace.\n- **Poisoned consolidation.** Sleep-time agent processes attacker-reachable content into core. Lesson 27 applies to the sleep-time surface too."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements:\n\n- `Block` — id, label, value, limit, description.\n- `BlockStore` — CRUD + `near_limit(label)` helper.\n- Two scripted agents — `PrimaryAgent` serves a turn, `SleepTimeAgent` consolidates between turns.\n- A trace that shows a three-turn conversation with block writes, plus a sleep-time pass that summarizes a block and invalidates a stale fact.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nThe transcript shows the split: primary turns are fast and produce raw writes; the sleep pass compacts and cleans up."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- **Letta** (letta.com) for the reference implementation. Self-host or managed cloud.\n- **Claude Agent SDK skills** as block-shaped knowledge — a skill is a named, versioned, retrievable block of instructions the agent loads on demand.\n- **Custom builds** for teams that want control over the storage backend. Use the Letta API contract so you can migrate later."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-memory-blocks.md` generates a Letta-shaped block system with sleep-time hooks for any runtime, including safety rules and citation wiring."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a `block_summarize` tool that replaces the block value with a model-generated summary when `near_limit` returns true. Which trigger threshold minimizes both summarization calls and block overflow?\n2. Implement sleep-time dedup over archival: two records whose text has >90% token overlap collapse to one. Do it only in the sleep pass, never on the critical path.\n3. Version blocks. On every write record the old value and a diff. Expose `block_history(label)` so operators can debug \"why did the agent forget X.\"\n4. Treat sleep-time agents as untrusted writers. When they touch the Persona or Safety block, require a second-agent review before committing.\n5. Port the example to use the Letta API (`letta_v1_agent`). What changes in the block schema, and how does native reasoning alter the trace shape?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Memory block | \"Editable prompt section\" | Typed, persistent, LLM-editable segment of core memory |\n| Human block | \"User memory\" | Facts about the user, pinned in core |\n| Persona block | \"Agent identity\" | Self-concept, tone, constraints, pinned in core |\n| Sleep-time compute | \"Async memory work\" | Second agent doing consolidation off the critical path |\n| Core / Recall / Archival | \"Tiers\" | Three-layer memory split: always-visible / conversation / external |\n| Block limit | \"Cap\" | Character limit per block; forces summarization |\n| Native reasoning | \"Thinking channel\" | Provider-level reasoning output, not prompt-level `Thought:` |\n| Learned context | \"Sleep output\" | Facts the sleep-time agent writes into shared blocks |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Letta, Memory Blocks blog](https://www.letta.com/blog/memory-blocks) — the block pattern\n- [Letta, Sleep-time Compute blog](https://www.letta.com/blog/sleep-time-compute) — async consolidation\n- [Letta, Rearchitecting the Agent Loop](https://www.letta.com/blog/letta-v1-agent) — native reasoning rewrite\n- [Packer et al., MemGPT (arXiv:2310.08560)](https://arxiv.org/abs/2310.08560) — the origin"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What are Letta's three memory tiers?",
+      "options": [
+        "Cache, KV, archival",
+        "Core, recall, archival",
+        "RAM, swap, disk",
+        "Working, episodic, semantic"
+      ],
+      "correct": 1,
+      "explanation": "Letta uses core (always visible), recall (conversation history), and archival (external) tiers."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Which production problem does sleep-time compute target?",
+      "options": [
+        "Tail latency from doing memory consolidation on the critical path",
+        "Higher accuracy on math problems",
+        "Lower embedding cost",
+        "Faster JSON parsing"
+      ],
+      "correct": 0,
+      "explanation": "Sleep-time moves prune/summarize/reconcile off the user-facing path, so primary responses stay fast."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which property is NOT a memory block field in Letta?",
+      "options": [
+        "label",
+        "value",
+        "limit",
+        "embedding_model_version"
+      ],
+      "correct": 3,
+      "explanation": "Blocks carry id, label, value, limit, description; embedding model version is not part of the block schema."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Why can the sleep-time agent run a stronger model than the primary?",
+      "options": [
+        "It receives a private API key",
+        "It is off the critical path, so it is not latency-constrained",
+        "It is exempt from rate limits",
+        "Memory ops cost half tokens"
+      ],
+      "correct": 1,
+      "explanation": "Because it does not block user responses, the sleep-time agent can be slower and more expensive."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What pattern do the Human and Persona blocks generalize to?",
+      "options": [
+        "Vector embeddings",
+        "Arbitrary user-defined typed editable blocks (Task, Project, Safety, ...)",
+        "JSON-RPC channels",
+        "OS processes"
+      ],
+      "correct": 1,
+      "explanation": "Letta generalizes the two MemGPT blocks to any user-defined block with id, label, value, limit, description."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What is silent drift in this pattern?",
+      "options": [
+        "A primary agent never seeing that the sleep-time agent rewrote a block underneath it; fix with versioning and visible diffs",
+        "Slow disk writes",
+        "Embedding model upgrades",
+        "Rate-limit jitter"
+      ],
+      "correct": 0,
+      "explanation": "Versioning blocks and surfacing diffs in the trace makes sleep-time rewrites visible to the primary loop."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What replaced inline `Thought:` tokens and the send_message/heartbeat pattern in Letta V1?",
+      "options": [
+        "Native reasoning emitted on a separate channel and passed through turns",
+        "A second LLM dedicated to thoughts",
+        "A bigger system prompt",
+        "Manual user-typed thoughts"
+      ],
+      "correct": 0,
+      "explanation": "Letta V1 (letta_v1_agent) uses provider-level native reasoning, not prompt-shaped thoughts."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Letta, Memory Blocks blog",
+      "href": "https://www.letta.com/blog/memory-blocks",
+      "kind": "Reading"
+    },
+    {
+      "label": "Letta, Sleep-time Compute blog",
+      "href": "https://www.letta.com/blog/sleep-time-compute",
+      "kind": "Reading"
+    },
+    {
+      "label": "Letta, Rearchitecting the Agent Loop",
+      "href": "https://www.letta.com/blog/letta-v1-agent",
+      "kind": "Reading"
+    },
+    {
+      "label": "Packer et al., MemGPT (arXiv:2310.08560)",
+      "href": "https://arxiv.org/abs/2310.08560",
+      "kind": "Reading"
+    },
+    {
+      "label": "Memory Blocks",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/08-memory-blocks-sleep-time-compute/outputs/skill-memory-blocks.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/08-memory-blocks-sleep-time-compute/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/08-memory-blocks-sleep-time-compute",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/08-memory-blocks-sleep-time-compute"
+}

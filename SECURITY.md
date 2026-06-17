@@ -8,7 +8,7 @@ If you discover a security issue (for example, XSS in rendered content, dependen
 
 Use GitHub private vulnerability reporting when enabled:
 
-https://github.com/DipakMandlik/AIbyDM/security/advisories/new
+https://github.com/DipakMandlik/AIByDM/security/advisories/new
 
 If private reporting is unavailable, contact a project maintainer directly through the GitHub organization before sharing details publicly.
 

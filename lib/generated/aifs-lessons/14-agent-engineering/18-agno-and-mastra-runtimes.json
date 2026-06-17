@@ -1,0 +1,235 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/18-agno-and-mastra-runtimes",
+  "slug": "18-agno-and-mastra-runtimes",
+  "phaseSlug": "14-agent-engineering",
+  "number": "18",
+  "title": "Agno and Mastra: Production Runtimes",
+  "summary": "Agno (Python) and Mastra (TypeScript) are the 2026 production-runtime pairing. Agno aims at microsecond agent instantiation and stateless FastAPI backends. Mastra ships agents, tools, workflows, unified model routing, and composite storage...",
+  "motto": "Agno (Python) and Mastra (TypeScript) are the 2026 production-runtime pairing. Agno aims at microsecond agent instantiation and stateless FastAPI backends. Mastra ships agents, tools, workflows, unified model routing, and composite storage on the Vercel AI SDK substrate.",
+  "type": "Learn",
+  "languages": [
+    "Python",
+    "TypeScript"
+  ],
+  "prerequisites": [
+    "Phase 14 · 01 (Agent Loop)",
+    "Phase 14 · 13 (LangGraph)"
+  ],
+  "duration": "~45 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Identify Agno's performance targets and when they matter.",
+    "Name Mastra's three primitives — Agents, Tools, Workflows — and the supported server adapters.",
+    "Explain why a stateless session-scoped FastAPI backend is the recommended Agno production path.",
+    "Pick Agno vs Mastra for a given stack (Python-first vs TypeScript-first)."
+  ],
+  "exercises": [
+    "Read Agno's docs. Port the stdlib ReAct loop (Lesson 01) to Agno. What disappeared? What stayed?",
+    "Read Mastra's docs. Port the same loop to Mastra. What changed in tool typing (Zod vs nothing)?",
+    "Benchmark: measure agent instantiation latency on your stack. Does Agno's 2μs matter to your workload?",
+    "Design a migration: if you've been running CrewAI in Python, what breaks if you move to Agno?",
+    "Read Mastra's ee/ license terms. What restrictions would affect an open-source fork?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Learn",
+    "Python",
+    "TypeScript",
+    "Agno",
+    "Mastra",
+    "Production",
+    "Runtimes",
+    "Unified Model Router",
+    "Composite storage",
+    "Mastra Studio",
+    "Source-available"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Agno (Python) and Mastra (TypeScript) are the 2026 production-runtime pairing. Agno aims at microsecond agent instantiation and stateless FastAPI backends. Mastra ships agents, tools, workflows, unified model routing, and composite storage on the Vercel AI SDK substrate."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Identify Agno's performance targets and when they matter.\n- Name Mastra's three primitives — Agents, Tools, Workflows — and the supported server adapters.\n- Explain why a stateless session-scoped FastAPI backend is the recommended Agno production path.\n- Pick Agno vs Mastra for a given stack (Python-first vs TypeScript-first)."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "LangGraph, AutoGen, CrewAI are framework-heavy. Teams that want \"just the agent loop, fast, in my runtime\" reach for Agno (Python) or Mastra (TypeScript). Both trade some of the framework-owned primitives for raw speed and a tighter fit to the surrounding stack."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Agno\n\n- Python runtime, formerly Phi-data.\n- \"No graphs, chains, or convoluted patterns — just pure python.\"\n- Performance targets from their docs: ~2μs agent instantiation, ~3.75 KiB memory per agent, ~23 model providers.\n- Production path: stateless session-scoped FastAPI backend. Each request starts a fresh agent; session state lives in a DB.\n- Native multimodal (text, image, audio, video, file) and agentic RAG.\n\nThe speed targets matter when you have thousands of short-lived agents per second (chat fan-in, evaluation pipelines). They matter less when one agent runs for 10 minutes.\n\n### Mastra\n\n- TypeScript, built on Vercel AI SDK.\n- Three primitives: **Agents**, **Tools** (Zod-typed), **Workflows**.\n- Unified Model Router — 3,300+ models across 94 providers (March 2026).\n- Composite storage: memory, workflows, observability to different backends; ClickHouse recommended for observability at scale.\n- Apache 2.0 with `ee/` directories under source-available enterprise license.\n- Server adapters for Express, Hono, Fastify, Koa; first-class Next.js and Astro integration.\n- Ships Mastra Studio (localhost:4111) for debugging.\n- 22k+ GitHub stars, 300k+ weekly npm downloads at 1.0 (Jan 2026).\n\n### Positioning\n\nNeither is trying to be LangGraph. They compete on:\n\n- **Language fit.** Agno for Python-first teams; Mastra for TypeScript-first.\n- **Runtime ergonomics.** Agno = near-zero overhead; Mastra = integrated with the Vercel ecosystem.\n- **Observability.** Both integrate with Langfuse/Phoenix/Opik (Lesson 24) but Mastra Studio is first-party.\n\n### When to pick each\n\n- **Agno** — Python backend, many short-lived agents, strong perf requirements, FastAPI shop.\n- **Mastra** — TypeScript backend, Next.js / Vercel deploy, unified multi-provider model routing, Zod-typed tools.\n- **LangGraph** (Lesson 13) — when durable state and explicit graph reasoning matter more than raw speed.\n- **OpenAI / Claude Agent SDK** — when you want the provider's productized shape (Lessons 16–17).\n\n### Where this pattern goes wrong\n\n- **Perf-for-perf's-sake.** Picking Agno because \"2μs\" sounds good when the workload is one slow agent call per request. Overhead is not the bottleneck.\n- **Ecosystem lock-in.** Mastra's Vercel-flavored integration is a plus on Vercel, a minus elsewhere.\n- **Enterprise license confusion.** Mastra's `ee/` directories are source-available, not Apache 2.0. Read the licenses if you're planning to fork."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "This lesson is primarily comparative — no single code artifact would do both frameworks justice. See `code/main.py` for a side-by-side toy: a minimal \"run an agent, stream the output, persist session\" flow implemented twice (once Agno-shaped, once Mastra-shaped).\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nTwo structurally different but functionally equivalent traces."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- **Agno** — Python backend that needs speed and FastAPI shape.\n- **Mastra** — TypeScript backend with many providers and workflow primitives.\n- Both ship first-party observability hooks. Both integrate with Langfuse."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-runtime-picker.md` picks Agno, Mastra, LangGraph, or a provider SDK based on stack, latency budget, and operational shape."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Read Agno's docs. Port the stdlib ReAct loop (Lesson 01) to Agno. What disappeared? What stayed?\n2. Read Mastra's docs. Port the same loop to Mastra. What changed in tool typing (Zod vs nothing)?\n3. Benchmark: measure agent instantiation latency on your stack. Does Agno's 2μs matter to your workload?\n4. Design a migration: if you've been running CrewAI in Python, what breaks if you move to Agno?\n5. Read Mastra's `ee/` license terms. What restrictions would affect an open-source fork?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Agno | \"Fast Python agents\" | Stateless session-scoped agent runtime |\n| Mastra | \"TypeScript agents on Vercel AI SDK\" | Agents + Tools + Workflows + Model Router |\n| Unified Model Router | \"Multi-provider access\" | Single client for 3,300+ models across 94 providers |\n| Composite storage | \"Multiple backends\" | Memory/workflows/observability each to a different store |\n| Mastra Studio | \"Local debugger\" | localhost:4111 UI for introspecting agents |\n| Source-available | \"Not OSS\" | License permits source reading but restricts commercial use |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Agno Agent Framework docs](https://www.agno.com/agent-framework) — performance targets, FastAPI integration\n- [Mastra docs](https://mastra.ai/docs) — primitives, server adapters, Model Router\n- [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview) — the stateful-graph alternative\n- [Comet Opik](https://www.comet.com/site/products/opik/) — observability comparisons cited by Mastra integrations"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Which language pairing does the lesson recommend for each runtime?",
+      "options": [
+        "Agno for TypeScript, Mastra for Python",
+        "Agno for Python, Mastra for TypeScript",
+        "Both are Rust-first",
+        "Both are Go-first"
+      ],
+      "correct": 1,
+      "explanation": "Agno is Python (FastAPI-shaped); Mastra is TypeScript (Vercel AI SDK-shaped)."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is Agno's recommended production deployment shape?",
+      "options": [
+        "A long-lived stateful daemon",
+        "A stateless session-scoped FastAPI backend; each request starts a fresh agent and session state lives in a DB",
+        "A serverless cron worker only",
+        "A WebSocket-only server"
+      ],
+      "correct": 1,
+      "explanation": "Stateless FastAPI per request; session state externalized to a DB."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What are Mastra's three primitives?",
+      "options": [
+        "Agents, Tools, Workflows",
+        "Actor, Message, Inbox",
+        "Plan, Worker, Solver",
+        "Node, Edge, State"
+      ],
+      "correct": 0,
+      "explanation": "Agents (LLM + role), Tools (Zod-typed), and Workflows are Mastra's three primitives."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Roughly what agent-instantiation cost does Agno target per its docs?",
+      "options": [
+        "About 2 microseconds with about 3.75 KiB per agent",
+        "About 200 milliseconds and 100 MiB per agent",
+        "About 1 second and 1 GiB per agent",
+        "About 10 minutes and 4 GiB per agent"
+      ],
+      "correct": 0,
+      "explanation": "Agno's docs cite about 2 microseconds and about 3.75 KiB per agent."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What does Mastra's Unified Model Router give?",
+      "options": [
+        "A single client surface for thousands of models across many providers",
+        "A queue for tool calls",
+        "A vector DB layer",
+        "A graph checkpointer"
+      ],
+      "correct": 0,
+      "explanation": "Mastra's Unified Model Router cites 3,300+ models across 94 providers."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "When is perf-for-perf's-sake the wrong reason to pick Agno?",
+      "options": [
+        "When the workload is one slow agent call per request and overhead is not the bottleneck",
+        "When using Python 3.13",
+        "When deploying to AWS",
+        "When using Langfuse"
+      ],
+      "correct": 0,
+      "explanation": "2 microseconds matters at chat fan-in scale, not for a single slow call per request."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What licensing surface should you read carefully before forking Mastra?",
+      "options": [
+        "There is no license file",
+        "ee/ directories are source-available rather than Apache 2.0 and restrict commercial use",
+        "All of Mastra is GPL",
+        "Mastra requires CLA but no license review"
+      ],
+      "correct": 1,
+      "explanation": "Mastra is Apache 2.0 except for ee/ which is source-available; check the restrictions before forking."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Agno Agent Framework docs",
+      "href": "https://www.agno.com/agent-framework",
+      "kind": "Reading"
+    },
+    {
+      "label": "Mastra docs",
+      "href": "https://mastra.ai/docs",
+      "kind": "Reading"
+    },
+    {
+      "label": "LangGraph overview",
+      "href": "https://docs.langchain.com/oss/python/langgraph/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "Comet Opik",
+      "href": "https://www.comet.com/site/products/opik/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Runtime Picker",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/18-agno-and-mastra-runtimes/outputs/skill-runtime-picker.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/18-agno-and-mastra-runtimes/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "main.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/18-agno-and-mastra-runtimes/code/main.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/18-agno-and-mastra-runtimes",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/18-agno-and-mastra-runtimes"
+}

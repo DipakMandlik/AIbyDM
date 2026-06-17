@@ -1,0 +1,226 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/25-multi-agent-debate",
+  "slug": "25-multi-agent-debate",
+  "phaseSlug": "14-agent-engineering",
+  "number": "25",
+  "title": "Multi-Agent Debate and Collaboration",
+  "summary": "Du et al. (ICML 2024, \"Society of Minds\") run N model instances that independently propose answers, then iteratively critique each other over R rounds to converge. Improves factuality, rule-following, reasoning. Sparse topology beats full...",
+  "motto": "Du et al. (ICML 2024, \"Society of Minds\") run N model instances that independently propose answers, then iteratively critique each other over R rounds to converge. Improves factuality, rule-following, reasoning. Sparse topology beats full mesh on token cost.",
+  "type": "Learn + Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Explain the debate protocol: N proposers, R rounds, converge on a shared answer.",
+    "Describe why debate improves factuality, rule-following, and reasoning.",
+    "Explain sparse topology: not every debater needs to see every other.",
+    "Implement a stdlib debate over a scripted LLM with full-mesh and sparse variants; measure token cost vs accuracy."
+  ],
+  "exercises": [
+    "Implement a \"forced disagreement\" rule: in round 1, every debater must produce a distinct proposal. Measure effect on convergence speed.",
+    "Add a confidence-weighted aggregation: debaters return (answer, confidence); aggregator weights by confidence. Does it help?",
+    "Swap one \"agent\" for a different scripted LLM with different opinions. Does heterogeneity improve accuracy?",
+    "Measure token cost for full mesh vs sparse on your 3 questions. Plot cost vs accuracy.",
+    "Read the Society of Minds paper. Port your toy to N=5, R=3. What breaks? What gets better?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Learn + Build",
+    "Python (stdlib)",
+    "Multi",
+    "Agent",
+    "Debate",
+    "Collaboration",
+    "Full mesh",
+    "Sparse topology",
+    "Hub-and-spoke",
+    "Convergence",
+    "Society of Minds"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Du et al. (ICML 2024, \"Society of Minds\") run N model instances that independently propose answers, then iteratively critique each other over R rounds to converge. Improves factuality, rule-following, reasoning. Sparse topology beats full mesh on token cost."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Explain the debate protocol: N proposers, R rounds, converge on a shared answer.\n- Describe why debate improves factuality, rule-following, and reasoning.\n- Explain sparse topology: not every debater needs to see every other.\n- Implement a stdlib debate over a scripted LLM with full-mesh and sparse variants; measure token cost vs accuracy."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Self-Refine (Lesson 05) is one model critiquing itself — risks groupthink. CRITIC (Lesson 05) grounds critique in external tools — not always available. Debate introduces a third mode: multiple instances, cross-critique, convergence by disagreement."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Society of Minds (Du et al., ICML 2024)\n\n- N model instances independently propose answers to the same question.\n- Over R rounds, each model reads the others' proposals and critiques them.\n- Models update their answers based on the critiques.\n- After R rounds, return the convergent answer.\n\nOriginal experiments used N=3, R=2 due to cost. Accuracy improves with more agents and more rounds on hard problems (MMLU, GSM8K, Chess Move Validity, biography generation).\n\nCross-model combinations beat single-model debates: ChatGPT + Bard together > either alone.\n\n### Sparse topology\n\n\"Improving Multi-Agent Debate with Sparse Communication Topology\" (arXiv:2406.11776, 2024-2025) showed full-mesh debate is not always optimal. Sparse topologies (star, ring, hub-and-spoke) can match accuracy at lower token cost. Each debater sees only a subset of peers.\n\nImplications:\n\n- Full mesh N=5, R=3 = 5 × 3 = 15 proposals, each reading 4 peers = 60 critique ops.\n- Star N=5, R=3 (one hub + 4 spokes) = 15 proposals, spokes read only the hub = 12 critique ops.\n\n### When debate helps\n\n- **Factuality.** N independent proposals, cross-check reduces hallucination.\n- **Rule-following.** Chess move validity — one model misses a rule, others catch it.\n- **Open-ended reasoning.** Multiple framings narrow in on the right answer.\n\n### When debate hurts\n\n- **Latency-sensitive UX.** N × R serial rounds is latency you may not have.\n- **Cost-sensitive scale.** N × R tokens per question.\n- **Simple factual lookups.** One lookup is cheaper than five debates.\n\n### 2026 practical instantiations\n\n- **Anthropic orchestrator-workers** (Lesson 12) — one variant of debate with a synthesis step.\n- **LangGraph supervisor** (Lesson 13) — central router + specialist agents can implement debate as a node.\n- **OpenAI Agents SDK** (Lesson 16) — agents handoff back and forth for iterative critique.\n- **Multi-agent evals** — pair debate + evaluator-optimizer for eval signal.\n\n### Where this pattern goes wrong\n\n- **Convergence collapse.** All agents converge on the first wrong answer. Mitigate with required disagreement rounds.\n- **Hub failure.** In a star topology, a bad hub corrupts everyone. Rotate or use multiple hubs.\n- **Prompt homogenization.** All agents use the same prompt; they produce the same answers. Use diverse prompts and/or models."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements stdlib debate:\n\n- `Debater` class (scripted LLM with per-debater opinion drift).\n- `FullMeshDebate` and `SparseDebate` runners.\n- Three questions: one factual, one rule-based, one reasoning.\n- Metrics: convergent answer, rounds to convergence, total critique ops.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nOutput: per-protocol accuracy and cost; sparse matches full mesh on 2/3 questions at lower cost."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- **Anthropic orchestrator-workers** for simple 2-3-worker debates.\n- **LangGraph** for stateful multi-round debate with checkpointing.\n- **Custom** for research or specialized correctness guarantees."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-debate.md` scaffolds a multi-agent debate with configurable topology, N, R, and a convergence rule."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Implement a \"forced disagreement\" rule: in round 1, every debater must produce a distinct proposal. Measure effect on convergence speed.\n2. Add a confidence-weighted aggregation: debaters return (answer, confidence); aggregator weights by confidence. Does it help?\n3. Swap one \"agent\" for a different scripted LLM with different opinions. Does heterogeneity improve accuracy?\n4. Measure token cost for full mesh vs sparse on your 3 questions. Plot cost vs accuracy.\n5. Read the Society of Minds paper. Port your toy to N=5, R=3. What breaks? What gets better?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Debate | \"Multi-agent critique\" | N proposers, R rounds of cross-critique, converge |\n| Full mesh | \"Everyone reads everyone\" | Every debater reads every peer each round |\n| Sparse topology | \"Limited peer view\" | Debaters read only a subset of peers |\n| Hub-and-spoke | \"Star topology\" | One central debater, N-1 spokes read only the hub |\n| Convergence | \"Agreement\" | Debaters converge on a shared answer |\n| Society of Minds | \"Du et al. debate paper\" | ICML 2024 multi-agent debate method |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Du et al., Society of Minds (arXiv:2305.14325)](https://arxiv.org/abs/2305.14325) — canonical multi-agent debate\n- [Sparse Communication Topology (arXiv:2406.11776)](https://arxiv.org/abs/2406.11776) — sparse topology results\n- [Anthropic, Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) — orchestrator-workers as a debate variant\n- [Madaan et al., Self-Refine (arXiv:2303.17651)](https://arxiv.org/abs/2303.17651) — single-model self-critique counterpart"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does the Society of Minds protocol have N model instances do?",
+      "options": [
+        "Each runs a different benchmark",
+        "Independently propose answers, then over R rounds read and critique each other's proposals until they converge",
+        "Train on a shared dataset",
+        "Negotiate prices"
+      ],
+      "correct": 1,
+      "explanation": "N proposers, R rounds, cross-critique, convergence is the canonical Du et al. debate."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why does cross-model debate (e.g. ChatGPT + Bard) outperform single-model debate?",
+      "options": [
+        "Different vendors negotiate prices",
+        "Heterogeneity reduces shared blind spots so cross-critique catches more errors",
+        "It is cheaper",
+        "Vendors share weights"
+      ],
+      "correct": 1,
+      "explanation": "Mixing models brings independent error distributions, which raises the ceiling of debate."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What is the main token-cost win of a sparse topology over full mesh?",
+      "options": [
+        "Sparse topology requires no models",
+        "Each debater reads only a subset of peers, so critique-op count drops while accuracy often matches",
+        "Sparse topology doubles the rounds",
+        "It removes the LLM"
+      ],
+      "correct": 1,
+      "explanation": "Sparse (star, ring, hub-and-spoke) reduces critique ops without losing accuracy on many tasks."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Which case does the lesson list as where debate hurts?",
+      "options": [
+        "Open-ended reasoning",
+        "A simple factual lookup, because one lookup is cheaper than five debates",
+        "Chess move validity",
+        "Biography generation"
+      ],
+      "correct": 1,
+      "explanation": "Latency- and cost-sensitive trivial lookups do not benefit from N x R debate."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What is convergence collapse?",
+      "options": [
+        "Network outage",
+        "All agents converge on the first wrong answer; mitigate with required disagreement rounds",
+        "Process crash",
+        "TLS handshake failure"
+      ],
+      "correct": 1,
+      "explanation": "Early agreement on a wrong answer is mitigated by forcing distinct round-1 proposals."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Why does prompt homogenization undermine debate?",
+      "options": [
+        "It violates Apache 2.0",
+        "Identical prompts produce nearly identical answers, removing the cross-critique signal",
+        "It uses too many tokens",
+        "It bypasses the supervisor"
+      ],
+      "correct": 1,
+      "explanation": "Diverse prompts (and ideally diverse models) keep the proposal distribution wide."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Which production pattern is a debate variant per the lesson?",
+      "options": [
+        "Anthropic orchestrator-workers with a synthesis step",
+        "Pure single-shot RAG",
+        "Cron-only schedule",
+        "Vector indexing"
+      ],
+      "correct": 0,
+      "explanation": "Orchestrator-workers with synthesis is a debate-shaped pattern in production."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Du et al., Society of Minds (arXiv:2305.14325)",
+      "href": "https://arxiv.org/abs/2305.14325",
+      "kind": "Reading"
+    },
+    {
+      "label": "Sparse Communication Topology (arXiv:2406.11776)",
+      "href": "https://arxiv.org/abs/2406.11776",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Building Effective Agents",
+      "href": "https://www.anthropic.com/research/building-effective-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Madaan et al., Self-Refine (arXiv:2303.17651)",
+      "href": "https://arxiv.org/abs/2303.17651",
+      "kind": "Reading"
+    },
+    {
+      "label": "Debate",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/25-multi-agent-debate/outputs/skill-debate.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/25-multi-agent-debate/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/25-multi-agent-debate",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/25-multi-agent-debate"
+}

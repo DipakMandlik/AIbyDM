@@ -1,0 +1,199 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/10-dimensionality-reduction",
+  "slug": "10-dimensionality-reduction",
+  "phaseSlug": "01-math-foundations",
+  "number": "10",
+  "title": "Dimensionality Reduction",
+  "summary": "High-dimensional data has structure. You find it by looking from the right angle.",
+  "motto": "High-dimensional data has structure. You find it by looking from the right angle.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Phase 1",
+    "Lessons 01 (Linear Algebra Intuition)",
+    "02 (Vectors",
+    "Matrices & Operations)",
+    "03 (Eigenvalues & Eigenvectors)",
+    "06 (Probability & Distributions)"
+  ],
+  "duration": "~90 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Implement PCA from scratch: center data, compute the covariance matrix, eigendecompose, and project",
+    "Use explained variance ratio and the elbow method to choose the number of principal components",
+    "Compare PCA, t-SNE, and UMAP for visualizing MNIST digits in 2D and explain their tradeoffs",
+    "Apply kernel PCA with an RBF kernel to separate nonlinear data structures that standard PCA cannot handle"
+  ],
+  "exercises": [
+    "Modify the PCA class to support inverse_transform. Reconstruct MNIST digits from 10, 50, and 200 components. Print the reconstruction error (mean squared difference from the original) for each.",
+    "Run t-SNE on the same MNIST subset with perplexity values of 5, 30, and 100. Describe how the output changes. Why does perplexity affect cluster tightness?",
+    "Take a dataset with 50 features where only 5 are informative (generate one with sklearn.datasets.make_classification). Apply PCA and check whether the explained variance curve correctly identifies that the data is effectively 5-dimensional."
+  ],
+  "topics": [
+    "Math Foundations",
+    "Build",
+    "Dimensionality",
+    "Reduction",
+    "Curse of dimensionality",
+    "PCA",
+    "Principal component",
+    "Explained variance ratio",
+    "Covariance matrix",
+    "t-SNE",
+    "UMAP",
+    "Perplexity",
+    "Manifold"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> High-dimensional data has structure. You find it by looking from the right angle."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Implement PCA from scratch: center data, compute the covariance matrix, eigendecompose, and project\n- Use explained variance ratio and the elbow method to choose the number of principal components\n- Compare PCA, t-SNE, and UMAP for visualizing MNIST digits in 2D and explain their tradeoffs\n- Apply kernel PCA with an RBF kernel to separate nonlinear data structures that standard PCA cannot handle"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You have a dataset with 784 features per sample. Maybe it is pixel values of handwritten digits. Maybe it is gene expression levels. Maybe it is user behavior signals. You cannot visualize 784 dimensions. You cannot plot them. You cannot even think about them.\n\nBut most of those 784 features are redundant. The actual information lives on a much smaller surface. A handwritten \"7\" does not need 784 independent numbers to describe it. It needs a few: the angle of the stroke, the length of the crossbar, how much it leans. The rest is noise.\n\nDimensionality reduction finds that smaller surface. It takes your 784-dimensional data and compresses it to 2, 10, or 50 dimensions while keeping the structure that matters."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### The curse of dimensionality\n\nHigh-dimensional spaces are unintuitive. Three things break as dimensions grow.\n\n**Distance becomes meaningless.** In high dimensions, the distance between any two random points converges to the same value. If every point is roughly the same distance from every other point, nearest-neighbor search stops working.\n\n```\nDimension    Avg distance ratio (max/min between random points)\n2            ~5.0\n10           ~1.8\n100          ~1.2\n1000         ~1.02\n```\n\n**Volume concentrates in corners.** A unit hypercube in d dimensions has 2^d corners. In 100 dimensions, nearly all the volume is in the corners, far from the center. Data points spread to the edges and your models starve for data in the interior.\n\n**You need exponentially more data.** To maintain the same density of samples in a space, going from 2D to 20D means you need 10^18 times more data. You never have enough. Reducing dimensions brings the data density back to something workable.\n\n### PCA: find the directions that matter\n\nPrincipal Component Analysis (PCA) finds the axes along which your data varies the most. It rotates your coordinate system so the first axis captures the most variance, the second captures the next most, and so on.\n\nThe algorithm:\n\n```\n1. Center the data        (subtract the mean from each feature)\n2. Compute covariance     (how features move together)\n3. Eigendecomposition     (find the principal directions)\n4. Sort by eigenvalue     (biggest variance first)\n5. Project               (keep top k eigenvectors, drop the rest)\n```\n\nWhy eigendecomposition? The covariance matrix is symmetric and positive semi-definite. Its eigenvectors are orthogonal directions in feature space. The eigenvalues tell you how much variance each direction captures. The eigenvector with the largest eigenvalue points along the direction of maximum variance.\n\n```mermaid\ngraph LR\n    A[\"Original data (2D)\\nData spread in both\\nx and y directions\"] -->|\"PCA rotation\"| B[\"After PCA\\nPC1 captures the elongated spread\\nPC2 captures the narrow spread\\nDrop PC2 and you lose little info\"]\n```\n\n- **Before PCA:** Data cloud is spread diagonally across both x and y axes\n- **After PCA:** Coordinate system is rotated so PC1 aligns with the direction of maximum variance (elongated spread) and PC2 aligns with the direction of minimum variance (narrow spread)\n- **Dimensionality reduction:** Dropping PC2 projects the data onto PC1, losing very little information\n\n### Explained variance ratio\n\nEach principal component captures a fraction of the total variance. The explained variance ratio tells you how much.\n\n```\nComponent    Eigenvalue    Explained ratio    Cumulative\nPC1          4.73          0.473              0.473\nPC2          2.51          0.251              0.724\nPC3          1.12          0.112              0.836\nPC4          0.89          0.089              0.925\n...\n```\n\nWhen the cumulative explained variance reaches 0.95, you know that many components capture 95% of the information. Everything after that is mostly noise.\n\n### Choosing the number of components\n\nThree strategies:\n\n1. **Threshold.** Keep enough components to explain 90-95% of the variance.\n2. **Elbow method.** Plot explained variance per component. Look for a sharp drop-off.\n3. **Downstream performance.** Use PCA as preprocessing. Sweep k and measure your model's accuracy. The best k is wherever accuracy plateaus.\n\n### t-SNE: preserve neighborhoods\n\nt-Distributed Stochastic Neighbor Embedding (t-SNE) is designed for visualization. It maps high-dimensional data to 2D (or 3D) while preserving which points are near each other.\n\nThe intuition: in the original space, compute a probability distribution over pairs of points based on their distances. Near points get high probability. Far points get low probability. Then find a 2D arrangement where the same probability distribution holds. Points that were neighbors in 784 dimensions stay neighbors in 2D.\n\nKey properties of t-SNE:\n- Non-linear. It can unfold complex manifolds that PCA cannot.\n- Stochastic. Different runs produce different layouts.\n- Perplexity parameter controls how many neighbors to consider (typical range: 5-50).\n- Distances between clusters in the output are not meaningful. Only the clusters themselves are.\n- Slow on large datasets. O(n^2) by default.\n\n### UMAP: faster, better global structure\n\nUniform Manifold Approximation and Projection (UMAP) works similarly to t-SNE but with two advantages:\n- Faster. It uses approximate nearest-neighbor graphs instead of computing all pairwise distances.\n- Better global structure. The relative positions of clusters in the output tend to be more meaningful than in t-SNE.\n\nUMAP builds a weighted graph in high-dimensional space (the \"fuzzy topological representation\") and then finds a low-dimensional layout that preserves this graph as well as possible.\n\nKey parameters:\n- `n_neighbors`: how many neighbors define local structure (similar to perplexity). Higher values preserve more global structure.\n- `min_dist`: how tightly points pack together in the output. Lower values create denser clusters.\n\n### When to use which\n\n| Method | Use case | Preserves | Speed |\n|--------|----------|-----------|-------|\n| PCA | Preprocessing before training | Global variance | Fast (exact), works on millions of samples |\n| PCA | Quick exploratory visualization | Linear structure | Fast |\n| t-SNE | Publication-quality 2D plots | Local neighborhoods | Slow (< 10k samples ideal) |\n| UMAP | 2D visualization at scale | Local + some global structure | Medium (handles millions) |\n| PCA | Feature reduction for models | Variance-ranked features | Fast |\n| t-SNE / UMAP | Understanding cluster structure | Cluster separation | Medium to slow |\n\nRule of thumb: use PCA for preprocessing and data compression. Use t-SNE or UMAP when you need to visualize structure in 2D.\n\n### Kernel PCA\n\nStandard PCA finds linear subspaces. It rotates your coordinate system and drops axes. But what if the data lies on a nonlinear manifold? A circle in 2D cannot be separated by any line. Standard PCA will not help.\n\nKernel PCA applies PCA in a high-dimensional feature space induced by a kernel function, without explicitly computing the coordinates in that space. This is the kernel trick -- the same idea behind SVMs.\n\nThe algorithm:\n1. Compute the kernel matrix K where K_ij = k(x_i, x_j)\n2. Center the kernel matrix in feature space\n3. Eigendecompose the centered kernel matrix\n4. The top eigenvectors (scaled by 1/sqrt(eigenvalue)) are the projections\n\nCommon kernel functions:\n\n| Kernel | Formula | Good for |\n|--------|---------|----------|\n| RBF (Gaussian) | exp(-gamma * \\|\\|x - y\\|\\|^2) | Most nonlinear data, smooth manifolds |\n| Polynomial | (x . y + c)^d | Polynomial relationships |\n| Sigmoid | tanh(alpha * x . y + c) | Neural network-like mappings |\n\nWhen to use kernel PCA vs standard PCA:\n\n| Criterion | Standard PCA | Kernel PCA |\n|-----------|-------------|------------|\n| Data structure | Linear subspace | Nonlinear manifold |\n| Speed | O(min(n^2 d, d^2 n)) | O(n^2 d + n^3) |\n| Interpretability | Components are linear combinations of features | Components lack direct feature interpretation |\n| Scalability | Works on millions of samples | Kernel matrix is n x n, memory-limited |\n| Reconstruction | Direct inverse transform | Requires pre-image approximation |\n\nThe classic example: concentric circles in 2D. Two rings of points, one inside the other. Standard PCA projects both onto the same line -- useless for classification. Kernel PCA with an RBF kernel maps the inner circle and outer circle to different regions, making them linearly separable.\n\n### Reconstruction Error\n\nHow good is your dimensionality reduction? You compressed 784 dimensions to 50. What did you lose?\n\nMeasure reconstruction error:\n1. Project data to k dimensions: X_reduced = X @ W_k\n2. Reconstruct: X_hat = X_reduced @ W_k^T\n3. Compute MSE: mean((X - X_hat)^2)\n\nFor PCA, reconstruction error has a clean relationship to explained variance:\n\n```\nReconstruction error = sum of eigenvalues NOT included\nTotal variance = sum of ALL eigenvalues\nFraction lost = (sum of dropped eigenvalues) / (sum of all eigenvalues)\n```\n\nThe explained variance ratio for each component is:\n\n```\nexplained_ratio_k = eigenvalue_k / sum(all eigenvalues)\n```\n\nPlotting cumulative explained variance against number of components gives you the \"elbow\" curve. The right number of components is where:\n- The curve flattens out (diminishing returns)\n- Cumulative variance crosses your threshold (usually 0.90 or 0.95)\n- Downstream task performance plateaus\n\nReconstruction error is useful beyond choosing k. You can use it for anomaly detection: samples with high reconstruction error are outliers that do not fit the learned subspace. This is the basis of PCA-based anomaly detection in production systems.\n\n```figure\npca-axes\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: PCA from scratch\n\n```python\nimport numpy as np\n\nclass PCA:\n    def __init__(self, n_components):\n        self.n_components = n_components\n        self.components = None\n        self.mean = None\n        self.eigenvalues = None\n        self.explained_variance_ratio_ = None\n\n    def fit(self, X):\n        self.mean = np.mean(X, axis=0)\n        X_centered = X - self.mean\n\n        cov_matrix = np.cov(X_centered, rowvar=False)\n\n        eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)\n\n        sorted_idx = np.argsort(eigenvalues)[::-1]\n        eigenvalues = eigenvalues[sorted_idx]\n        eigenvectors = eigenvectors[:, sorted_idx]\n\n        self.components = eigenvectors[:, :self.n_components].T\n        self.eigenvalues = eigenvalues[:self.n_components]\n        total_var = np.sum(eigenvalues)\n        self.explained_variance_ratio_ = self.eigenvalues / total_var\n\n        return self\n\n    def transform(self, X):\n        X_centered = X - self.mean\n        return X_centered @ self.components.T\n\n    def fit_transform(self, X):\n        self.fit(X)\n        return self.transform(X)\n```\n\n### Step 2: Test on synthetic data\n\n```python\nnp.random.seed(42)\nn_samples = 500\n\nt = np.random.uniform(0, 2 * np.pi, n_samples)\nx1 = 3 * np.cos(t) + np.random.normal(0, 0.2, n_samples)\nx2 = 3 * np.sin(t) + np.random.normal(0, 0.2, n_samples)\nx3 = 0.5 * x1 + 0.3 * x2 + np.random.normal(0, 0.1, n_samples)\n\nX_synthetic = np.column_stack([x1, x2, x3])\n\npca = PCA(n_components=2)\nX_reduced = pca.fit_transform(X_synthetic)\n\nprint(f\"Original shape: {X_synthetic.shape}\")\nprint(f\"Reduced shape:  {X_reduced.shape}\")\nprint(f\"Explained variance ratios: {pca.explained_variance_ratio_}\")\nprint(f\"Total variance captured: {sum(pca.explained_variance_ratio_):.4f}\")\n```\n\n### Step 3: MNIST digits in 2D\n\n```python\nfrom sklearn.datasets import fetch_openml\n\nmnist = fetch_openml(\"mnist_784\", version=1, as_frame=False, parser=\"auto\")\nX_mnist = mnist.data[:5000].astype(float)\ny_mnist = mnist.target[:5000].astype(int)\n\npca_mnist = PCA(n_components=50)\nX_pca50 = pca_mnist.fit_transform(X_mnist)\nprint(f\"50 components capture {sum(pca_mnist.explained_variance_ratio_):.2%} of variance\")\n\npca_2d = PCA(n_components=2)\nX_pca2d = pca_2d.fit_transform(X_mnist)\nprint(f\"2 components capture {sum(pca_2d.explained_variance_ratio_):.2%} of variance\")\n```\n\n### Step 4: Compare with sklearn\n\n```python\nfrom sklearn.decomposition import PCA as SklearnPCA\nfrom sklearn.manifold import TSNE\n\nsklearn_pca = SklearnPCA(n_components=2)\nX_sklearn_pca = sklearn_pca.fit_transform(X_mnist)\n\nprint(f\"\\nOur PCA explained variance:     {pca_2d.explained_variance_ratio_}\")\nprint(f\"Sklearn PCA explained variance: {sklearn_pca.explained_variance_ratio_}\")\n\ndiff = np.abs(np.abs(X_pca2d) - np.abs(X_sklearn_pca))\nprint(f\"Max absolute difference: {diff.max():.10f}\")\n\ntsne = TSNE(n_components=2, perplexity=30, random_state=42)\nX_tsne = tsne.fit_transform(X_mnist)\nprint(f\"\\nt-SNE output shape: {X_tsne.shape}\")\n```\n\n### Step 5: UMAP comparison\n\n```python\ntry:\n    from umap import UMAP\n\n    reducer = UMAP(n_components=2, n_neighbors=15, min_dist=0.1, random_state=42)\n    X_umap = reducer.fit_transform(X_mnist)\n    print(f\"UMAP output shape: {X_umap.shape}\")\nexcept ImportError:\n    print(\"Install umap-learn: pip install umap-learn\")\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "PCA as preprocessing before a classifier:\n\n```python\nfrom sklearn.decomposition import PCA as SklearnPCA\nfrom sklearn.linear_model import LogisticRegression\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import accuracy_score\n\nX_train, X_test, y_train, y_test = train_test_split(\n    X_mnist, y_mnist, test_size=0.2, random_state=42\n)\n\nresults = {}\nfor k in [10, 30, 50, 100, 200]:\n    pca_k = SklearnPCA(n_components=k)\n    X_tr = pca_k.fit_transform(X_train)\n    X_te = pca_k.transform(X_test)\n\n    clf = LogisticRegression(max_iter=1000, random_state=42)\n    clf.fit(X_tr, y_train)\n    acc = accuracy_score(y_test, clf.predict(X_te))\n    var_captured = sum(pca_k.explained_variance_ratio_)\n    results[k] = (acc, var_captured)\n    print(f\"k={k:>3d}  accuracy={acc:.4f}  variance={var_captured:.4f}\")\n```\n\nPerformance plateaus well before 784 dimensions. That plateau is your operating point."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces:\n- `outputs/skill-dimensionality-reduction.md` - a skill for choosing the right dimensionality reduction technique for a given task"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Modify the PCA class to support `inverse_transform`. Reconstruct MNIST digits from 10, 50, and 200 components. Print the reconstruction error (mean squared difference from the original) for each.\n\n2. Run t-SNE on the same MNIST subset with perplexity values of 5, 30, and 100. Describe how the output changes. Why does perplexity affect cluster tightness?\n\n3. Take a dataset with 50 features where only 5 are informative (generate one with `sklearn.datasets.make_classification`). Apply PCA and check whether the explained variance curve correctly identifies that the data is effectively 5-dimensional."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Curse of dimensionality | \"Too many features\" | Distances, volumes, and data density all behave counterintuitively as dimensions grow. Models need exponentially more data to compensate. |\n| PCA | \"Reduce dimensions\" | Rotate your coordinate system so the axes align with the directions of maximum variance, then drop the low-variance axes. |\n| Principal component | \"An important direction\" | An eigenvector of the covariance matrix. The direction in feature space along which the data varies most. |\n| Explained variance ratio | \"How much info this component has\" | The fraction of total variance captured by one principal component. Sum the top k ratios to see how much k components preserve. |\n| Covariance matrix | \"How features correlate\" | A symmetric matrix where entry (i,j) measures how feature i and feature j move together. Diagonal entries are individual variances. |\n| t-SNE | \"That cluster plot\" | A nonlinear method that maps high-dimensional data to 2D by preserving pairwise neighborhood probabilities. Good for visualization, not for preprocessing. |\n| UMAP | \"Faster t-SNE\" | A nonlinear method based on topological data analysis. Preserves both local and some global structure. Scales better than t-SNE. |\n| Perplexity | \"A t-SNE knob\" | Controls the effective number of neighbors each point considers. Low perplexity focuses on very local structure. High perplexity captures broader patterns. |\n| Manifold | \"The surface the data lives on\" | A lower-dimensional surface embedded in a higher-dimensional space. A sheet of paper crumpled in 3D is a 2D manifold. |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [A Tutorial on Principal Component Analysis](https://arxiv.org/abs/1404.1100) (Shlens) - clear derivation of PCA from the ground up\n- [How to Use t-SNE Effectively](https://distill.pub/2016/misread-tsne/) (Wattenberg et al.) - interactive guide to t-SNE pitfalls and parameter choices\n- [UMAP documentation](https://umap-learn.readthedocs.io/) - theory and practical guidance from the UMAP authors"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is the 'curse of dimensionality'?",
+      "options": [
+        "High-dimensional data takes too long to download",
+        "As dimensions grow, distances become meaningless, volume concentrates in corners, and you need exponentially more data",
+        "Neural networks cannot process data with more than 100 features",
+        "High-dimensional data always contains noise"
+      ],
+      "correct": 1,
+      "explanation": "In high dimensions, all pairwise distances converge to similar values, data points spread to corners, and maintaining sample density requires exponentially more data. Dimensionality reduction counteracts these effects."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does PCA find?",
+      "options": [
+        "The most important features by name",
+        "The orthogonal directions of maximum variance in the data",
+        "Clusters of similar data points",
+        "The optimal number of features to keep"
+      ],
+      "correct": 1,
+      "explanation": "PCA computes the eigenvectors of the covariance matrix, which are orthogonal directions ranked by how much data variance they capture. The first principal component points along the direction of maximum spread."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "After running PCA on 784-dimensional MNIST data with k=50 components, you find 95% of variance is captured. What does this tell you?",
+      "options": [
+        "Only 50 pixels matter in each image",
+        "The data effectively lives in a ~50-dimensional subspace; the remaining 734 dimensions are mostly noise or redundancy",
+        "95% of images belong to the same class",
+        "The model will achieve 95% accuracy"
+      ],
+      "correct": 1,
+      "explanation": "95% explained variance with 50 components means the essential structure of 784-dimensional data is captured by just 50 directions. The rest carries only 5% of the variation -- mostly noise."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "Why should you NOT use t-SNE as preprocessing before training a classifier?",
+      "options": [
+        "t-SNE is too slow for large datasets",
+        "t-SNE is designed for visualization only: it distorts global distances, is stochastic, and the output coordinates have no consistent meaning across runs",
+        "t-SNE reduces data to exactly 2 dimensions which is too few",
+        "t-SNE requires the labels to be known in advance"
+      ],
+      "correct": 1,
+      "explanation": "t-SNE preserves local neighborhoods but distorts global structure. Distances between clusters are meaningless, and different runs produce different layouts. Use PCA for preprocessing and t-SNE/UMAP only for visualization."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "When would you choose kernel PCA over standard PCA?",
+      "options": [
+        "When you have more samples than features",
+        "When the data lies on a nonlinear manifold that standard PCA cannot separate, like concentric circles",
+        "When you need the fastest possible computation",
+        "When you want interpretable principal components"
+      ],
+      "correct": 1,
+      "explanation": "Standard PCA finds linear subspaces. If data has nonlinear structure (e.g., two concentric rings), PCA projects both onto the same line. Kernel PCA maps data to a higher-dimensional space where the structure becomes linear."
+    }
+  ],
+  "resources": [
+    {
+      "label": "A Tutorial on Principal Component Analysis",
+      "href": "https://arxiv.org/abs/1404.1100",
+      "kind": "Reading"
+    },
+    {
+      "label": "How to Use t-SNE Effectively",
+      "href": "https://distill.pub/2016/misread-tsne/",
+      "kind": "Reading"
+    },
+    {
+      "label": "UMAP documentation",
+      "href": "https://umap-learn.readthedocs.io/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Dimensionality Reduction",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/10-dimensionality-reduction/outputs/skill-dimensionality-reduction.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "dim_reduction.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/10-dimensionality-reduction/code/dim_reduction.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/10-dimensionality-reduction",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/10-dimensionality-reduction"
+}

@@ -1,0 +1,193 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/01-linear-algebra-intuition",
+  "slug": "01-linear-algebra-intuition",
+  "phaseSlug": "01-math-foundations",
+  "number": "01",
+  "title": "Linear Algebra Intuition",
+  "summary": "Every AI model is just matrix math wearing a fancy hat.",
+  "motto": "Every AI model is just matrix math wearing a fancy hat.",
+  "type": "Learn",
+  "languages": [
+    "Python",
+    "Julia"
+  ],
+  "prerequisites": [
+    "Phase 0"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Implement vector and matrix operations (addition, dot product, matrix multiply) from scratch in Python",
+    "Explain geometrically what the dot product, projection, and Gram-Schmidt process do",
+    "Determine linear independence, rank, and basis of a set of vectors using row reduction",
+    "Connect linear algebra concepts to their AI applications: embeddings, attention scores, and LoRA"
+  ],
+  "exercises": [
+    "Implement Vector.angle_between(other) that returns the angle in degrees between two vectors",
+    "Create a 2D scaling matrix that doubles the x-coordinate and triples the y-coordinate, then apply it to the vector [1, 1]",
+    "Given 5 random word-like vectors (dimension 50), find the two most similar using cosine similarity",
+    "Verify that the Gram-Schmidt output is truly orthonormal: check that every pair has dot product 0 and every vector has magnitude 1",
+    "Create a 3x3 matrix with rank 2. Verify using the rank() method. Then explain what geometric object the columns span.",
+    "Project the vector [1, 2, 3] onto [1, 1, 1]. What does the result represent geometrically?"
+  ],
+  "topics": [
+    "Math Foundations",
+    "Learn",
+    "Python",
+    "Julia",
+    "Linear",
+    "Algebra",
+    "Intuition",
+    "Vector",
+    "Matrix",
+    "Dot product",
+    "Embedding",
+    "Linear independence",
+    "Rank",
+    "Projection",
+    "Basis",
+    "Orthonormal"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Every AI model is just matrix math wearing a fancy hat."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Implement vector and matrix operations (addition, dot product, matrix multiply) from scratch in Python\n- Explain geometrically what the dot product, projection, and Gram-Schmidt process do\n- Determine linear independence, rank, and basis of a set of vectors using row reduction\n- Connect linear algebra concepts to their AI applications: embeddings, attention scores, and LoRA"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Open any ML paper. Within the first page, you'll see vectors, matrices, dot products, and transformations. Without linear algebra intuition, these are just symbols. With it, you can see what a neural network is actually doing -- moving points around in space.\n\nYou don't need to be a mathematician. You need to see what these operations mean geometrically, then code them yourself."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Vectors Are Points (and Directions)\n\nA vector is just a list of numbers. But those numbers mean something -- they're coordinates in space.\n\n**2D vector [3, 2]:**\n\n| x | y | Point |\n|---|---|-------|\n| 3 | 2 | The vector points from origin (0,0) to (3, 2) on the plane |\n\nThe vector has magnitude sqrt(3^2 + 2^2) = sqrt(13) and points up and to the right.\n\nIn AI, vectors represent everything:\n- A word → a vector of 768 numbers (its \"meaning\" in embedding space)\n- An image → a vector of millions of pixel values\n- A user → a vector of preferences\n\n### Matrices Are Transformations\n\nA matrix transforms one vector into another. It can rotate, scale, stretch, or project.\n\n```mermaid\ngraph LR\n    subgraph Before\n        A[\"Point A\"]\n        B[\"Point B\"]\n    end\n    subgraph Matrix[\"Matrix Multiplication\"]\n        M[\"M (transformation)\"]\n    end\n    subgraph After\n        A2[\"Point A'\"]\n        B2[\"Point B'\"]\n    end\n    A --> M\n    B --> M\n    M --> A2\n    M --> B2\n```\n\nIn AI, matrices ARE the model:\n- Neural network weights → matrices that transform input into output\n- Attention scores → matrices that decide what to focus on\n- Embeddings → matrices that map words to vectors\n\n### The Dot Product Measures Similarity\n\nThe dot product of two vectors tells you how similar they are.\n\n```\na · b = a₁×b₁ + a₂×b₂ + ... + aₙ×bₙ\n\nSame direction:      a · b > 0  (similar)\nPerpendicular:       a · b = 0  (unrelated)\nOpposite direction:  a · b < 0  (dissimilar)\n```\n\nThis is literally how search engines, recommendation systems, and RAG work -- find vectors with high dot products.\n\n### Linear Independence\n\nVectors are linearly independent if no vector in the set can be written as a combination of the others. If v1, v2, v3 are independent, they span a 3D space. If one is a combination of the others, they only span a plane.\n\nWhy it matters for AI: your feature matrix should have linearly independent columns. If two features are perfectly correlated (linearly dependent), the model cannot distinguish their effects. This causes multicollinearity in regression -- the weight matrix becomes unstable, and small input changes produce wild output swings.\n\n**Concrete example:**\n\n```\nv1 = [1, 0, 0]\nv2 = [0, 1, 0]\nv3 = [2, 1, 0]   # v3 = 2*v1 + v2\n```\n\nv1 and v2 are independent -- neither is a scalar multiple or combination of the other. But v3 = 2*v1 + v2, so {v1, v2, v3} is a dependent set. These three vectors all lie in the xy-plane. No matter how you combine them, you cannot reach [0, 0, 1]. You have three vectors but only two dimensions of freedom.\n\nIn a dataset: if feature_3 = 2*feature_1 + feature_2, adding feature_3 gives the model zero new information. Worse, it makes the normal equations singular -- there is no unique solution for the weights.\n\n### Basis and Rank\n\nA basis is a minimal set of linearly independent vectors that span the entire space. The number of basis vectors is the dimension of the space.\n\nThe standard basis for 3D space is {[1,0,0], [0,1,0], [0,0,1]}. But any three independent vectors in 3D form a valid basis. The choice of basis is a choice of coordinate system.\n\nRank of a matrix = number of linearly independent columns = number of linearly independent rows. If rank < min(rows, cols), the matrix is rank-deficient. This means:\n- The system has infinitely many solutions (or none)\n- Information is lost in the transformation\n- The matrix cannot be inverted\n\n| Situation | Rank | What it means for ML |\n|-----------|------|---------------------|\n| Full rank (rank = min(m, n)) | Maximum possible | Unique least-squares solution exists. Model is well-conditioned. |\n| Rank deficient (rank < min(m, n)) | Below maximum | Features are redundant. Infinitely many weight solutions. Regularization needed. |\n| Rank 1 | 1 | Every column is a scaled copy of one vector. All data lies on a line. |\n| Near rank-deficient (small singular values) | Numerically low | Matrix is ill-conditioned. Tiny input noise causes large output changes. Use SVD truncation or ridge regression. |\n\n### Projection\n\nProjecting vector **a** onto vector **b** gives the component of **a** in the direction of **b**:\n\n```\nproj_b(a) = (a dot b / b dot b) * b\n```\n\nThe residual (a - proj_b(a)) is perpendicular to b. This orthogonal decomposition is the foundation of least-squares fitting.\n\nProjection is everywhere in ML:\n- Linear regression minimizes the distance from observations to the column space -- the solution IS a projection\n- PCA projects data onto the directions of maximum variance\n- Attention in transformers computes projections of queries onto keys\n\n```mermaid\ngraph LR\n    subgraph Projection[\"Projection of a onto b\"]\n        direction TB\n        O[\"Origin\"] --> |\"b (direction)\"| B[\"b\"]\n        O --> |\"a (original)\"| A[\"a\"]\n        O --> |\"proj_b(a)\"| P[\"projection\"]\n        A -.-> |\"residual (perpendicular)\"| P\n    end\n```\n\n**Example:** a = [3, 4], b = [1, 0]\n\nproj_b(a) = (3*1 + 4*0) / (1*1 + 0*0) * [1, 0] = 3 * [1, 0] = [3, 0]\n\nThe projection drops the y-component. This is dimensionality reduction in its simplest form -- throw away the directions you don't care about.\n\n### Gram-Schmidt Process\n\nConverting any set of independent vectors into an orthonormal basis. Orthonormal means every vector has length 1 and every pair is perpendicular.\n\nThe algorithm:\n1. Take the first vector, normalize it\n2. Take the second vector, subtract its projection onto the first, normalize\n3. Take the third vector, subtract its projections onto all previous vectors, normalize\n4. Repeat for remaining vectors\n\n```\nInput:  v1, v2, v3, ... (linearly independent)\n\nu1 = v1 / |v1|\n\nw2 = v2 - (v2 dot u1) * u1\nu2 = w2 / |w2|\n\nw3 = v3 - (v3 dot u1) * u1 - (v3 dot u2) * u2\nu3 = w3 / |w3|\n\nOutput: u1, u2, u3, ... (orthonormal basis)\n```\n\nThis is how QR decomposition works internally. Q is the orthonormal basis, R captures the projection coefficients. QR decomposition is used in:\n- Solving linear systems (more stable than Gaussian elimination)\n- Computing eigenvalues (QR algorithm)\n- Least-squares regression (the standard numerical method)\n\n```figure\neigen-directions\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Vectors from scratch (Python)\n\n```python\nclass Vector:\n    def __init__(self, components):\n        self.components = list(components)\n        self.dim = len(self.components)\n\n    def __add__(self, other):\n        return Vector([a + b for a, b in zip(self.components, other.components)])\n\n    def __sub__(self, other):\n        return Vector([a - b for a, b in zip(self.components, other.components)])\n\n    def dot(self, other):\n        return sum(a * b for a, b in zip(self.components, other.components))\n\n    def magnitude(self):\n        return sum(x**2 for x in self.components) ** 0.5\n\n    def normalize(self):\n        mag = self.magnitude()\n        return Vector([x / mag for x in self.components])\n\n    def cosine_similarity(self, other):\n        return self.dot(other) / (self.magnitude() * other.magnitude())\n\n    def __repr__(self):\n        return f\"Vector({self.components})\"\n\n\na = Vector([1, 2, 3])\nb = Vector([4, 5, 6])\n\nprint(f\"a + b = {a + b}\")\nprint(f\"a · b = {a.dot(b)}\")\nprint(f\"|a| = {a.magnitude():.4f}\")\nprint(f\"cosine similarity = {a.cosine_similarity(b):.4f}\")\n```\n\n### Step 2: Matrices from scratch (Python)\n\n```python\nclass Matrix:\n    def __init__(self, rows):\n        self.rows = [list(row) for row in rows]\n        self.shape = (len(self.rows), len(self.rows[0]))\n\n    def __matmul__(self, other):\n        if isinstance(other, Vector):\n            return Vector([\n                sum(self.rows[i][j] * other.components[j] for j in range(self.shape[1]))\n                for i in range(self.shape[0])\n            ])\n        rows = []\n        for i in range(self.shape[0]):\n            row = []\n            for j in range(other.shape[1]):\n                row.append(sum(\n                    self.rows[i][k] * other.rows[k][j]\n                    for k in range(self.shape[1])\n                ))\n            rows.append(row)\n        return Matrix(rows)\n\n    def transpose(self):\n        return Matrix([\n            [self.rows[j][i] for j in range(self.shape[0])]\n            for i in range(self.shape[1])\n        ])\n\n    def __repr__(self):\n        return f\"Matrix({self.rows})\"\n\n\nrotation_90 = Matrix([[0, -1], [1, 0]])\npoint = Vector([3, 1])\n\nrotated = rotation_90 @ point\nprint(f\"Original: {point}\")\nprint(f\"Rotated 90°: {rotated}\")\n```\n\n### Step 3: Why this matters for AI\n\n```python\nimport random\n\nrandom.seed(42)\nweights = Matrix([[random.gauss(0, 0.1) for _ in range(3)] for _ in range(2)])\ninput_vector = Vector([1.0, 0.5, -0.3])\n\noutput = weights @ input_vector\nprint(f\"Input (3D): {input_vector}\")\nprint(f\"Output (2D): {output}\")\nprint(\"This is what a neural network layer does -- matrix multiplication.\")\n```\n\n### Step 4: Julia version\n\n```julia\na = [1.0, 2.0, 3.0]\nb = [4.0, 5.0, 6.0]\n\nprintln(\"a + b = \", a + b)\nprintln(\"a · b = \", a ⋅ b)       # Julia supports unicode operators\nprintln(\"|a| = \", √(a ⋅ a))\nprintln(\"cosine = \", (a ⋅ b) / (√(a ⋅ a) * √(b ⋅ b)))\n\n# Matrix-vector multiplication\nW = [0.1 -0.2 0.3; 0.4 0.5 -0.1]\nx = [1.0, 0.5, -0.3]\nprintln(\"Wx = \", W * x)\nprintln(\"This is a neural network layer.\")\n```\n\n### Step 5: Linear independence and projection from scratch (Python)\n\n```python\ndef is_linearly_independent(vectors):\n    n = len(vectors)\n    dim = len(vectors[0].components)\n    mat = Matrix([v.components[:] for v in vectors])\n    rows = [row[:] for row in mat.rows]\n    rank = 0\n    for col in range(dim):\n        pivot = None\n        for row in range(rank, len(rows)):\n            if abs(rows[row][col]) > 1e-10:\n                pivot = row\n                break\n        if pivot is None:\n            continue\n        rows[rank], rows[pivot] = rows[pivot], rows[rank]\n        scale = rows[rank][col]\n        rows[rank] = [x / scale for x in rows[rank]]\n        for row in range(len(rows)):\n            if row != rank and abs(rows[row][col]) > 1e-10:\n                factor = rows[row][col]\n                rows[row] = [rows[row][j] - factor * rows[rank][j] for j in range(dim)]\n        rank += 1\n    return rank == n\n\n\ndef project(a, b):\n    scalar = a.dot(b) / b.dot(b)\n    return Vector([scalar * x for x in b.components])\n\n\ndef gram_schmidt(vectors):\n    orthonormal = []\n    for v in vectors:\n        w = v\n        for u in orthonormal:\n            proj = project(w, u)\n            w = w - proj\n        if w.magnitude() < 1e-10:\n            continue\n        orthonormal.append(w.normalize())\n    return orthonormal\n\n\nv1 = Vector([1, 0, 0])\nv2 = Vector([1, 1, 0])\nv3 = Vector([1, 1, 1])\nbasis = gram_schmidt([v1, v2, v3])\nfor i, u in enumerate(basis):\n    print(f\"u{i+1} = {u}\")\n    print(f\"  |u{i+1}| = {u.magnitude():.6f}\")\n\nprint(f\"u1 · u2 = {basis[0].dot(basis[1]):.6f}\")\nprint(f\"u1 · u3 = {basis[0].dot(basis[2]):.6f}\")\nprint(f\"u2 · u3 = {basis[1].dot(basis[2]):.6f}\")\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Now the same thing with NumPy -- what you'll actually use in practice:\n\n```python\nimport numpy as np\n\na = np.array([1, 2, 3], dtype=float)\nb = np.array([4, 5, 6], dtype=float)\n\nprint(f\"a + b = {a + b}\")\nprint(f\"a · b = {np.dot(a, b)}\")\nprint(f\"|a| = {np.linalg.norm(a):.4f}\")\nprint(f\"cosine = {np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)):.4f}\")\n\nW = np.random.randn(2, 3) * 0.1\nx = np.array([1.0, 0.5, -0.3])\nprint(f\"Wx = {W @ x}\")\n```\n\n### Rank, Projection, and QR with NumPy\n\n```python\nimport numpy as np\n\nA = np.array([[1, 2], [2, 4]])\nprint(f\"Rank: {np.linalg.matrix_rank(A)}\")\n\na = np.array([3, 4])\nb = np.array([1, 0])\nproj = (np.dot(a, b) / np.dot(b, b)) * b\nprint(f\"Projection of {a} onto {b}: {proj}\")\n\nQ, R = np.linalg.qr(np.random.randn(3, 3))\nprint(f\"Q is orthogonal: {np.allclose(Q @ Q.T, np.eye(3))}\")\nprint(f\"R is upper triangular: {np.allclose(R, np.triu(R))}\")\n```\n\n### PyTorch -- Tensors Are Vectors with Autodiff\n\n```python\nimport torch\n\nx = torch.randn(3, requires_grad=True)\ny = torch.tensor([1.0, 0.0, 0.0])\n\nsimilarity = torch.dot(x, y)\nsimilarity.backward()\n\nprint(f\"x = {x.data}\")\nprint(f\"y = {y.data}\")\nprint(f\"dot product = {similarity.item():.4f}\")\nprint(f\"d(dot)/dx = {x.grad}\")\n```\n\nThe gradient of the dot product with respect to x is just y. PyTorch computed this automatically. Every operation in a neural network is built from operations like this -- matrix multiplies, dot products, projections -- and autodiff tracks gradients through all of them.\n\nYou just built from scratch what NumPy does in one line. Now you know what's happening under the hood."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces:\n- `outputs/prompt-linear-algebra-tutor.md` -- a prompt for AI assistants to teach linear algebra through geometric intuition"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Implement `Vector.angle_between(other)` that returns the angle in degrees between two vectors\n2. Create a 2D scaling matrix that doubles the x-coordinate and triples the y-coordinate, then apply it to the vector [1, 1]\n3. Given 5 random word-like vectors (dimension 50), find the two most similar using cosine similarity\n4. Verify that the Gram-Schmidt output is truly orthonormal: check that every pair has dot product 0 and every vector has magnitude 1\n5. Create a 3x3 matrix with rank 2. Verify using the `rank()` method. Then explain what geometric object the columns span.\n6. Project the vector [1, 2, 3] onto [1, 1, 1]. What does the result represent geometrically?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Vector | \"An arrow\" | A list of numbers representing a point or direction in n-dimensional space |\n| Matrix | \"A table of numbers\" | A transformation that maps vectors from one space to another |\n| Dot product | \"Multiply and sum\" | A measure of how aligned two vectors are -- the core of similarity search |\n| Embedding | \"Some AI magic\" | A vector that represents the meaning of something (word, image, user) |\n| Linear independence | \"They don't overlap\" | No vector in the set can be written as a combination of the others |\n| Rank | \"How many dimensions\" | The number of linearly independent columns (or rows) in a matrix |\n| Projection | \"The shadow\" | The component of one vector in the direction of another |\n| Basis | \"The coordinate axes\" | A minimal set of independent vectors that span the space |\n| Orthonormal | \"Perpendicular unit vectors\" | Vectors that are mutually perpendicular and each have length 1 |"
+    },
+    {
+      "key": "connections",
+      "title": "Connections",
+      "markdown": "Everything in this lesson connects to specific parts of modern AI:\n\n| Concept | Where it shows up |\n|---------|------------------|\n| Dot product | Attention scores in transformers, cosine similarity in RAG |\n| Matrix multiply | Every neural network layer, every linear transformation |\n| Linear independence | Feature selection, avoiding multicollinearity |\n| Rank | Determining if a system is solvable, LoRA (low-rank adaptation) |\n| Projection | Linear regression (projecting onto column space), PCA |\n| Gram-Schmidt / QR | Numerical solvers, eigenvalue computation |\n| Orthonormal basis | Stable numerical computation, whitening transforms |\n\nLoRA deserves special mention. It fine-tunes large language models by decomposing weight updates into low-rank matrices. Instead of updating a 4096x4096 weight matrix (16M parameters), LoRA updates two matrices of size 4096x16 and 16x4096 (131K parameters). The rank-16 constraint means LoRA assumes the weight update lives in a 16-dimensional subspace of the full 4096-dimensional space. That is linear algebra doing real work."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does the dot product of two vectors measure?",
+      "options": [
+        "The distance between the two vectors",
+        "How similar or aligned the two vectors are",
+        "The angle between the vectors in degrees",
+        "The number of dimensions the vectors share"
+      ],
+      "correct": 1,
+      "explanation": "The dot product measures alignment: positive means same direction (similar), zero means perpendicular (unrelated), negative means opposite direction (dissimilar). This is the basis of similarity search in AI."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "In AI, what does 'embedding' refer to?",
+      "options": [
+        "Inserting one model inside another",
+        "A vector representation that captures the meaning of something (word, image, user)",
+        "A technique for compressing model weights",
+        "The process of converting code to machine instructions"
+      ],
+      "correct": 1,
+      "explanation": "An embedding maps discrete objects (words, images, users) to continuous vectors in a high-dimensional space where similar items are close together. It is the bridge between real-world concepts and mathematical operations."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Three vectors v1=[1,0,0], v2=[0,1,0], v3=[2,1,0] are given. Are they linearly independent?",
+      "options": [
+        "Yes, because there are three vectors in 3D space",
+        "No, because v3 = 2*v1 + v2, so v3 is a linear combination of the others",
+        "Yes, because none of the vectors are identical",
+        "No, because they all have a zero component"
+      ],
+      "correct": 1,
+      "explanation": "v3 = 2*v1 + v2, making the set linearly dependent. All three vectors lie in the xy-plane and cannot reach [0,0,1]. Despite having 3 vectors in 3D, they only span a 2D subspace."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "What does the rank of a matrix tell you in the context of machine learning?",
+      "options": [
+        "How fast the matrix can be multiplied",
+        "The number of linearly independent columns, indicating how many dimensions of useful information it contains",
+        "The maximum value in the matrix",
+        "The number of non-zero entries in the matrix"
+      ],
+      "correct": 1,
+      "explanation": "Rank equals the number of linearly independent columns. In ML, a rank-deficient feature matrix means redundant features, infinitely many weight solutions, and the need for regularization."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "How does LoRA (Low-Rank Adaptation) use linear algebra to efficiently fine-tune large language models?",
+      "options": [
+        "It removes unused rows from weight matrices to shrink the model",
+        "It decomposes weight updates into two small low-rank matrices instead of updating the full weight matrix",
+        "It converts all weights from float32 to int8",
+        "It freezes the embedding layer and only trains the output head"
+      ],
+      "correct": 1,
+      "explanation": "LoRA decomposes a 4096x4096 weight update into two matrices of size 4096x16 and 16x4096 (rank-16), reducing trainable parameters from 16M to 131K by assuming updates live in a low-dimensional subspace."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Linear Algebra Tutor",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/outputs/prompt-linear-algebra-tutor.md",
+      "kind": "Prompt"
+    },
+    {
+      "label": "vectors.jl",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.jl",
+      "kind": "Code"
+    },
+    {
+      "label": "vectors.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/01-linear-algebra-intuition"
+}

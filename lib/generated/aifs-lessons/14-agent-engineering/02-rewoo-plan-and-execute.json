@@ -1,0 +1,230 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/02-rewoo-plan-and-execute",
+  "slug": "02-rewoo-plan-and-execute",
+  "phaseSlug": "14-agent-engineering",
+  "number": "02",
+  "title": "ReWOO and Plan-and-Execute: Decoupled Planning",
+  "summary": "ReAct interleaves thought and action in one stream. ReWOO separates them: one big plan up front, then execute. 5x fewer tokens, +4% accuracy on HotpotQA, and you can distill the planner into a 7B model. Plan-and-Execute generalized it; Pla...",
+  "motto": "ReAct interleaves thought and action in one stream. ReWOO separates them: one big plan up front, then execute. 5x fewer tokens, +4% accuracy on HotpotQA, and you can distill the planner into a 7B model. Plan-and-Execute generalized it; Plan-and-Act scaled it to web navigation.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 01 (Agent Loop)"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Explain why ReWOO's Planner / Worker / Solver split saves tokens and improves robustness over ReAct's interleaved loop.",
+    "Implement a plan DAG, a dependency-ordered executor, and a solver that composes worker outputs — all stdlib.",
+    "Decide when a task should run as plan-then-execute vs interleaved ReAct, using the 2026 \"five workflow patterns\" framing (Anthropic).",
+    "Recognize when Plan-and-Act's synthetic plan data is needed for long-horizon web or mobile tasks."
+  ],
+  "exercises": [
+    "Parallelize worker execution for independent plan nodes. What does it buy you on a 6-node DAG with 2 parallel groups?",
+    "Add a replanner node that fires if any worker returns an error. What is the smallest change to ReWOO that makes it Plan-and-Execute?",
+    "Replace Planner with a small model (7B class) and keep Solver on a frontier model. Compare end-to-end quality — where does the split fail?",
+    "Read Section 4 of the ReWOO paper on planner distillation. Reproduce the 175B -> 7B result conceptually: what training data do you need, and how do you score plan quality?",
+    "Port the toy to Plan-and-Act's trajectory shape: plan is a sequence, not a DAG. What tradeoffs change?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "ReWOO",
+    "Plan",
+    "Execute",
+    "Decoupled",
+    "Planning",
+    "Plan-and-Execute",
+    "Plan-and-Act",
+    "Evidence reference",
+    "Planner distillation",
+    "Token efficiency",
+    "DAG executor"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> ReAct interleaves thought and action in one stream. ReWOO separates them: one big plan up front, then execute. 5x fewer tokens, +4% accuracy on HotpotQA, and you can distill the planner into a 7B model. Plan-and-Execute generalized it; Plan-and-Act scaled it to web navigation."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Explain why ReWOO's Planner / Worker / Solver split saves tokens and improves robustness over ReAct's interleaved loop.\n- Implement a plan DAG, a dependency-ordered executor, and a solver that composes worker outputs — all stdlib.\n- Decide when a task should run as plan-then-execute vs interleaved ReAct, using the 2026 \"five workflow patterns\" framing (Anthropic).\n- Recognize when Plan-and-Act's synthetic plan data is needed for long-horizon web or mobile tasks."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "ReAct's interleaved thought-action-observation loop is simple and flexible, but each tool call has to carry the full prior context — including every previous thought. Token usage grows quadratically with depth. Worse: when a tool fails mid-loop, the model has to re-derive the whole plan from the error observation.\n\nReWOO (Xu et al., arXiv:2305.18323, May 2023) noticed this and made a bet: plan the whole thing up front, fetch evidence in parallel, compose the answer at the end. One LLM call to plan, N tool calls for evidence (can be parallel), one LLM call to solve. The trade is less flexibility (the plan is static) for much better token efficiency and clearer failure modes."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### The three roles\n\n```\nPlanner:  user_question -> [plan_dag]\nWorkers:  [plan_dag]     -> [evidence]        (tool calls, possibly parallel)\nSolver:   user_question, plan_dag, evidence -> final_answer\n```\n\nPlanner produces a DAG. Each node names a tool, its arguments, and which earlier nodes it depends on (references like `#E1`, `#E2`). Workers execute nodes in topological order. Solver stitches everything together.\n\n### Why 5x fewer tokens\n\nReAct grows prompt length linearly with step count. At step 10, the prompt contains thought 1 plus action 1 plus observation 1 plus thought 2 plus action 2 plus observation 2, and so on. Each intermediate step also redundantly includes the original prompt.\n\nReWOO pays one planner prompt (large), N small worker prompts (each just the tool call, no chain), and one solver prompt. On HotpotQA the paper measures ~5x fewer tokens while scoring +4 absolute accuracy.\n\n### Why it is more robust\n\nIf worker 3 fails in ReAct, the loop has to reason out of the error mid-stream. In ReWOO, worker 3 returns an error string; the solver sees it in context with the original plan and can degrade gracefully. Failure localization is per-node, not per-step.\n\n### Planner distillation\n\nThe paper's second result: because the planner does not see observations, you can fine-tune a 7B model on planner outputs from a 175B teacher. The small model handles planning; the big model is not needed at inference. This is now standard — many 2026 production agents use a small planner and a big executor or vice-versa.\n\n### Plan-and-Execute (LangChain, 2023)\n\nThe LangChain team's August 2023 post generalized ReWOO into a pattern name: Plan-and-Execute. Up-front planner emits a step list, executor runs each step, an optional replanner can revise after observing results. This is closer to ReAct than ReWOO (the replanner brings observations back into planning) but preserves the token savings.\n\n### Plan-and-Act (Erdogan et al., arXiv:2503.09572, ICML 2025)\n\nPlan-and-Act scales the pattern to long-horizon web and mobile agents. The key contribution is synthetic plan data: a labeled trajectory generator produces training data where the plan is explicit. Used to fine-tune planner models that keep working past 30–50 steps on WebArena-like tasks where a single ReAct trajectory loses coherence.\n\n### When to pick which\n\n| Pattern | When |\n|---------|------|\n| ReAct | Short tasks, unknown environment, need reactive exception handling |\n| ReWOO | Structured tasks with known tools, token-sensitive, parallelizable evidence |\n| Plan-and-Execute | Like ReWOO but with replanning after partial execution |\n| Plan-and-Act | Long-horizon (>30 steps), web/mobile/computer-use |\n| Tree of Thoughts | Search is worth paying for (Lesson 04) |\n\nAnthropic's Dec 2024 guidance: start with the simplest. If the task is one tool call plus a summary, do not build ReWOO. If the task is a 40-step research assignment, do not do ReAct alone."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements a toy ReWOO:\n\n- `Planner` — a scripted policy that emits a plan DAG from a prompt.\n- `Worker` — dispatches each node's tool call via the registry.\n- `Solver` — scripted composition that reads evidence and produces a final answer.\n- Dependency resolution — references like `#E1` are substituted with earlier worker outputs.\n\nThe demo answers \"What is the population of the capital of France, rounded to millions?\" using a two-step plan: (1) look up the capital, (2) look up the population, then solve.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nThe trace shows the full plan first, then worker results, then solver composition. Compare the token count (we print a rough character count) to a ReAct-style interleaved run — ReWOO wins on this kind of structured task."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "LangGraph ships Plan-and-Execute as a recipe (`create_react_agent` for ReAct, custom graphs for plan-execute). CrewAI's Flows encode the pattern directly: you define tasks up front and the Flow DAG executes them. Plan-and-Act's synthetic data approach is still mostly research; the runtime pattern (explicit plan DAG) ships in production through LangGraph and CrewAI Flows."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-rewoo-planner.md` generates a ReWOO plan DAG from a user request, given a tool catalog. It validates the plan (acyclic, every reference resolved, every tool exists) before handing off to an executor."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Parallelize worker execution for independent plan nodes. What does it buy you on a 6-node DAG with 2 parallel groups?\n2. Add a replanner node that fires if any worker returns an error. What is the smallest change to ReWOO that makes it Plan-and-Execute?\n3. Replace `Planner` with a small model (7B class) and keep `Solver` on a frontier model. Compare end-to-end quality — where does the split fail?\n4. Read Section 4 of the ReWOO paper on planner distillation. Reproduce the 175B -> 7B result conceptually: what training data do you need, and how do you score plan quality?\n5. Port the toy to Plan-and-Act's trajectory shape: plan is a sequence, not a DAG. What tradeoffs change?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| ReWOO | \"Reasoning without observations\" | Plan, then fetch evidence in parallel, then solve — no observations in the planning prompt |\n| Plan-and-Execute | \"LangChain's plan-execute pattern\" | ReWOO with an optional replanner node after execution |\n| Plan-and-Act | \"Scaled plan-execute\" | Explicit planner/executor split with synthetic plan training data for long-horizon tasks |\n| Evidence reference | \"#E1, #E2, ...\" | Plan-node placeholder substituted with prior worker output at dispatch time |\n| Planner distillation | \"Small planner, big executor\" | Fine-tune a small model on planner traces from a large teacher |\n| Token efficiency | \"Fewer round trips\" | 5x fewer tokens on HotpotQA vs ReAct in the paper |\n| DAG executor | \"Topological dispatcher\" | Runs plan nodes in dependency order; parallel at each level |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Xu et al., ReWOO: Decoupling Reasoning from Observations (arXiv:2305.18323)](https://arxiv.org/abs/2305.18323) — the canonical paper\n- [Erdogan et al., Plan-and-Act (arXiv:2503.09572)](https://arxiv.org/abs/2503.09572) — scaled planner-executor with synthetic plans\n- [LangGraph Plan-and-Execute tutorial](https://docs.langchain.com/oss/python/langgraph/overview) — the framework recipe\n- [Anthropic, Building Effective Agents](https://www.anthropic.com/research/building-effective-agents) — pick the simplest pattern that works"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why does ReAct's prompt grow quadratically with depth?",
+      "options": [
+        "The model re-tokenizes itself on every step",
+        "Each step carries the full prior context including every previous thought and observation",
+        "Tool schemas are duplicated per call",
+        "The provider charges per byte rather than per token"
+      ],
+      "correct": 1,
+      "explanation": "ReAct re-includes prior thoughts and observations on each step, making total prompt length grow with the square of the depth."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is the three-role split that defines ReWOO?",
+      "options": [
+        "Reader, Writer, Reviewer",
+        "Planner, Workers, Solver",
+        "Actor, Evaluator, Reflector",
+        "Generator, Critic, Optimizer"
+      ],
+      "correct": 1,
+      "explanation": "ReWOO separates a Planner that emits a DAG, Workers that fetch evidence, and a Solver that composes the final answer."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What headline numbers does the paper report for ReWOO vs ReAct on HotpotQA?",
+      "options": [
+        "~5x fewer tokens and +4 absolute accuracy",
+        "~2x more tokens and +10 accuracy",
+        "Same tokens and +1 accuracy",
+        "10x fewer tokens and -2 accuracy"
+      ],
+      "correct": 0,
+      "explanation": "ReWOO reports about a 5x token reduction and +4 absolute accuracy on HotpotQA compared to ReAct."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does a placeholder like #E1 inside a ReWOO plan node mean?",
+      "options": [
+        "An error code returned by worker 1",
+        "A reference substituted at dispatch time with the output of an earlier worker node",
+        "A retry counter for evidence fetching",
+        "A planner version identifier"
+      ],
+      "correct": 1,
+      "explanation": "Plan nodes use evidence references like #E1, #E2 that the executor substitutes with the output of upstream workers."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why does ReWOO localize failures better than ReAct?",
+      "options": [
+        "Workers crash the run on any error",
+        "An error in a worker becomes a string the Solver sees alongside the original plan, so degradation is per-node not per-step",
+        "ReWOO retries every failed call up to ten times",
+        "The Planner re-emits a fresh DAG after every error"
+      ],
+      "correct": 1,
+      "explanation": "Per-node failure with the original plan in context lets the Solver degrade gracefully rather than reasoning mid-stream out of an error."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Which task shape best fits Plan-and-Act over plain ReWOO?",
+      "options": [
+        "A two-step factoid lookup",
+        "A 40-step web or mobile navigation trajectory",
+        "A single-turn classification",
+        "A pure arithmetic question"
+      ],
+      "correct": 1,
+      "explanation": "Plan-and-Act is built for long-horizon (over 30 steps) web and mobile agents where a single ReAct trajectory loses coherence."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What does ReWOO's planner distillation result imply for production agents?",
+      "options": [
+        "Frontier models must be used at every step",
+        "A small planner (around 7B) can match a large teacher because the planner never sees observations",
+        "Planning quality drops below 7B parameters",
+        "Distillation requires gradient-based RL data"
+      ],
+      "correct": 1,
+      "explanation": "Because the planner does not see observations, plan traces from a large teacher transfer cleanly to a small fine-tuned planner."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Xu et al., ReWOO: Decoupling Reasoning from Observations (arXiv:2305.18323)",
+      "href": "https://arxiv.org/abs/2305.18323",
+      "kind": "Reading"
+    },
+    {
+      "label": "Erdogan et al., Plan-and-Act (arXiv:2503.09572)",
+      "href": "https://arxiv.org/abs/2503.09572",
+      "kind": "Reading"
+    },
+    {
+      "label": "LangGraph Plan-and-Execute tutorial",
+      "href": "https://docs.langchain.com/oss/python/langgraph/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Building Effective Agents",
+      "href": "https://www.anthropic.com/research/building-effective-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Rewoo Planner",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/02-rewoo-plan-and-execute/outputs/skill-rewoo-planner.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/02-rewoo-plan-and-execute/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/02-rewoo-plan-and-execute",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/02-rewoo-plan-and-execute"
+}

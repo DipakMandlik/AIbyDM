@@ -1,0 +1,232 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/12-anthropic-workflow-patterns",
+  "slug": "12-anthropic-workflow-patterns",
+  "phaseSlug": "14-agent-engineering",
+  "number": "12",
+  "title": "Anthropic's Workflow Patterns: Simple Over Complex",
+  "summary": "Schluntz and Zhang (Anthropic, Dec 2024) distinguish workflows (predefined paths) from agents (dynamic tool-use). Five workflow patterns cover most cases. Start with direct API calls. Add agents only when steps cannot be predicted.",
+  "motto": "Schluntz and Zhang (Anthropic, Dec 2024) distinguish workflows (predefined paths) from agents (dynamic tool-use). Five workflow patterns cover most cases. Start with direct API calls. Add agents only when steps cannot be predicted.",
+  "type": "Learn + Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 01 (Agent Loop)"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Name Anthropic's five workflow patterns: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer.",
+    "Explain the agent-vs-workflow distinction and the engineering cost of each.",
+    "Identify when to pick a workflow over an agent (and vice versa).",
+    "Implement all five patterns in stdlib against a scripted LLM."
+  ],
+  "exercises": [
+    "Implement routing with a confidence threshold. Below threshold -> escalate to human. Where does the threshold land for a tier-1 support use case?",
+    "Add a timeout to parallel_vote. What happens when one call hangs? How do you aggregate with missing votes?",
+    "Turn evaluator_optimizer into a bandit: keep the top-2 outputs across iterations so a late good result doesn't get overwritten by a late bad one.",
+    "Combine prompt chaining with routing: a router picks one of three chains. Measure token cost vs a single big-prompt alternative.",
+    "Pick one of your production features. Draw the workflow graph. Count steps. Would an agent actually be better here?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Learn + Build",
+    "Python (stdlib)",
+    "Anthropic",
+    "Workflow",
+    "Patterns",
+    "Simple",
+    "Over",
+    "Complex",
+    "Agent",
+    "Augmented LLM",
+    "Prompt chaining",
+    "Routing",
+    "Parallelization",
+    "Orchestrator-workers",
+    "Evaluator-optimizer"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Schluntz and Zhang (Anthropic, Dec 2024) distinguish workflows (predefined paths) from agents (dynamic tool-use). Five workflow patterns cover most cases. Start with direct API calls. Add agents only when steps cannot be predicted."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Name Anthropic's five workflow patterns: prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer.\n- Explain the agent-vs-workflow distinction and the engineering cost of each.\n- Identify when to pick a workflow over an agent (and vice versa).\n- Implement all five patterns in stdlib against a scripted LLM."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Teams reach for multi-agent frameworks for problems that want a single function call. The cost is real: frameworks add layers that obscure prompts, hide control flow, and invite premature complexity. Schluntz and Zhang's Dec 2024 post is the most-cited industry pushback: start simple, add complexity only when it earns its cost."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Workflows vs agents\n\n- **Workflow.** LLMs and tools orchestrated through predefined code paths. Engineers own the graph.\n- **Agent.** LLMs dynamically direct their own tools and take their own steps. The model owns the graph.\n\nBoth have their place. Workflows are cheaper, faster, and easier to debug. Agents unlock open-ended problems but make failure modes harder to reason about.\n\n### The augmented LLM\n\nFoundation for all five patterns: one LLM with three capabilities wired in — search (retrieval), tools (actions), memory (persistence). Any API call can use these.\n\n### The five patterns\n\n1. **Prompt chaining.** Output of call 1 is input to call 2. Use when a task has a clean linear decomposition. Optional programmatic gates between steps.\n\n2. **Routing.** A classifier LLM picks which downstream LLM or tool to invoke. Use when categorically different inputs need different handling (tier-1 support vs refund vs bug vs sales).\n\n3. **Parallelization.** Run N LLM calls concurrently, aggregate results. Two shapes: sectioning (different chunks) and voting (same prompt, N runs, majority/synthesis).\n\n4. **Orchestrator-workers.** An orchestrator LLM dynamically decides which workers (also LLMs) to run and synthesizes their output. Similar to agent loops but the orchestrator does not loop indefinitely.\n\n5. **Evaluator-optimizer.** One LLM proposes an answer, another LLM evaluates it. Iterate until the evaluator passes. This is Self-Refine (Lesson 05) generalized.\n\n### Where workflows beat agents\n\n- **Predictable tasks.** If you can enumerate the steps, you should.\n- **Cost-bound tasks.** Workflows have bounded step counts; agents can spiral.\n- **Compliance-bound tasks.** Auditors want to read the graph, not infer it from trajectories.\n\n### Where agents beat workflows\n\n- **Open-ended research.** When the next step depends on what the last step returned.\n- **Variable-length tasks.** Minutes to hours of work where step count is unknown.\n- **Novel domains.** When you don't yet know the right workflow — exploration first, codify later.\n\n### The context-engineering companion\n\n\"Effective context engineering for AI agents\" (Anthropic 2025) formalizes the adjacent discipline: the 200k window is a budget, not a container. What to include, when to compact, when to let context grow. Covered in detail in Phase 14 lesson on context compression (Phase 14 earlier lesson 06 in this curriculum before the renumber)."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements all five workflow patterns against a `ScriptedLLM`:\n\n- `prompt_chain(input, steps)` — sequential.\n- `route(input, classifier, handlers)` — classification + dispatch.\n- `parallel_vote(prompt, n, aggregator)` — N runs, aggregate.\n- `orchestrator_workers(task, workers)` — orchestrator picks workers.\n- `evaluator_optimizer(task, proposer, evaluator, max_iter)` — loop until pass.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nEach pattern prints its trace. Total lines of code per pattern is ~10-15; the cost of a framework is measured in thousands."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- Direct API calls for most tasks.\n- Framework only when the pattern genuinely needs durable state (LangGraph), actor-model concurrency (AutoGen v0.4), or role templating (CrewAI).\n- Reach for the Claude Agent SDK when you want the Claude Code harness shape without rebuilding it."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-workflow-picker.md` picks the right pattern for a given task description, including the decision rationale and the refactor path to an agent if workflows fall short."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Implement routing with a confidence threshold. Below threshold -> escalate to human. Where does the threshold land for a tier-1 support use case?\n2. Add a timeout to `parallel_vote`. What happens when one call hangs? How do you aggregate with missing votes?\n3. Turn `evaluator_optimizer` into a bandit: keep the top-2 outputs across iterations so a late good result doesn't get overwritten by a late bad one.\n4. Combine prompt chaining with routing: a router picks one of three chains. Measure token cost vs a single big-prompt alternative.\n5. Pick one of your production features. Draw the workflow graph. Count steps. Would an agent actually be better here?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Workflow | \"Predefined flow\" | Engineer-owned graph of LLM and tool calls |\n| Agent | \"Autonomous AI\" | Model-owned graph; dynamic tool direction |\n| Augmented LLM | \"LLM with tools\" | LLM + search + tools + memory; the atomic unit |\n| Prompt chaining | \"Sequential calls\" | Output of call N is input to call N+1 |\n| Routing | \"Classifier dispatch\" | Pick which chain/model handles the input |\n| Parallelization | \"Fan out\" | N concurrent calls; aggregate by sectioning or voting |\n| Orchestrator-workers | \"Dispatcher agent\" | Orchestrator LLM picks specialist LLMs dynamically |\n| Evaluator-optimizer | \"Proposer + judge\" | Iterate until evaluator passes; Self-Refine generalized |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Anthropic, Building Effective Agents (Dec 2024)](https://www.anthropic.com/research/building-effective-agents) — the five workflow patterns\n- [Anthropic, Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) — the companion discipline\n- [LangGraph overview](https://docs.langchain.com/oss/python/langgraph/overview) — when stateful graphs earn their cost\n- [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/) — the orchestrator-workers pattern, productized"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "How does Anthropic distinguish a workflow from an agent?",
+      "options": [
+        "Workflows use embeddings; agents use tools",
+        "Workflows are engineer-owned predefined graphs; agents are model-owned dynamic tool direction",
+        "Workflows run on CPUs; agents need GPUs",
+        "Workflows are stateless; agents are stateful"
+      ],
+      "correct": 1,
+      "explanation": "Workflow = predefined code path the engineer owns; agent = the model owns the graph."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What are the three capabilities of the augmented LLM that underpins all five patterns?",
+      "options": [
+        "Search (retrieval), tools (actions), memory (persistence)",
+        "Embeddings, fine-tuning, RAG",
+        "Vector, KV, graph",
+        "Plan, execute, reflect"
+      ],
+      "correct": 0,
+      "explanation": "The atomic unit is one LLM with retrieval, tools, and memory wired in."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which is NOT one of the five Anthropic workflow patterns?",
+      "options": [
+        "Prompt chaining",
+        "Routing",
+        "Evaluator-optimizer",
+        "Gradient distillation"
+      ],
+      "correct": 3,
+      "explanation": "The five are prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer. Gradient distillation is a training concept."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Which two shapes does parallelization come in?",
+      "options": [
+        "Sync and async",
+        "Sectioning (different chunks) and voting (same prompt N times, aggregate)",
+        "Hot and cold",
+        "Stateful and stateless"
+      ],
+      "correct": 1,
+      "explanation": "Parallelization is sectioning or voting; both fan out N calls and aggregate."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Which workflow pattern is Self-Refine generalized?",
+      "options": [
+        "Prompt chaining",
+        "Routing",
+        "Orchestrator-workers",
+        "Evaluator-optimizer"
+      ],
+      "correct": 3,
+      "explanation": "Evaluator-optimizer is the Anthropic name for the Self-Refine / CRITIC iterative pattern."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "When do workflows beat agents according to the lesson?",
+      "options": [
+        "Always",
+        "On predictable, cost-bounded, or compliance-bounded tasks where the graph can be enumerated and audited",
+        "Only for chat",
+        "Only on GPUs"
+      ],
+      "correct": 1,
+      "explanation": "Workflows are cheaper, easier to debug, and auditable; pick them when steps are knowable."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What is the lesson's recommended default starting point?",
+      "options": [
+        "A multi-agent framework",
+        "Direct API calls; add frameworks only when durable state, actor concurrency, or role templating earns its cost",
+        "Fine-tune the model",
+        "Build a custom MCTS"
+      ],
+      "correct": 1,
+      "explanation": "Schluntz and Zhang: start simple; add framework complexity only when justified."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Anthropic, Building Effective Agents (Dec 2024)",
+      "href": "https://www.anthropic.com/research/building-effective-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Effective context engineering for AI agents",
+      "href": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "LangGraph overview",
+      "href": "https://docs.langchain.com/oss/python/langgraph/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "OpenAI Agents SDK",
+      "href": "https://openai.github.io/openai-agents-python/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Workflow Picker",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/12-anthropic-workflow-patterns/outputs/skill-workflow-picker.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/12-anthropic-workflow-patterns/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/12-anthropic-workflow-patterns",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/12-anthropic-workflow-patterns"
+}

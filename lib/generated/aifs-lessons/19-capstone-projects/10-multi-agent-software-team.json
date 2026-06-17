@@ -1,0 +1,288 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/10-multi-agent-software-team",
+  "slug": "10-multi-agent-software-team",
+  "phaseSlug": "19-capstone-projects",
+  "number": "10",
+  "title": "Capstone 10 — Multi-Agent Software Engineering Team",
+  "summary": "SWE-AF's factory architecture, MetaGPT's role-based prompting, AutoGen 0.4's typed actor graph, Cognition's Devin, and Factory's Droids all converged on the same 2026 shape: an architect plans, N coders work in parallel worktrees, a review...",
+  "motto": "SWE-AF's factory architecture, MetaGPT's role-based prompting, AutoGen 0.4's typed actor graph, Cognition's Devin, and Factory's Droids all converged on the same 2026 shape: an architect plans, N coders work in parallel worktrees, a reviewer gates, a tester verifies. Parallel worktrees convert wall-clock into throughput. Shared state and handoff protocols become the failure surface. The capstone is to build the team, evaluate on SWE-bench Pro, and report which handoffs break and how often.",
+  "type": "Capstone",
+  "languages": [
+    "Python",
+    "TypeScript (agents)",
+    "Shell (worktree scripts)"
+  ],
+  "prerequisites": [],
+  "duration": "40 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Inject an obvious bug into a diff mid-run (extra return None before the main body). Measure the reviewer's false-approve rate. Tune the reviewer prompt until false-approval is under 5%.",
+    "Reduce to two coders (architect + coder + reviewer + tester, coder runs two subtasks sequentially). Compare wall-clock and pass rate.",
+    "Replace the merge coordinator with a single-writer constraint (subtasks touch disjoint file sets). Measure the planning burden on the architect.",
+    "Swap reviewer from GPT-5.4 to Claude Opus 4.7. Measure false-approval rate and token cost delta.",
+    "Add a fifth role: documenter (Haiku 4.5). After review, it produces a changelog entry. Measure whether documentation quality justifies the extra token spend."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python",
+    "TypeScript (agents)",
+    "Shell (worktree scripts)",
+    "Multi",
+    "Agent",
+    "Software",
+    "Engineering",
+    "Team",
+    "Parallel worktree",
+    "Task board",
+    "Handoff",
+    "Token amplification",
+    "A2A protocol",
+    "Merge coordinator",
+    "False approval"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> SWE-AF's factory architecture, MetaGPT's role-based prompting, AutoGen 0.4's typed actor graph, Cognition's Devin, and Factory's Droids all converged on the same 2026 shape: an architect plans, N coders work in parallel worktrees, a reviewer gates, a tester verifies. Parallel worktrees convert wall-clock into throughput. Shared state and handoff protocols become the failure surface. The capstone is to build the team, evaluate on SWE-bench Pro, and report which handoffs break and how often."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "Single-agent coding harnesses hit a ceiling on large tasks. Not because any individual agent is weak, but because a 200k-token context cannot hold an architecture plan plus four parallel codebase slices plus reviewer commentary plus test output. Multi-agent factories split the problem: an architect owns the plan, coders own implementation in parallel worktrees, a reviewer gates, a tester verifies. SWE-AF's \"factory\" architecture, MetaGPT's roles, AutoGen's typed actor graph — all three framings describe the same shape.\n\nThe failure surface is the handoff. Architect plans something the coders cannot implement. Coders produce conflicting diffs. Reviewer approves a hallucinated fix. Tester races a still-writing coder. You will build one of these teams, run it on 50 SWE-bench Pro issues, track every handoff, and publish the post-mortem."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "Roles are typed agents. **Architect** (Claude Opus 4.7) reads the issue, writes a plan, and breaks it into subtasks with explicit interfaces. **Coders** (Claude Sonnet 4.7, N parallel instances, each in a `git worktree` + Daytona sandbox) implement subtasks independently. **Reviewer** (GPT-5.4) reads the merged diff and either approves or requests specific changes. **Tester** (Gemini 2.5 Pro) runs the test suite in isolation and reports pass/fail with artifacts.\n\nCommunication is through a shared task board (file-backed or Redis). Each role consumes tasks it is permitted to handle. Handoffs are A2A-protocol-typed messages. Coordination concerns: merge-conflict resolution (coordinator role or automatic three-way merge), shared-state synchronization (the plan is frozen once coders start; replans are separate events), and reviewer gatekeeping (the reviewer cannot approve its own changes or changes it proposed).\n\nToken amplification is the hidden cost. Every role boundary adds summary prompts and handoff context. A 40-turn single-agent run becomes 160 total turns across four roles. The rubric specifically weighs token efficiency vs single-agent baseline because the question is not \"does multi-agent work\" but \"does it win per dollar.\""
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **Task board.** File-backed JSONL with typed messages: `plan_request`, `subtask`, `diff_ready`, `review_needed`, `test_needed`, `approved`, `rejected`, `replan_needed`. Agents subscribe to tags.\n\n2. **Architect.** Reads the GitHub issue, runs Opus 4.7 with a plan template requiring explicit subtask interfaces (files touched, public functions, test impact). Emits one `plan_request` with a DAG of subtasks.\n\n3. **Coders.** N parallel workers, each claims one subtask from the board. Each spawns a fresh `git worktree add` branch plus a Daytona sandbox. Implements the subtask. Emits `diff_ready` with the patch + test deltas.\n\n4. **Merge coordinator.** On all-coders-done, three-way merges the N branches into a staging branch. LLM-mediated conflict resolution only when file-level overlap exists.\n\n5. **Reviewer.** GPT-5.4 reads the merged diff. Cannot approve diffs it authored. Emits `approved` (no-op) or `review_feedback` with specific change requests routed back to the relevant coder.\n\n6. **Tester.** Gemini 2.5 Pro runs the test suite in a clean sandbox. Captures artifacts. Emits `test_passed` or `test_failed` with stacktraces. Failed tests loop back to the coder owning the failing subtask.\n\n7. **Handoff accounting.** Every message crossing a role boundary gets a span in Langfuse with payload size and model used. Compute per-subtask token amplification (coder_tokens + reviewer_tokens + tester_tokens + architect_share / coder_tokens).\n\n8. **Eval.** Run on 50 SWE-bench Pro issues. Compare pass@1 and $-per-solved-issue against a single-agent baseline (one Sonnet 4.7 in a single worktree).\n\n9. **Post-mortem.** For each failed issue, identify the handoff that broke (plan too vague, merge conflict, reviewer false-approve, tester flake). Produce a handoff-failure histogram."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n$ team run --issue https://github.com/acme/widget/issues/842\n[architect] plan: 4 subtasks (parser, cache, api, migration)\n[board]     dispatched to 4 coders in parallel worktrees\n[coder-A]   subtask parser  -> 42 lines, tests pass locally\n[coder-B]   subtask cache   -> 88 lines, tests pass locally\n[coder-C]   subtask api     -> 31 lines, tests pass locally\n[coder-D]   subtask migration -> 19 lines, tests pass locally\n[merge]     3-way merge: 0 conflicts\n[reviewer]  comments on cache (thread pool sizing); routed to coder-B\n[coder-B]   revision: 92 lines; submits\n[reviewer]  approved\n[tester]    all 412 tests pass\n[pr]        opened #3382   4 coders, 1 revision, $4.90, 18m\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-multi-agent-team.md` is the deliverable. Given an issue URL and parallelism level, the team produces a merge-ready PR with per-role token accounting.\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | SWE-bench Pro pass@1 | Matched 50-issue subset, pass@1 |\n| 20 | Parallel speedup | Wall-clock vs single-agent baseline |\n| 20 | Review quality | False-approval rate on injected-bug probe |\n| 20 | Token efficiency | Total tokens per solved issue vs single-agent |\n| 15 | Coordination engineering | Merge-conflict resolution, handoff-failure histogram |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Inject an obvious bug into a diff mid-run (extra `return None` before the main body). Measure the reviewer's false-approve rate. Tune the reviewer prompt until false-approval is under 5%.\n\n2. Reduce to two coders (architect + coder + reviewer + tester, coder runs two subtasks sequentially). Compare wall-clock and pass rate.\n\n3. Replace the merge coordinator with a single-writer constraint (subtasks touch disjoint file sets). Measure the planning burden on the architect.\n\n4. Swap reviewer from GPT-5.4 to Claude Opus 4.7. Measure false-approval rate and token cost delta.\n\n5. Add a fifth role: documenter (Haiku 4.5). After review, it produces a changelog entry. Measure whether documentation quality justifies the extra token spend."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Parallel worktree | \"Isolated branch\" | `git worktree add` producing a fresh working tree per coder |\n| Task board | \"Shared message bus\" | File or Redis store of typed messages agents subscribe to |\n| Handoff | \"Role boundary\" | Any message crossing from one role's context to another's |\n| Token amplification | \"Multi-agent overhead\" | Total tokens across roles / single-agent tokens for the same task |\n| A2A protocol | \"Agent-to-agent\" | Google's 2025 spec for typed inter-agent messages |\n| Merge coordinator | \"Integrator\" | Component that runs three-way merge and mediates conflicts |\n| False approval | \"Reviewer hallucination\" | Reviewer approves a diff with known bugs |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [SWE-AF factory architecture](https://github.com/Agent-Field/SWE-AF) — the reference 2026 multi-agent factory\n- [MetaGPT](https://github.com/FoundationAgents/MetaGPT) — role-based multi-agent framework\n- [AutoGen v0.4](https://github.com/microsoft/autogen) — Microsoft's typed actor framework\n- [Cognition AI (Devin)](https://cognition.ai) — reference product\n- [Factory Droids](https://www.factory.ai) — alternate reference product\n- [Google A2A protocol](https://developers.google.com/agent-to-agent) — inter-agent messaging spec\n- [git worktree documentation](https://git-scm.com/docs/git-worktree) — the isolation substrate\n- [SWE-bench Pro](https://www.swebench.com) — the evaluation target"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\nGitHub issue URL\n      |\n      v\nArchitect (Opus 4.7)\n   reads issue, produces plan with subtasks + interfaces\n      |\n      v\nTask board (file / Redis)\n      |\n   +-- subtask 1 ---+-- subtask 2 ---+-- subtask 3 ---+-- subtask 4 ---+\n   v                v                v                v                v\nCoder A          Coder B          Coder C          Coder D          (4 parallel)\n (Sonnet)         (Sonnet)         (Sonnet)         (Sonnet)\n worktree A       worktree B       worktree C       worktree D\n Daytona          Daytona          Daytona          Daytona\n      |                |                |                |\n      +--------+-------+-------+--------+\n               v\n           merge coordinator  (three-way merge + conflict resolution)\n               |\n               v\n           Reviewer (GPT-5.4)\n               |\n               v\n           Tester  (Gemini 2.5 Pro)  -> passes? -> open PR\n                                     -> fails?  -> route back to coder\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Orchestration: LangGraph with shared state + per-agent sub-graphs\n- Messaging: A2A protocol (Google 2025) for typed inter-agent messages\n- Models: Opus 4.7 (architect), Sonnet 4.7 (coders), GPT-5.4 (reviewer), Gemini 2.5 Pro (tester)\n- Worktree isolation: `git worktree add` per coder + Daytona sandbox\n- Merge coordinator: custom three-way merge + LLM-mediated conflict resolution\n- Eval: SWE-bench Pro (50 issues), SWE-AF scenarios, HumanEval++ for unit tests\n- Observability: Langfuse with role-tagged spans, per-agent token accounting\n- Deployment: K8s with each role as a separate Deployment + HPA on backlog"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why does a single-agent harness hit a ceiling on large tasks even with a 200k-token context?",
+      "options": [
+        "Single agents cannot make tool calls",
+        "Sandboxes refuse to host more than one process",
+        "Context cannot hold the architecture plan, four parallel codebase slices, reviewer commentary, and test output at once",
+        "Models lack support for git"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does the architect role own in this factory shape?",
+      "options": [
+        "Reviewing the merged diff for hallucinations",
+        "Reading the issue and emitting a plan with subtasks that have explicit interfaces",
+        "Running the test suite in a clean sandbox",
+        "Force-merging branches when coders disagree"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why does each coder work in its own git worktree plus a Daytona sandbox?",
+      "options": [
+        "Worktrees are faster to clone than branches",
+        "Daytona is the only sandbox that supports SSH",
+        "Isolated working trees let N coders implement subtasks in parallel without stepping on shared files",
+        "The architect requires worktree IDs"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What constraint is placed on the reviewer to keep it honest?",
+      "options": [
+        "It can only run after the tester signs off",
+        "It cannot approve diffs it authored or proposed",
+        "It must approve every diff it reads",
+        "It must be the same model as the architect"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why does the rubric weigh token efficiency against a single-agent baseline?",
+      "options": [
+        "Multi-agent is always cheaper",
+        "Role boundaries add summary and handoff context, so the real question is whether the factory wins per dollar",
+        "Single-agent has no observability story",
+        "Token cost is unrelated to performance"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Which artifact is produced from each failed issue during the post-mortem?",
+      "options": [
+        "A new architect plan template",
+        "An updated A2A protocol spec",
+        "A force-push log",
+        "A handoff-failure histogram identifying which role boundary broke (plan, merge, review, test)"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Which evaluation set does the capstone use to score pass@1 across roles?",
+      "options": [
+        "SWE-bench Pro 50-issue subset",
+        "HumanEval-Java",
+        "MT-Bench-v2",
+        "MigrationBench"
+      ],
+      "correct": 0,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "SWE-AF factory architecture",
+      "href": "https://github.com/Agent-Field/SWE-AF",
+      "kind": "Reading"
+    },
+    {
+      "label": "MetaGPT",
+      "href": "https://github.com/FoundationAgents/MetaGPT",
+      "kind": "Reading"
+    },
+    {
+      "label": "AutoGen v0.4",
+      "href": "https://github.com/microsoft/autogen",
+      "kind": "Reading"
+    },
+    {
+      "label": "Cognition AI (Devin)",
+      "href": "https://cognition.ai",
+      "kind": "Reading"
+    },
+    {
+      "label": "Factory Droids",
+      "href": "https://www.factory.ai",
+      "kind": "Reading"
+    },
+    {
+      "label": "Google A2A protocol",
+      "href": "https://developers.google.com/agent-to-agent",
+      "kind": "Reading"
+    },
+    {
+      "label": "git worktree documentation",
+      "href": "https://git-scm.com/docs/git-worktree",
+      "kind": "Reading"
+    },
+    {
+      "label": "SWE-bench Pro",
+      "href": "https://www.swebench.com",
+      "kind": "Reading"
+    },
+    {
+      "label": "Multi Agent Team",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/outputs/skill-multi-agent-team.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/README.md",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/README.md",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/package.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/package.json",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/agent.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/src/agent.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/coordinator.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/src/coordinator.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/src/index.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/runtime.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/src/runtime.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/types.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team/code/ts/src/types.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/10-multi-agent-software-team",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/10-multi-agent-software-team"
+}

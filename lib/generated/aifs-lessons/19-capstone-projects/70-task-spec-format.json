@@ -1,0 +1,189 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/70-task-spec-format",
+  "slug": "70-task-spec-format",
+  "phaseSlug": "19-capstone-projects",
+  "number": "70",
+  "title": "Task Spec Format",
+  "summary": "An eval harness is only as good as the contract its tasks honour. Freeze the JSONL shape and the metric vocabulary before you write a single scoring function.",
+  "motto": "An eval harness is only as good as the contract its tasks honour. Freeze the JSONL shape and the metric vocabulary before you write a single scoring function.",
+  "type": "Build",
+  "languages": [
+    "Python"
+  ],
+  "prerequisites": [
+    "Phase 19 Track B foundations"
+  ],
+  "duration": "~90 min",
+  "status": "Complete",
+  "objectives": [
+    "Define a JSONL task record schema that covers arithmetic, multiple-choice, code execution, classification, and free-text summarisation in one shape.",
+    "Pin a closed vocabulary of metric names so downstream lessons (71-73) can dispatch on a single field.",
+    "Specify few-shot examples and post-processing rules as part of the task, not the runner, so the same prompt produces the same target across models.",
+    "Implement a strict validator that rejects malformed records before they reach the runner.",
+    "Ship a 10-task fixture set that exercises every branch of the spec so the validator has something real to chew on."
+  ],
+  "exercises": [],
+  "topics": [
+    "Capstone Projects",
+    "Build",
+    "Python",
+    "Task",
+    "Spec",
+    "Format"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> An eval harness is only as good as the contract its tasks honour. Freeze the JSONL shape and the metric vocabulary before you write a single scoring function."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning objectives",
+      "markdown": "- Define a JSONL task record schema that covers arithmetic, multiple-choice, code execution, classification, and free-text summarisation in one shape.\n- Pin a closed vocabulary of metric names so downstream lessons (71-73) can dispatch on a single field.\n- Specify few-shot examples and post-processing rules as part of the task, not the runner, so the same prompt produces the same target across models.\n- Implement a strict validator that rejects malformed records before they reach the runner.\n- Ship a 10-task fixture set that exercises every branch of the spec so the validator has something real to chew on."
+    },
+    {
+      "key": "why-a-frozen-spec",
+      "title": "Why a frozen spec",
+      "markdown": "A research codebase will accumulate eval scripts faster than it accumulates tests. Six months in, every notebook has its own JSON shape, every metric is reimplemented twice, and nothing can be compared across runs. The fix is boring. Pick a schema. Write a validator. Reject everything else. That is what this lesson does.\n\nThe shape borrows ideas from BIG-bench, HELM, and lm-eval style harnesses, but the field names are ours. Every field has a single owner. The runner reads the task. The metric reads the targets. The post-process step normalises the generation. No field is mutable mid-pipeline."
+    },
+    {
+      "key": "the-record-shape",
+      "title": "The record shape",
+      "markdown": "A task is a JSON object on a single line. The harness reads `tasks.jsonl` and validates each line independently. A bad line aborts that record, not the run.\n\n```json\n{\n  \"task_id\": \"arith_001\",\n  \"category\": \"arithmetic\",\n  \"prompt\": \"Compute the result. Question: 17 + 24\\nAnswer:\",\n  \"targets\": [\"41\"],\n  \"metric_name\": \"exact_match\",\n  \"few_shot_examples\": [\n    {\"prompt\": \"Question: 2 + 2\\nAnswer:\", \"completion\": \"4\"}\n  ],\n  \"post_process\": \"strip_whitespace\",\n  \"metadata\": {\"difficulty\": \"easy\"}\n}\n```\n\nThe required fields are `task_id`, `category`, `prompt`, `targets`, `metric_name`, `post_process`. `few_shot_examples` and `metadata` are optional. Unknown top-level fields fail validation."
+    },
+    {
+      "key": "field-rules",
+      "title": "Field rules",
+      "markdown": "`task_id` is a string with no whitespace. The validator enforces uniqueness across the file.\n\n`category` is one of `arithmetic`, `mcq`, `code_exec`, `classification`, `summary`. The category constrains which metric and post-process pair is legal. A `code_exec` task must use `metric_name = code_exec` and a `mcq` task must use `metric_name = exact_match` against a single-letter target.\n\n`prompt` is a non-empty string. The validator forbids trailing whitespace and rejects records that already contain a few-shot block in the prompt body. Few-shot rendering happens in the runner, not the author.\n\n`targets` is a non-empty list of strings. For `exact_match`, any element matching counts. For `f1` and `rouge_l`, the highest-scoring target wins. For `mcq`, the list holds exactly one element.\n\n`metric_name` is one of `exact_match`, `f1`, `bleu_4`, `rouge_l`, `accuracy`, `code_exec`. The vocabulary is closed. A new metric requires a new lesson and a new entry here.\n\n`few_shot_examples` is a list of `{prompt, completion}` pairs. The validator caps the list at eight entries to keep prompts bounded.\n\n`post_process` is one of `none`, `strip_whitespace`, `lower`, `extract_letter`, `extract_code_block`, `extract_first_line`. Each rule has a single deterministic behaviour. The validator forbids combining rules."
+    },
+    {
+      "key": "validator-behaviour",
+      "title": "Validator behaviour",
+      "markdown": "```mermaid\nflowchart TD\n    A[read tasks.jsonl] --> B[parse line as JSON]\n    B -->|error| Z[record error, continue]\n    B --> C[check required fields]\n    C -->|missing| Z\n    C --> D[check field types]\n    D -->|bad type| Z\n    D --> E[check category-metric pair]\n    E -->|illegal| Z\n    E --> F[check task_id uniqueness]\n    F -->|dup| Z\n    F --> G[append to validated set]\n    Z --> H{more lines?}\n    G --> H\n    H -->|yes| B\n    H -->|no| I[return validated, errors]\n```\n\nThe validator returns two lists: validated records and error records with the offending line, the violated rule, and the field at fault. The runner refuses to start if the error list is non-empty unless an explicit `--allow-bad-tasks` flag is set."
+    },
+    {
+      "key": "few-shot-rendering",
+      "title": "Few-shot rendering",
+      "markdown": "The runner concatenates few-shot examples in front of the prompt with a blank line separator. The same code path runs for every model, so the only source of variance is the model itself. Authors write examples once, not once per provider.\n\n```python\ndef render(task):\n    parts = []\n    for ex in task.get(\"few_shot_examples\", []):\n        parts.append(ex[\"prompt\"] + \" \" + ex[\"completion\"])\n    parts.append(task[\"prompt\"])\n    return \"\\n\\n\".join(parts)\n```"
+    },
+    {
+      "key": "post-process-rules",
+      "title": "Post-process rules",
+      "markdown": "The post-process step runs after generation, before the metric. It is deterministic and stateless.\n\n- `none` returns the string unchanged.\n- `strip_whitespace` strips leading and trailing whitespace.\n- `lower` lowercases the string.\n- `extract_letter` returns the first character that matches `[A-E]`, used for MCQ.\n- `extract_code_block` returns the body of the first triple-backtick fenced block, used for code-exec.\n- `extract_first_line` returns the first non-empty line, used for summary classification.\n\nA task that needs a rule outside this list belongs in a new lesson."
+    },
+    {
+      "key": "what-this-lesson-does-not-do",
+      "title": "What this lesson does not do",
+      "markdown": "It does not score. It does not call a model. It does not run code. Those come in lessons 71, 72, and 75. This lesson freezes the contract that all of them honour.\n\nThe 10-task fixture covers two arithmetic items, two MCQ items, two code-exec items, two classification items, and two summarisation items. The validator passes on all 10. A separate fixture (`tasks_bad.jsonl`) trips every rule and the validator returns exactly that many errors."
+    },
+    {
+      "key": "how-to-read-the-code",
+      "title": "How to read the code",
+      "markdown": "`main.py` defines `TaskSpec`, `validate_task`, `validate_file`, and a CLI entry point. The fixture loader is `load_fixtures`. The render and post-process helpers live next to validation so the runner in lesson 75 imports a single module.\n\nRead `main.py` top to bottom. Then read `code/tests/test_spec.py`. The tests pin every validation rule and every post-process behaviour. The demo at the bottom of `main.py` validates the bundled fixture and prints a summary."
+    },
+    {
+      "key": "going-further",
+      "title": "Going further",
+      "markdown": "Real eval suites grow categories the way schemas grow columns. The sober move is to refuse to add a category without also adding a metric, a post-process rule, and at least one fixture task. Treat the spec like a database migration. Every change is reviewed, versioned, and accompanied by tests. The validator in this lesson is the gate."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why freeze the task record schema before writing scoring code?",
+      "options": [
+        "It makes the JSON parser run faster",
+        "It locks the contract so metrics, runners, and post-processors agree on field names",
+        "It removes the need for a validator",
+        "It allows arbitrary new metric names without further changes"
+      ],
+      "correct": 1,
+      "explanation": "The schema is the contract every downstream consumer reads from. Locking it lets you change components independently without breaking the rest."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is the closed vocabulary that the metric_name field accepts?",
+      "options": [
+        "Whatever the runner is configured to recognise",
+        "exact_match, f1, bleu_4, rouge_l, accuracy, code_exec",
+        "Any string the task author chooses",
+        "Only exact_match and f1"
+      ],
+      "correct": 1,
+      "explanation": "The lesson pins the metric vocabulary to six names. Adding one requires a new lesson and a new validator entry."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What does the validator do when it sees an unknown top-level field on a record?",
+      "options": [
+        "Strips it and continues",
+        "Logs a warning but accepts the record",
+        "Returns a validation error and rejects the record",
+        "Renames it to metadata.unknown"
+      ],
+      "correct": 2,
+      "explanation": "Unknown fields are a forward-compatibility hazard. The validator rejects them so the schema stays the only source of truth."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Why are few-shot examples attached to the task record rather than computed by the runner?",
+      "options": [
+        "The runner does not have file I/O",
+        "Author intent is part of the eval; binding examples to the task removes per-model variance in prompt construction",
+        "It saves disk space",
+        "Few-shot is only used during fine-tuning"
+      ],
+      "correct": 1,
+      "explanation": "Few-shot composition is part of the eval definition, not the model interface. Putting it in the task means every model sees the same prompt."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Which category-metric pair is illegal under the validator?",
+      "options": [
+        "summary + rouge_l",
+        "arithmetic + exact_match",
+        "mcq + bleu_4",
+        "code_exec + code_exec"
+      ],
+      "correct": 2,
+      "explanation": "BLEU on a single letter is meaningless. The validator enforces that mcq tasks use exact_match or accuracy only."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What does the post_process rule extract_letter return when the generation is `Answer: C is correct`?",
+      "options": [
+        "The full string unchanged",
+        "C",
+        "Answer",
+        "An empty string"
+      ],
+      "correct": 1,
+      "explanation": "extract_letter returns the first character matching [A-E] in the generation. The string has C at the start of the body."
+    }
+  ],
+  "resources": [
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/70-task-spec-format/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "tests/test_spec.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/70-task-spec-format/code/tests/test_spec.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/70-task-spec-format",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/70-task-spec-format"
+}

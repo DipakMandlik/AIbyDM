@@ -18,7 +18,7 @@
     "dev": "next dev",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "build": "next build"
+    "build": "node scripts/next-build.mjs"
   },
   "engines": {
     "node": ">=22.12.0"

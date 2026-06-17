@@ -1,0 +1,216 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/64-chunking-strategies-advanced",
+  "slug": "64-chunking-strategies-advanced",
+  "phaseSlug": "19-capstone-projects",
+  "number": "64",
+  "title": "Chunking Strategies, Compared",
+  "summary": "Chunking decides what your retriever can ever surface. Get the boundaries wrong and no embedding model, no reranker, no LLM can repair the damage downstream.",
+  "motto": "Chunking decides what your retriever can ever surface. Get the boundaries wrong and no embedding model, no reranker, no LLM can repair the damage downstream.",
+  "type": "Build",
+  "languages": [
+    "Python"
+  ],
+  "prerequisites": [],
+  "duration": "~90 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Implement five chunking strategies from scratch: fixed-window, sentence, recursive-split, semantic clustering, and structural markdown headers.",
+    "Measure recall@k on a fixture corpus with gold-labeled answer spans and explain why one strategy wins on prose and a different strategy wins on technical documents.",
+    "Read a chunk-length distribution and recognize the failure modes each strategy injects: orphan sentences, mid-symbol cuts, header-only chunks, semantic drift.",
+    "Pick a default for a new corpus without running the benchmark by inspecting three properties: document type, average paragraph length, and whether the format carries explicit structure."
+  ],
+  "exercises": [
+    "Add a sixth strategy: token-window using tiktoken instead of character counts. Compare against fixed-window on the same fixture.",
+    "Inject a 30 percent fraction of code blocks into the prose fixture. Re-run the table. Explain why every strategy except structural markdown loses recall.",
+    "Replace the deterministic embedding with the one from your project's real provider. Measure the semantic-clustering recall delta. Report whether the spread between strategies widens or narrows.",
+    "Add a summary field per chunk: a one-sentence centroid description. Re-run the eval with the summary appended to the chunk body. Measure the recall lift."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Build",
+    "Python",
+    "Chunking",
+    "Strategies",
+    "Compared",
+    "Recall@k",
+    "Chunk overlap",
+    "Structural splitter",
+    "Semantic chunker",
+    "Centroid drift"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Chunking decides what your retriever can ever surface. Get the boundaries wrong and no embedding model, no reranker, no LLM can repair the damage downstream."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Implement five chunking strategies from scratch: fixed-window, sentence, recursive-split, semantic clustering, and structural markdown headers.\n- Measure recall@k on a fixture corpus with gold-labeled answer spans and explain why one strategy wins on prose and a different strategy wins on technical documents.\n- Read a chunk-length distribution and recognize the failure modes each strategy injects: orphan sentences, mid-symbol cuts, header-only chunks, semantic drift.\n- Pick a default for a new corpus without running the benchmark by inspecting three properties: document type, average paragraph length, and whether the format carries explicit structure."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Every RAG pipeline starts by cutting source documents into pieces small enough that an embedding model fits them and large enough that each piece carries a self-contained idea. The choice of where to cut is not a hyperparameter. It is the upper bound on what the retriever can ever return.\n\nA query that asks \"what does the budget abort threshold look like\" can only succeed if the chunk that holds the abort threshold is reachable. If the fixed-window splitter cut the threshold value from the surrounding context, the embedding moves to a different cluster, the BM25 score drops, the rerankers see noise, and the answer the LLM generates is wrong. The 2024 paper \"LongRAG: Enhancing Retrieval-Augmented Generation with Long-context LLMs\" measured a 35 percent absolute swing in retrieval recall purely from the chunking choice. The follow-up work in 2025 on contextual chunk headers narrowed the gap but did not close it.\n\nThis lesson builds five strategies side by side, runs them against a fixture corpus with gold-labeled answer spans, and lets you read the recall numbers yourself."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart LR\n  Doc[Source Document] --> S1[Fixed Window]\n  Doc --> S2[Sentence]\n  Doc --> S3[Recursive Split]\n  Doc --> S4[Semantic Cluster]\n  Doc --> S5[Structural Markdown]\n  S1 --> Chunks1[Chunks]\n  S2 --> Chunks2[Chunks]\n  S3 --> Chunks3[Chunks]\n  S4 --> Chunks4[Chunks]\n  S5 --> Chunks5[Chunks]\n  Chunks1 --> Index[Embedding Index]\n  Chunks2 --> Index\n  Chunks3 --> Index\n  Chunks4 --> Index\n  Chunks5 --> Index\n  Index --> Eval[Recall@k vs Gold Spans]\n```\n\n### Fixed-window\n\nThe brute-force baseline. Cut every N characters. Optionally overlap so a sentence cut at position N appears whole inside the chunk that starts at position N - overlap. Fast, deterministic, terrible at boundaries. Use it as a control, not a default.\n\n### Sentence\n\nSplit on sentence boundaries with a regex or a simple state machine. Pack one or more sentences into a chunk up to a target character budget. Stops cutting mid-word. Still cuts mid-paragraph and mid-section. The default in many early RAG pipelines and a reasonable choice for prose with no other structure.\n\n### Recursive split\n\nThe hierarchy strategy popularized by 2023-era libraries. Try to split on the strongest separator first (double newline, paragraph), fall back to the next (single newline), then to sentences, then to characters. The recursion terminates when the chunk fits the budget. Strong on documents that have inconsistent structure because it adapts per region.\n\n### Semantic clustering\n\nEmbed every sentence. Cluster contiguous sentences that share a topic centroid. Cut whenever the running similarity to the centroid drops below a threshold. The boundaries reflect meaning, not characters. Slower to build and dependent on the embedding model, but resilient against documents that switch topics inside a paragraph.\n\n### Structural markdown headers\n\nFor documents that carry explicit structure (markdown, reStructuredText, RFC-style numbered sections), cut at heading boundaries. Each chunk becomes the heading plus everything underneath it down to the next heading at the same or higher level. Smallest chunks per topic, but only available when the corpus is well-formed.\n\n### How recall@k measures the boundary choice\n\nA gold-labeled query carries the exact character offsets of the answer span inside the source document. After chunking, you ask: does any of the top-k chunks the retriever returned overlap the gold span? If yes, recall@k for that query is 1. If no, it is 0. Average across the query set. Run the same evaluation for each strategy and the spread shows you which boundary policy survives the corpus you have."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements:\n\n- `fixed_window(text, size, overlap)` - the baseline.\n- `sentence_chunks(text, target)` - simple sentence packer.\n- `recursive_split(text, separators, target)` - hierarchical recursion.\n- `semantic_chunks(text, similarity_threshold)` - centroid-based clustering on top of a deterministic mock embedding.\n- `structural_markdown(text)` - header-aware splitter.\n- `mock_embed(text, dim)` - a hash-based embedding so the loop runs offline.\n- `DenseIndex` - the same shape used in Phase 19 Track B's hybrid retrieval lesson.\n- `eval_recall(strategy, corpus, queries, k)` - the comparison loop.\n- A `main()` that runs every strategy on the fixture corpus and prints a recall@k table.\n\nRun it:\n\n```bash\npython3 code/main.py\n```\n\nThe output is a small table with one row per strategy and one column per k. Sentence loses on the structured fixture. Structural-markdown wins on the markdown fixture. Recursive holds its own on the mixed fixture because the recursion adapts. Semantic clustering wins on the prose fixture where there are no useful structural cues."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Production patterns:\n\n- Run the eval before you ship a new pipeline; do not trust the strategy your library defaults to.\n- Re-run the eval whenever you change the embedding model or the corpus mix; the winner is corpus-dependent.\n- Persist the strategy name in each chunk's metadata so you can attribute regressions later."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "The Track F end-to-end RAG system in lesson 69 uses the chunker selected here as its first stage. The eval harness in lesson 68 reads recall@k from the same shape that `eval_recall` returns in this lesson. Pick the strategy that wins on your corpus and feed it forward."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a sixth strategy: token-window using `tiktoken` instead of character counts. Compare against fixed-window on the same fixture.\n2. Inject a 30 percent fraction of code blocks into the prose fixture. Re-run the table. Explain why every strategy except structural markdown loses recall.\n3. Replace the deterministic embedding with the one from your project's real provider. Measure the semantic-clustering recall delta. Report whether the spread between strategies widens or narrows.\n4. Add a `summary` field per chunk: a one-sentence centroid description. Re-run the eval with the summary appended to the chunk body. Measure the recall lift."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Recall@k | \"Did we get the right chunk?\" | Fraction of queries where any of the top-k chunks overlaps the gold answer span |\n| Chunk overlap | \"Sliding window\" | Re-include the last N characters of the previous chunk in the next chunk |\n| Structural splitter | \"Header-aware chunks\" | Cut at H1/H2/H3 boundaries; the heading text is part of the chunk |\n| Semantic chunker | \"Topic-aware chunks\" | Embed sentences, cluster by centroid similarity, cut on drift |\n| Centroid drift | \"Topic shift\" | Cosine similarity between the running mean and the next sentence drops past a threshold |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [LongRAG: Enhancing Retrieval-Augmented Generation with Long-context LLMs (arXiv 2406.15319)](https://arxiv.org/abs/2406.15319)\n- [Anthropic, Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval)\n- [LlamaIndex, Chunking strategies for production RAG](https://docs.llamaindex.ai/en/stable/optimizing/production_rag/)\n- Phase 11 lesson 06 - RAG fundamentals\n- Phase 11 lesson 07 - advanced RAG\n- Phase 19 lesson 65 - hybrid retrieval that ranks the chunks produced here\n- Phase 19 lesson 68 - the eval harness that scores the strategy choice in production"
+    },
+    {
+      "key": "failure-modes-the-table-will-not-hide",
+      "title": "Failure modes the table will not hide",
+      "markdown": "**Orphan sentences.** Sentence packing produces chunks that miss the topic sentence. The embedding then points at the wrong cluster.\n\n**Mid-symbol cuts.** Fixed-window inside code or YAML will split an identifier in half. The two halves embed to noise.\n\n**Header-only chunks.** Structural markdown emits a chunk containing nothing but `## Title`. Filter those out or attach the next chunk's first paragraph.\n\n**Semantic drift.** Semantic clustering under-cuts when the corpus is uniformly on topic. A 5000-character chunk packs many specific answers into one diffuse embedding. Combine semantic with a hard character cap.\n\n**Stale embeddings.** Semantic clustering uses an embedding model. If you change the model, you also change the chunks. Pin the chunk model separately from the retrieval model or rebuild the index together."
+    },
+    {
+      "key": "choosing-a-default-without-running-the-benchmark",
+      "title": "Choosing a default without running the benchmark",
+      "markdown": "Three properties decide the default chunker for a new corpus.\n\n| Property | Value | Default |\n|----------|-------|---------|\n| Document type | Prose with no structure | Recursive split, target 800 |\n| Document type | Markdown / RFC / API docs | Structural markdown |\n| Document type | Code | AST-aware (out of scope; see Phase 19 lesson 02) |\n| Paragraph length | Long, single topic | Sentence, target 500 |\n| Paragraph length | Short, mixed topics | Semantic, threshold 0.6 |\n\nWhen in doubt, pick recursive split. It is the strongest single-strategy baseline."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why is the chunking choice an upper bound on retrieval quality and not just a hyperparameter?",
+      "options": [
+        "Because the LLM never reads chunks",
+        "Because the embedding model is fixed at training time",
+        "Because no embedding, reranker, or LLM downstream can recover an answer span that was cut into incoherent pieces",
+        "Because BM25 has no role in modern RAG"
+      ],
+      "correct": 2,
+      "explanation": "If the chunk that holds the answer span is incoherent the embedding moves to the wrong cluster and downstream components cannot repair the damage."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Which strategy is the strongest single-strategy default when you have no prior knowledge of the corpus?",
+      "options": [
+        "Fixed-window",
+        "Sentence packer",
+        "Recursive split",
+        "Structural markdown"
+      ],
+      "correct": 2,
+      "explanation": "Recursive split adapts per region by trying the strongest separator first and falling back, so it survives inconsistent structure."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What does recall@k measure in this lesson?",
+      "options": [
+        "Whether the top-k chunks contain the literal query string",
+        "Whether any of the top-k chunks overlaps the gold answer span",
+        "The cosine similarity between the query and the top-k chunks",
+        "The number of unique documents in the top-k"
+      ],
+      "correct": 1,
+      "explanation": "Each query carries gold offsets; recall@k is 1 if any top-k chunk overlaps the gold span, else 0; averaged across queries."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Why does fixed-window chunking fail badly on code or YAML corpora?",
+      "options": [
+        "It loses Unicode characters",
+        "It cuts identifiers and key-value pairs in half, producing chunks that embed to noise",
+        "It produces chunks larger than the embedding model's context window",
+        "It cannot be parallelized"
+      ],
+      "correct": 1,
+      "explanation": "Character-level cuts inside a symbol destroy the meaning the embedding model is supposed to capture."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What is the centroid drift termination criterion in semantic chunking?",
+      "options": [
+        "Cosine similarity between the running mean vector and the next sentence drops below a threshold",
+        "Character count exceeds the max",
+        "Sentence count exceeds a hardcoded limit",
+        "The chunker has consumed the entire embedding budget"
+      ],
+      "correct": 0,
+      "explanation": "Semantic chunking cuts when the running centroid no longer matches the next sentence by a configured similarity threshold."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What stale-embedding failure mode does semantic chunking introduce that the other four strategies do not?",
+      "options": [
+        "Chunks too small for the embedding context",
+        "Chunk boundaries change whenever you change the chunk-model, requiring a coordinated rebuild",
+        "Chunks are no longer indexable by BM25",
+        "Chunks lose their start and end offsets"
+      ],
+      "correct": 1,
+      "explanation": "Semantic clustering depends on an embedding model; swapping the model changes the boundaries, so the chunk-model must be pinned separately or rebuilt together with the retrieval model."
+    }
+  ],
+  "resources": [
+    {
+      "label": "LongRAG: Enhancing Retrieval-Augmented Generation with Long-context LLMs (arXiv 2406.15319)",
+      "href": "https://arxiv.org/abs/2406.15319",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Contextual Retrieval",
+      "href": "https://www.anthropic.com/news/contextual-retrieval",
+      "kind": "Reading"
+    },
+    {
+      "label": "LlamaIndex, Chunking strategies for production RAG",
+      "href": "https://docs.llamaindex.ai/en/stable/optimizing/production_rag/",
+      "kind": "Reading"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/64-chunking-strategies-advanced/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "tests/test_chunkers.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/64-chunking-strategies-advanced/code/tests/test_chunkers.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/64-chunking-strategies-advanced",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/64-chunking-strategies-advanced"
+}

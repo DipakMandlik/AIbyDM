@@ -1,0 +1,238 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/37-runtime-feedback-loops",
+  "slug": "37-runtime-feedback-loops",
+  "phaseSlug": "14-agent-engineering",
+  "number": "37",
+  "title": "Runtime Feedback Loops",
+  "summary": "Agents that do not see real command output guess. A feedback runner captures stdout, stderr, exit code, and timing into a structured record the next turn can read. Then the agent reacts to facts instead of to its own prediction of facts.",
+  "motto": "Agents that do not see real command output guess. A feedback runner captures stdout, stderr, exit code, and timing into a structured record the next turn can read. Then the agent reacts to facts instead of to its own prediction of facts.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 32 (Minimal Workbench)",
+    "Phase 14 · 35 (Init Script)"
+  ],
+  "duration": "~50 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Distinguish runtime feedback from observability telemetry.",
+    "Build a feedback runner that wraps shell commands and persists structured records.",
+    "Truncate large outputs deterministically so the loop stays within token budget.",
+    "Refuse to advance the loop when feedback is missing."
+  ],
+  "exercises": [
+    "Add a cwd field per record so the same command run from different directories is distinguishable.",
+    "Add a redaction step that strips lines matching ^Bearer or password=. Test on a fixture record.",
+    "Cap total feedback_record.jsonl size at 1 MB by rotating to .1, .2 files. Defend the rotation policy.",
+    "Add a parent_command_id so retry chains are visible: which command produced the input that the next command consumed.",
+    "Pipe the JSONL into a tiny TUI that highlights the latest non-zero exit. Eight key features the TUI must show to be useful in a review."
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "Runtime",
+    "Feedback",
+    "Loops",
+    "Feedback record",
+    "Tail truncation",
+    "Refuse-on-null",
+    "Agent note",
+    "Telemetry split"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Agents that do not see real command output guess. A feedback runner captures stdout, stderr, exit code, and timing into a structured record the next turn can read. Then the agent reacts to facts instead of to its own prediction of facts."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Distinguish runtime feedback from observability telemetry.\n- Build a feedback runner that wraps shell commands and persists structured records.\n- Truncate large outputs deterministically so the loop stays within token budget.\n- Refuse to advance the loop when feedback is missing."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "The agent says \"running tests now.\" The next message says \"all tests pass.\" The reality is that no test ran. The agent imagined the output, or it ran the command and never read the result, or it read the result and silently truncated the failure line.\n\nA feedback runner removes that gap. Every command goes through the runner. Every record carries the command, the captured stdout and stderr, the exit code, the wall-clock duration, and a one-line agent note. The agent reads the record at the next turn. The verification gate reads the records at the end of the task."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart LR\n  Agent[Agent Loop] --> Runner[run_with_feedback.py]\n  Runner --> Shell[subprocess]\n  Shell --> Capture[stdout / stderr / exit / duration]\n  Capture --> Record[feedback_record.jsonl]\n  Record --> Agent\n  Record --> Gate[Verification Gate]\n```\n\n### What goes in a feedback record\n\n| Field | Why it matters |\n|-------|----------------|\n| `command` | Exact argv, no shell expansion surprises |\n| `stdout_tail` | Last N lines, deterministic truncation |\n| `stderr_tail` | Last N lines, separate from stdout |\n| `exit_code` | The unambiguous success signal |\n| `duration_ms` | Surfaces slow probes and runaway processes |\n| `started_at` | Timestamp for replay |\n| `agent_note` | One line the agent writes about what it expected |\n\n### Truncation is deterministic\n\nA 50 MB log destroys the loop. The runner truncates head and tail with a `...truncated N lines...` marker, deterministic so the same output always produces the same record. No sampling; the parts the agent needs to see (final error, final summary) live at the tail.\n\n### Feedback versus telemetry\n\nTelemetry (Phase 14 · 23, OTel GenAI conventions) is for human operators reviewing runs across time. Feedback is for the next turn of this run. They share fields but they live in different files with different retention.\n\n### Refuse to advance without feedback\n\nIf the runner errors before capturing exit, the record carries `exit_code: null` and `error: <reason>`. The agent loop must refuse to claim success on a `null` exit. No exit, no progress."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements:\n\n- `run_with_feedback(command, agent_note)` that wraps `subprocess.run`, captures stdout/stderr/exit/duration, truncates deterministically, appends to `feedback_record.jsonl`.\n- A small loader that streams the JSONL into a Python list.\n- A demo that runs three commands (success, failure, slow) and prints the last record per command.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nOutput: three feedback records appended to `feedback_record.jsonl`, the last one of each printed inline. Tail the file across re-runs to see the loop accumulate."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Production patterns:\n\n- **Claude Code Bash tool.** The tool already captures stdout, stderr, exit, and duration. The runner in this lesson is the framework-agnostic equivalent for any agent product.\n- **LangGraph nodes.** Wrap any shell node in the runner so the record persists outside graph state.\n- **CI logs.** Pipe the JSONL into your CI artifact store; reviewers can replay any command without rerunning the session.\n\nThe runner is a thin wrapper that survives every framework migration because it owns the shape of the record."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-feedback-runner.md` generates a project-specific `run_with_feedback.py` with the right truncation budget, a JSONL writer wired to the workbench, and a loader the agent reads at every turn."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a `cwd` field per record so the same command run from different directories is distinguishable.\n2. Add a `redaction` step that strips lines matching `^Bearer ` or `password=`. Test on a fixture record.\n3. Cap total `feedback_record.jsonl` size at 1 MB by rotating to `.1`, `.2` files. Defend the rotation policy.\n4. Add a `parent_command_id` so retry chains are visible: which command produced the input that the next command consumed.\n5. Pipe the JSONL into a tiny TUI that highlights the latest non-zero exit. Eight key features the TUI must show to be useful in a review."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Feedback record | \"Run log\" | Structured JSONL entry with command, output, exit, duration |\n| Tail truncation | \"Trim the log\" | Deterministic head+tail capture so records fit in token budget |\n| Refuse-on-null | \"Block on missing data\" | The loop must not advance when `exit_code` is null |\n| Agent note | \"Expectation tag\" | The one-line prediction the agent writes before reading the result |\n| Telemetry split | \"Two log files\" | Feedback for the next turn, telemetry for the operator |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [OpenTelemetry GenAI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)\n- [Anthropic, Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)\n- [Guardrails AI x MLflow — deterministic safety, PII, quality validators](https://guardrailsai.com/blog/guardrails-mlflow) — redaction patterns as regression tests\n- [Aport.io, Best AI Agent Guardrails 2026: Pre-Action Authorization Compared](https://aport.io/blog/best-ai-agent-guardrails-2026-pre-action-authorization-compared/) — pre/post-tool capture\n- [Andrii Furmanets, AI Agents in 2026: Practical Architecture for Tools, Memory, Evals, Guardrails](https://andriifurmanets.com/blogs/ai-agents-2026-practical-architecture-tools-memory-evals-guardrails) — observability surfaces\n- Phase 14 · 23 — OTel GenAI conventions for the telemetry side\n- Phase 14 · 24 — agent observability platforms (Langfuse, Phoenix, Opik)\n- Phase 14 · 33 — the rule that demands feedback before declaring done\n- Phase 14 · 38 — the verification gate that reads the JSONL"
+    },
+    {
+      "key": "production-patterns-in-the-wild",
+      "title": "Production patterns in the wild",
+      "markdown": "Three patterns harden the runner enough to ship.\n\n**Redact at write, not at read.** Any record that touches stdout or stderr can leak secrets. The runner ships a redaction pass before the JSONL append: strip lines matching `^Bearer `, `password=`, `api[_-]?key=`, `AKIA[0-9A-Z]{16}` (AWS), `xox[baprs]-` (Slack). Redaction at read time is a foot-gun; the file on disk is what an attacker reaches. Audit the redaction patterns quarterly against the production runtime's observed secret formats.\n\n**Rotation policy, not a single file.** Cap `feedback_record.jsonl` at 1 MB per file; on overflow rotate to `.1`, `.2`, drop `.5`. The agent's loop only reads the current file, so the runtime cost is bounded. CI artifact storage gets the full rotated set. Without rotation the file becomes the bottleneck on every loader call.\n\n**Parent-command id for retry chains.** Every record gets `command_id`; retries carry `parent_command_id` pointing at the previous attempt. The reviewer's \"failed attempts\" list (Phase 14 · 40) and the verification gate's audit both follow the chain. Without this link, retries look like independent successes and the audit hides the failure history."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does the feedback runner force the agent to do?",
+      "options": [
+        "React to imagined output",
+        "React to facts: structured stdout/stderr/exit/duration records captured into the loop on every command",
+        "Skip verification",
+        "Use a different model"
+      ],
+      "correct": 1,
+      "explanation": "The runner closes the gap between 'tests passed' (imagined) and 'tests actually ran and exited zero' (recorded)."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "How does feedback differ from telemetry?",
+      "options": [
+        "Telemetry is paid",
+        "Feedback is for the next turn of this run; telemetry is for operators reviewing runs across time (different files, different retention)",
+        "Telemetry uses OTel; feedback uses GraphQL",
+        "They are the same thing"
+      ],
+      "correct": 1,
+      "explanation": "Both share fields but live in different files with different retention; feedback is intra-run, telemetry is cross-run."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which field MUST appear in every feedback record?",
+      "options": [
+        "model_id",
+        "exit_code (and a null exit must refuse to advance the loop)",
+        "embedding_vector",
+        "prompt_cache_token"
+      ],
+      "correct": 1,
+      "explanation": "exit_code is the unambiguous success signal; null exit means no progress."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "How does the runner truncate large outputs?",
+      "options": [
+        "Random sampling",
+        "Deterministic head + tail with a 'truncated N lines' marker so the same output always produces the same record",
+        "First 10 lines only",
+        "Compresses with gzip"
+      ],
+      "correct": 1,
+      "explanation": "Deterministic truncation keeps records replayable while bounding token cost; tails carry the failure summary."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why redact at write time rather than read time?",
+      "options": [
+        "Compression",
+        "The file on disk is what an attacker reaches; redacting only on read leaves secrets in JSONL files",
+        "Read-time redaction breaks JSON",
+        "It is faster"
+      ],
+      "correct": 1,
+      "explanation": "Redact lines matching Bearer, password=, api_key=, AKIA..., xox[baprs]- before append; auditing the patterns quarterly."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What does parent_command_id give the workbench?",
+      "options": [
+        "Cheaper inference",
+        "Retries link to their parent attempt so the reviewer and audit see the failure chain; without it retries look like independent successes",
+        "Faster file I/O",
+        "Lower memory"
+      ],
+      "correct": 1,
+      "explanation": "Parent linkage makes retry chains visible to the reviewer (Lesson 39) and the verification gate."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Why cap feedback_record.jsonl at 1 MB with rotation?",
+      "options": [
+        "JSON does not handle larger files",
+        "The agent only reads the current file; rotation keeps runtime cost bounded while CI artifacts capture the full set",
+        "Disks are too slow",
+        "The provider charges per byte"
+      ],
+      "correct": 1,
+      "explanation": "Bounded current file + rotated history is the same pattern logrotate uses; predictable cost in the hot loop."
+    }
+  ],
+  "resources": [
+    {
+      "label": "OpenTelemetry GenAI semantic conventions",
+      "href": "https://opentelemetry.io/docs/specs/semconv/gen-ai/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Effective harnesses for long-running agents",
+      "href": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Guardrails AI x MLflow — deterministic safety, PII, quality validators",
+      "href": "https://guardrailsai.com/blog/guardrails-mlflow",
+      "kind": "Reading"
+    },
+    {
+      "label": "Aport.io, Best AI Agent Guardrails 2026: Pre-Action Authorization Compared",
+      "href": "https://aport.io/blog/best-ai-agent-guardrails-2026-pre-action-authorization-compared/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Andrii Furmanets, AI Agents in 2026: Practical Architecture for Tools, Memory, Evals, Guardrails",
+      "href": "https://andriifurmanets.com/blogs/ai-agents-2026-practical-architecture-tools-memory-evals-guardrails",
+      "kind": "Reading"
+    },
+    {
+      "label": "Feedback Runner",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/37-runtime-feedback-loops/outputs/skill-feedback-runner.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/37-runtime-feedback-loops/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/37-runtime-feedback-loops",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/37-runtime-feedback-loops"
+}

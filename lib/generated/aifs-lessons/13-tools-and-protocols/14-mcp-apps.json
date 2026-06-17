@@ -1,0 +1,147 @@
+{
+  "id": "ai-from-scratch/13-tools-and-protocols/14-mcp-apps",
+  "slug": "14-mcp-apps",
+  "phaseSlug": "13-tools-and-protocols",
+  "number": "14",
+  "title": "MCP Apps — Interactive UI Resources via `ui://`",
+  "summary": "Text-only tool output caps what agents can show. MCP Apps (SEP-1724, official January 26, 2026) let a tool return sandboxed interactive HTML rendered inline in Claude Desktop, ChatGPT, Cursor, Goose, and VS Code. Dashboards, forms, maps, 3...",
+  "motto": "Text-only tool output caps what agents can show. MCP Apps (SEP-1724, official January 26, 2026) let a tool return sandboxed interactive HTML rendered inline in Claude Desktop, ChatGPT, Cursor, Goose, and VS Code. Dashboards, forms, maps, 3D scenes, all through one extension. This lesson walks the ui:// resource scheme, the text/html;profile=mcp-app MIME, the iframe-sandbox postMessage protocol, and the security surface that comes with letting a server render HTML.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib",
+    "UI resource emitter)",
+    "HTML (sample app)"
+  ],
+  "prerequisites": [
+    "Phase 13 · 07 (MCP server)",
+    "Phase 13 · 10 (resources)"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Return a ui:// resource from a tool call and set the correct MIME and metadata.",
+    "Declare a tool's associated UI with _meta.ui.resourceUri, _meta.ui.csp, and _meta.ui.permissions.",
+    "Implement the iframe sandbox postMessage JSON-RPC for UI-to-host communication.",
+    "Apply CSP and permissions-policy defaults that defend against UI-originated attacks."
+  ],
+  "exercises": [
+    "Run code/main.py and inspect the HTML emitted. Open the HTML directly in a browser; verify the SVG renders. Then sketch the postMessage contract the UI would use to call host.callTool(\"notes_update\", ...).",
+    "Tighten the CSP: remove 'unsafe-inline' and use a nonce-based script policy. What changes in the HTML generation code?",
+    "Add a second UI resource ui://notes/editor with a form for editing a note in place. When the user submits, the iframe calls host.callTool(\"notes_update\", ...).",
+    "Audit the UI's attack surface. Where could a malicious server inject content? What does the iframe sandbox defend against and what does it not?",
+    "Read the SEP-1724 spec and identify one capability in the MCP Apps SDK that this toy implementation does not use. (Hint: component-level state sync.)"
+  ],
+  "topics": [
+    "Tools & Protocols",
+    "Build",
+    "Python (stdlib",
+    "UI resource emitter)",
+    "HTML (sample app)",
+    "MCP",
+    "Apps",
+    "Interactive",
+    "Resources",
+    "via",
+    "MCP Apps",
+    "ui://",
+    "text/html;profile=mcp-app",
+    "Iframe sandbox",
+    "postMessage JSON-RPC",
+    "_meta.ui",
+    "CSP",
+    "AppRenderer",
+    "AppFrame",
+    "ui/initialize"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Text-only tool output caps what agents can show. MCP Apps (SEP-1724, official January 26, 2026) let a tool return sandboxed interactive HTML rendered inline in Claude Desktop, ChatGPT, Cursor, Goose, and VS Code. Dashboards, forms, maps, 3D scenes, all through one extension. This lesson walks the ui:// resource scheme, the text/html;profile=mcp-app MIME, the iframe-sandbox postMessage protocol, and the security surface that comes with letting a server render HTML."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Return a `ui://` resource from a tool call and set the correct MIME and metadata.\n- Declare a tool's associated UI with `_meta.ui.resourceUri`, `_meta.ui.csp`, and `_meta.ui.permissions`.\n- Implement the iframe sandbox postMessage JSON-RPC for UI-to-host communication.\n- Apply CSP and permissions-policy defaults that defend against UI-originated attacks."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A 2025-era `visualize_timeline` tool can return \"Here are 14 notes organized chronologically: ...\". That is a paragraph. Users actually want the interactive timeline. Before MCP Apps, the options were: client-specific widget APIs (Claude artifacts, OpenAI Custom GPT HTML), or no UI at all.\n\nMCP Apps (SEP-1724, shipped January 26, 2026) standardize the contract. A tool result contains a `resource` whose URI is `ui://...` and whose MIME is `text/html;profile=mcp-app`. The host renders it in a sandboxed iframe with a limited CSP and no network access unless explicitly granted. The UI inside the iframe posts messages to the host via a tiny postMessage JSON-RPC dialect.\n\nEvery compatible client (Claude Desktop, ChatGPT, Goose, VS Code) renders the same `ui://` resource the same way. One server, one HTML bundle, universal UI."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### The `ui://` resource scheme\n\nA tool returns:\n\n```json\n{\n  \"content\": [\n    {\"type\": \"text\", \"text\": \"Here is your notes timeline:\"},\n    {\"type\": \"ui_resource\", \"uri\": \"ui://notes/timeline\"}\n  ],\n  \"_meta\": {\n    \"ui\": {\n      \"resourceUri\": \"ui://notes/timeline\",\n      \"csp\": {\n        \"defaultSrc\": \"'self'\",\n        \"scriptSrc\": \"'self' 'unsafe-inline'\",\n        \"connectSrc\": \"'self'\"\n      },\n      \"permissions\": []\n    }\n  }\n}\n```\n\nThe host then calls `resources/read` on the `ui://notes/timeline` URI and gets back:\n\n```json\n{\n  \"contents\": [{\n    \"uri\": \"ui://notes/timeline\",\n    \"mimeType\": \"text/html;profile=mcp-app\",\n    \"text\": \"<!doctype html>...\"\n  }]\n}\n```\n\n### Iframe sandbox\n\nThe host renders the HTML inside a sandboxed `<iframe>` with:\n\n- `sandbox=\"allow-scripts allow-same-origin\"` (or stricter per server declaration)\n- Server-declared CSP applied via response headers.\n- No cookies, no localStorage from the host's origin.\n- Network access limited to `connectSrc` in CSP.\n\n### postMessage protocol\n\nThe iframe communicates with the host via `window.postMessage`. A tiny JSON-RPC 2.0 dialect:\n\nAlways pin `targetOrigin` to the peer's exact origin, and on the receiving side validate `event.origin` against an allowlist before processing any payload. Never use `\"*\"` for either side of this channel — the body carries tool calls and resource reads.\n\n```js\n// iframe to host  (pin to host origin)\nwindow.parent.postMessage({\n  jsonrpc: \"2.0\",\n  id: 1,\n  method: \"host.callTool\",\n  params: { name: \"notes_update\", arguments: { id: \"note-14\", title: \"...\" } }\n}, \"https://host.example.com\");\n\n// host to iframe  (pin to iframe origin)\niframe.contentWindow.postMessage({\n  jsonrpc: \"2.0\",\n  id: 1,\n  result: { content: [...] }\n}, \"https://iframe.example.com\");\n\n// receiver on both sides\nwindow.addEventListener(\"message\", (event) => {\n  if (event.origin !== \"https://expected-peer.example.com\") return;\n  // safe to process event.data\n});\n```\n\nAvailable host-side methods the UI can call:\n\n- `host.callTool(name, arguments)` — invokes a server tool.\n- `host.readResource(uri)` — reads an MCP resource.\n- `host.getPrompt(name, arguments)` — fetches a prompt template.\n- `host.close()` — dismisses the UI.\n\nEvery call still goes through the MCP protocol and inherits the server's permissions.\n\n### Permissions\n\nThe `_meta.ui.permissions` list requests extra capabilities:\n\n- `camera` — access the user's camera (used for scan-a-document UIs).\n- `microphone` — voice input.\n- `geolocation` — location.\n- `network:*` — wider network access than `connectSrc` alone allows.\n\nEach permission is a prompt the user sees before the UI renders.\n\n### Security risks\n\nHTML in an iframe is still HTML. New attack surface:\n\n- **Prompt-injection via UI.** A malicious server UI can show text that looks like a system message and tricks the user. Host rendering should visibly distinguish server UI from host UI.\n- **Exfiltration via `connectSrc`.** If CSP permits `connect-src: *`, the UI can send data anywhere. Default should be strict.\n- **Clickjacking.** The UI overlays host chrome. Hosts must prevent z-index manipulation and enforce opacity rules.\n- **Steal focus.** UI takes keyboard focus and captures the next message. Hosts must intercept.\n\nPhase 13 · 15 covers these in depth as part of MCP security; this lesson introduces them.\n\n### `ui/initialize` handshake\n\nAfter the iframe loads, it sends `ui/initialize` over postMessage:\n\n```json\n{\"jsonrpc\": \"2.0\", \"id\": 0, \"method\": \"ui/initialize\",\n \"params\": {\"theme\": \"dark\", \"locale\": \"en-US\", \"sessionId\": \"...\"}}\n```\n\nHost responds with capabilities and a session token. The UI uses the session token on every subsequent host call.\n\n### AppRenderer / AppFrame SDK primitives\n\nThe ext-apps SDK exposes two convenience primitives:\n\n- `AppRenderer` (server side) — wraps a React / Vue / Solid component and emits a `ui://` resource with the right MIME and metadata.\n- `AppFrame` (client side) — receives the resource, mounts the iframe, and mediates postMessage.\n\nYou can use these or hand-roll the HTML and JSON-RPC.\n\n### Ecosystem status\n\nMCP Apps shipped January 26, 2026. Client support as of April 2026:\n\n- **Claude Desktop.** Full support since January 2026.\n- **ChatGPT.** Full support via the Apps SDK (same underlying MCP Apps protocol).\n- **Cursor.** Beta; enable via settings.\n- **VS Code.** Insider builds only.\n- **Goose.** Full support.\n- **Zed, Windsurf.** Roadmapped.\n\nServers in production: dashboards, map visualizations, data tables, chart builders, sandbox IDE previews."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "`code/main.py` extends the notes server with a `visualize_timeline` tool that returns a `ui://notes/timeline` resource, plus a handler for `resources/read` on that URI which returns a small but complete HTML bundle with an SVG timeline. The HTML is stdlib-templated — no build system. postMessage is sketched in JS comments since stdlib cannot drive a browser.\n\nWhat to look at:\n\n- `_meta.ui` on the tool response carries resourceUri, CSP, permissions.\n- The HTML renders without network access; all data is inlined.\n- JS calls `host.callTool` via `window.parent.postMessage` (documented but inert in this stdlib demo)."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces `outputs/skill-mcp-apps-spec.md`. Given a tool that would benefit from an interactive UI, the skill produces the full MCP Apps contract: `ui://` URI, CSP, permissions, postMessage entrypoints, and a security checklist."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run `code/main.py` and inspect the HTML emitted. Open the HTML directly in a browser; verify the SVG renders. Then sketch the postMessage contract the UI would use to call `host.callTool(\"notes_update\", ...)`.\n\n2. Tighten the CSP: remove `'unsafe-inline'` and use a nonce-based script policy. What changes in the HTML generation code?\n\n3. Add a second UI resource `ui://notes/editor` with a form for editing a note in place. When the user submits, the iframe calls `host.callTool(\"notes_update\", ...)`.\n\n4. Audit the UI's attack surface. Where could a malicious server inject content? What does the iframe sandbox defend against and what does it not?\n\n5. Read the SEP-1724 spec and identify one capability in the MCP Apps SDK that this toy implementation does not use. (Hint: component-level state sync.)"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| MCP Apps | \"Interactive UI resources\" | SEP-1724 extension shipped 2026-01-26 |\n| `ui://` | \"App URI scheme\" | Resource scheme for UI bundles |\n| `text/html;profile=mcp-app` | \"The MIME\" | Content-type for MCP App HTML |\n| Iframe sandbox | \"Render container\" | Browser sandboxing of the UI with CSP and permissions |\n| postMessage JSON-RPC | \"UI-to-host wire\" | Tiny JSON-RPC-over-postMessage dialect for host calls |\n| `_meta.ui` | \"Tool-UI binding\" | Metadata linking a tool result to a UI resource |\n| CSP | \"Content-Security-Policy\" | Declares allowed sources for scripts, network, styles |\n| AppRenderer | \"Server SDK primitive\" | Converts a framework component into a `ui://` resource |\n| AppFrame | \"Client SDK primitive\" | Iframe mount helper that mediates postMessage |\n| `ui/initialize` | \"Handshake\" | First postMessage from UI to host |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [MCP ext-apps — GitHub](https://github.com/modelcontextprotocol/ext-apps) — reference implementation and SDK\n- [MCP Apps specification 2026-01-26](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx) — formal spec document\n- [MCP — Apps extension overview](https://modelcontextprotocol.io/extensions/apps/overview) — high-level documentation\n- [MCP blog — MCP Apps launch](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) — January 2026 launch post\n- [MCP Apps API reference](https://apps.extensions.modelcontextprotocol.io/api/) — JSDoc-style SDK reference"
+    }
+  ],
+  "quiz": [],
+  "resources": [
+    {
+      "label": "MCP ext-apps — GitHub",
+      "href": "https://github.com/modelcontextprotocol/ext-apps",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP Apps specification 2026-01-26",
+      "href": "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP — Apps extension overview",
+      "href": "https://modelcontextprotocol.io/extensions/apps/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP blog — MCP Apps launch",
+      "href": "https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP Apps API reference",
+      "href": "https://apps.extensions.modelcontextprotocol.io/api/",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP Apps Spec",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/14-mcp-apps/outputs/skill-mcp-apps-spec.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/14-mcp-apps/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/14-mcp-apps",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/13-tools-and-protocols/14-mcp-apps"
+}

@@ -1,0 +1,295 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/04-multimodal-document-qa",
+  "slug": "04-multimodal-document-qa",
+  "phaseSlug": "19-capstone-projects",
+  "number": "04",
+  "title": "Capstone 04 — Multimodal Document QA (Vision-First PDF, Tables, Charts)",
+  "summary": "The 2026 document-QA frontier moved away from OCR-then-text and toward vision-first late interaction. ColPali, ColQwen2.5, and ColQwen3-omni treat each PDF page as an image, embed it with multi-vector late interaction, and let the query at...",
+  "motto": "The 2026 document-QA frontier moved away from OCR-then-text and toward vision-first late interaction. ColPali, ColQwen2.5, and ColQwen3-omni treat each PDF page as an image, embed it with multi-vector late interaction, and let the query attend to patches directly. On financial 10-Ks, scientific papers, and handwritten notes this pattern beats OCR-first by a large margin. Build the pipeline end to end on 10k pages and publish the side-by-side against OCR-then-text.",
+  "type": "Capstone",
+  "languages": [
+    "Python (pipeline)",
+    "TypeScript (viewer UI)"
+  ],
+  "prerequisites": [
+    "Phase 4 (computer vision)",
+    "Phase 5 (NLP)",
+    "Phase 7 (transformers)",
+    "Phase 11 (LLM engineering)",
+    "Phase 12 (multimodal)",
+    "Phase 17 (infrastructure)"
+  ],
+  "duration": "30 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Measure ColQwen2.5-v0.2 vs ColQwen3-omni on the same corpus. Which pages does one get right and the other miss? Add a \"content class\" tag to the index to route by type.",
+    "Prune embeddings aggressively (75%, 90%). Find the compression cliff: the point where ViDoRe nDCG@5 drops below the OCR baseline.",
+    "Build a hybrid: run OCR-then-text and ColQwen in parallel, fuse with RRF, rerank with a cross-encoder. Does the hybrid beat either alone? Where does it help most?",
+    "Swap Qwen3-VL-30B for a smaller VLM (Qwen2.5-VL-7B). Measure the accuracy-per-dollar curve.",
+    "Add handwritten-note support. Render the handwriting corpus, embed with ColQwen, measure retrieval. Compare against a handwriting OCR pipeline."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python (pipeline)",
+    "TypeScript (viewer UI)",
+    "Multimodal",
+    "Document",
+    "Vision",
+    "First",
+    "PDF",
+    "Tables",
+    "Charts",
+    "Late interaction",
+    "Multi-vector",
+    "MaxSim",
+    "DocPruner",
+    "ViDoRe v3",
+    "Evidence region",
+    "OCR fallback"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> The 2026 document-QA frontier moved away from OCR-then-text and toward vision-first late interaction. ColPali, ColQwen2.5, and ColQwen3-omni treat each PDF page as an image, embed it with multi-vector late interaction, and let the query attend to patches directly. On financial 10-Ks, scientific papers, and handwritten notes this pattern beats OCR-first by a large margin. Build the pipeline end to end on 10k pages and publish the side-by-side against OCR-then-text."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "Enterprises sit on PDFs that OCR pipelines mangle: scanned 10-Ks with rotated tables, scientific papers dense with equations, charts that only make sense as images, handwritten annotations. Treating these as text-first means losing half the signal. The 2026 answer is late-interaction multi-vector retrieval on raw page images. ColPali (Illuin Tech) introduced it; ColQwen2.5-v0.2 and ColQwen3-omni pushed accuracy. On ViDoRe v3, vision-first retrieval scores above OCR-then-text by meaningful margins — and the gap widens on charts, tables, and handwriting.\n\nThe trade-off is storage and latency. A ColQwen embedding is ~2048 patch vectors per page, not a single 1024-dim vector. Raw storage balloons. DocPruner (2026) brings 50% pruning without measurable accuracy loss. You will index 10k pages, measure ViDoRe v3 nDCG@5, serve answers under 2s, and compare directly against an OCR-then-text baseline."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "Late interaction means every query token scores against every patch token, and the maximum score per query token is summed. You get fine-grained matching without needing a single pooled vector. A multi-vector index (Vespa, Qdrant multi-vector, or AstraDB) stores the per-patch embeddings and runs MaxSim at retrieval time.\n\nThe answerer is a vision-language model that takes the query plus the top-k retrieved pages as images and writes an answer with evidence regions (bounding boxes or page references). Qwen3-VL-30B, Gemini 2.5 Pro, and InternVL3 are the 2026 frontier choices. For equations and scientific notation, an OCR fallback (Nougat, dots.ocr) is spliced in as an optional text channel.\n\nEvaluation is a two-dimensional matrix. One axis: content type (plain text paragraphs, dense tables, bar/line charts, handwritten notes, equations). Other axis: retrieval approach (vision-first late interaction vs OCR-then-text vs hybrid). Each cell gets nDCG@5 and answer accuracy. The report is the deliverable."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **Ingest.** Walk a corpus of 10k PDF pages across 10-Ks, scientific papers, and scanned documents. Render each page to a 1536x2048 PNG. Persist `{doc_id, page_num, image_path}`.\n\n2. **Embed.** Run ColQwen2.5-v0.2 on each page image. Output shape ~2048 patch embeddings of dim 128. Apply DocPruner to keep the highest-signal half. Write to Vespa multi-vector field or Qdrant multi-vector.\n\n3. **Query.** For each incoming query, embed with the query tower (token-level embeddings). Run MaxSim against the index: for every query token, take the max dot-product over page patch embeddings, sum. Return top-k pages.\n\n4. **Synthesize.** Call Qwen3-VL-30B with the query and the top-5 page images. Prompt: \"Answer using only the supplied pages. Cite each claim by (doc_id, page) and name the region (figure, table, paragraph).\"\n\n5. **Evidence regions.** Post-process the answer to extract cited regions. If the VLM emits bounding boxes (Qwen3-VL does), render them as overlays in the viewer.\n\n6. **OCR fallback.** For pages identified as equation-dense (heuristic on image variance), run Nougat or dots.ocr and pass the OCR text as an extra channel alongside the image.\n\n7. **Eval.** Run ViDoRe v3 (retrieval nDCG@5) and M3DocVQA (multi-page QA accuracy). Also run OCR-then-text pipeline on the same corpus with the same synthesizer. Produce a content-type × approach matrix.\n\n8. **UI.** Streamlit prototype first; Next.js 15 production viewer with page-by-page evidence-region overlay."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n$ doc-qa ask \"what was the 2024 operating margin change for segment EMEA?\"\n[retrieve]   top-5 pages in 320ms (ColQwen2.5, MaxSim, Vespa)\n[synth]      qwen3-vl-30b, 1.4s, cited (form-10k-2024, p. 88) + (..., p. 92)\nanswer:\n  EMEA operating margin moved from 18.2% to 16.8%, a 140bp decline.\n  cited: 10-K-2024.pdf p.88 (Table 4, Segment Operating Margin)\n         10-K-2024.pdf p.92 (MD&A, Operating Performance)\n[viewer]     open with highlighted bounding boxes overlaid on p.88 Table 4\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-doc-qa.md` describes the deliverable: a vision-first multimodal document QA system tuned to a specific corpus and evaluated against an OCR-then-text baseline on ViDoRe v3.\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | ViDoRe v3 / M3DocVQA accuracy | Benchmark numbers vs OCR-text baseline and published leaderboard |\n| 20 | Evidence-region grounding | Fraction of cited regions that actually contain the answer span |\n| 20 | Storage and latency engineering | DocPruner compression ratio, index p95, answer p95 |\n| 20 | Multi-page reasoning | Accuracy on a hand-labeled 100-question multi-page set |\n| 15 | Source-inspection UX | Viewer clarity, overlay fidelity, side-by-side comparison tools |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Measure ColQwen2.5-v0.2 vs ColQwen3-omni on the same corpus. Which pages does one get right and the other miss? Add a \"content class\" tag to the index to route by type.\n\n2. Prune embeddings aggressively (75%, 90%). Find the compression cliff: the point where ViDoRe nDCG@5 drops below the OCR baseline.\n\n3. Build a hybrid: run OCR-then-text and ColQwen in parallel, fuse with RRF, rerank with a cross-encoder. Does the hybrid beat either alone? Where does it help most?\n\n4. Swap Qwen3-VL-30B for a smaller VLM (Qwen2.5-VL-7B). Measure the accuracy-per-dollar curve.\n\n5. Add handwritten-note support. Render the handwriting corpus, embed with ColQwen, measure retrieval. Compare against a handwriting OCR pipeline."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Late interaction | \"ColPali-style retrieval\" | Query tokens score against page patches independently; MaxSim aggregates |\n| Multi-vector | \"Per-patch embedding\" | Each document has many vectors, not one pooled vector |\n| MaxSim | \"Late-interaction scoring\" | For every query token, take max similarity over document vectors; sum |\n| DocPruner | \"Patch compression\" | 2026 pruning that keeps 50% of patches with negligible accuracy loss |\n| ViDoRe v3 | \"Document-retrieval benchmark\" | The 2026 standard for measuring visual-document retrieval |\n| Evidence region | \"Cited bounding box\" | A bbox on the source page that localizes the answer span |\n| OCR fallback | \"Equation channel\" | Text pipeline used alongside vision for equation- or table-heavy pages |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [ColPali (Illuin Tech) repository](https://github.com/illuin-tech/colpali) — reference late-interaction doc retrieval\n- [ColPali paper (arXiv:2407.01449)](https://arxiv.org/abs/2407.01449) — the foundational method paper\n- [ColQwen family on Hugging Face](https://huggingface.co/vidore) — production-ready checkpoints\n- [M3DocRAG (Adobe)](https://arxiv.org/abs/2411.04952) — multi-page multimodal RAG baseline\n- [Vespa multi-vector tutorial](https://docs.vespa.ai/en/colpali.html) — reference serving stack\n- [Qdrant multi-vector support](https://qdrant.tech/documentation/concepts/vectors/#multivectors) — alternate index\n- [AstraDB multi-vector](https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html) — alternate managed index\n- [Nougat OCR](https://github.com/facebookresearch/nougat) — equation-capable OCR fallback"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\nPDFs -> page renderer (PyMuPDF, 180 DPI)\n           |\n           v\n  ColQwen2.5-v0.2 embed (multi-vector per page, ~2048 patches)\n           |\n           +------> DocPruner 50% compression\n           |\n           v\n   multi-vector index (Vespa or Qdrant multi-vector)\n           |\nquery ----+----> retrieve top-k pages (MaxSim)\n           |\n           v\n  VLM answerer: Qwen3-VL-30B | Gemini 2.5 Pro | InternVL3\n    inputs: query + top-k page images + optional OCR text\n           |\n           v\n  answer with cited page numbers + evidence regions\n           |\n           v\n  Streamlit / Next.js viewer: highlighted boxes on source page\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Page rendering: PyMuPDF (fitz) at 180 DPI, portrait-normalized\n- Late-interaction model: ColQwen2.5-v0.2 or ColQwen3-omni (vidore team on Hugging Face)\n- Index: Vespa with multi-vector field, or Qdrant multi-vector, or AstraDB with MaxSim\n- Pruning: DocPruner 2026 policy (keep high-variance patches, 50% compression at < 0.5% accuracy loss)\n- OCR fallback (equations / dense tables): dots.ocr or Nougat\n- VLM answerer: Qwen3-VL-30B self-hosted or Gemini 2.5 Pro hosted; InternVL3 as fallback\n- Evaluation: ViDoRe v3 benchmark, M3DocVQA for multi-page reasoning\n- Viewer UI: Next.js 15 with canvas overlay for evidence regions"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why does the 2026 frontier prefer vision-first late interaction over OCR-then-text on financial PDFs and scientific papers?",
+      "options": [
+        "Vision models are cheaper per page",
+        "OCR pipelines mangle rotated tables, dense equations, and chart imagery, losing half the signal",
+        "OCR is slower than rendering",
+        "OCR cannot run on GPUs"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does late interaction mean in ColPali-style retrieval?",
+      "options": [
+        "Each query token scores against every patch token, and per-token maxima are summed via MaxSim",
+        "Embeddings are deferred until eval time",
+        "Embeddings are computed after the user clicks a result",
+        "The reranker only runs on the final candidate"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Roughly how many patch vectors does a ColQwen embedding produce per page, and what storage problem does that create?",
+      "options": [
+        "Around 2048 patch vectors per page, ballooning raw storage compared with single-vector indexes",
+        "Exactly 128 vectors, fitting cleanly in any vector DB",
+        "1 vector per page, no storage issue",
+        "16 vectors with negligible storage overhead"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does DocPruner do in this pipeline?",
+      "options": [
+        "Removes duplicate PDF pages before ingestion",
+        "Compresses the multi-vector index by keeping high-signal patches at about 50% with negligible accuracy loss",
+        "Rewrites the query embedding for shorter vectors",
+        "Crops bounding boxes around evidence regions"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why is an OCR text channel still spliced in for some pages?",
+      "options": [
+        "It improves PDF rendering quality",
+        "VLMs cannot read images at 180 DPI",
+        "OCR is the primary retrieval modality",
+        "Equation-dense and table-heavy pages benefit from a text fallback alongside the image"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Which benchmark does this capstone target for vision-first retrieval evaluation?",
+      "options": [
+        "RewardBench-2",
+        "SWE-bench Pro",
+        "ViDoRe v3",
+        "MMLU-Pro"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What does the rubric mean by evidence-region grounding?",
+      "options": [
+        "Compression ratio achieved by DocPruner",
+        "Re-ranker latency at the p99 tail",
+        "Total number of pages retrieved per query",
+        "Fraction of cited bounding boxes that actually contain the answer span"
+      ],
+      "correct": 3,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "ColPali (Illuin Tech) repository",
+      "href": "https://github.com/illuin-tech/colpali",
+      "kind": "Reading"
+    },
+    {
+      "label": "ColPali paper (arXiv:2407.01449)",
+      "href": "https://arxiv.org/abs/2407.01449",
+      "kind": "Reading"
+    },
+    {
+      "label": "ColQwen family on Hugging Face",
+      "href": "https://huggingface.co/vidore",
+      "kind": "Reading"
+    },
+    {
+      "label": "M3DocRAG (Adobe)",
+      "href": "https://arxiv.org/abs/2411.04952",
+      "kind": "Reading"
+    },
+    {
+      "label": "Vespa multi-vector tutorial",
+      "href": "https://docs.vespa.ai/en/colpali.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "Qdrant multi-vector support",
+      "href": "https://qdrant.tech/documentation/concepts/vectors/#multivectors",
+      "kind": "Reading"
+    },
+    {
+      "label": "AstraDB multi-vector",
+      "href": "https://docs.datastax.com/en/astra-db-serverless/databases/vector-search.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "Nougat OCR",
+      "href": "https://github.com/facebookresearch/nougat",
+      "kind": "Reading"
+    },
+    {
+      "label": "Doc Qa",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/outputs/skill-doc-qa.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/README.md",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/README.md",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/package.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/package.json",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/fixtures.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/src/fixtures.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/src/index.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/render.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/src/render.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/server.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/src/server.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/types.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa/code/ts/src/types.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/04-multimodal-document-qa",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/04-multimodal-document-qa"
+}

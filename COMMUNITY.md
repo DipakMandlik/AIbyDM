@@ -13,6 +13,10 @@ project direction, and a welcoming place for learners and builders to participat
 | [SUPPORT.md](./SUPPORT.md)                                               | Where to ask for help                                            |
 | [SECURITY.md](./SECURITY.md)                                             | Private vulnerability reporting                                  |
 
+## Discord Future
+
+AIByDM is currently GitHub-native: Issues for scoped work and Discussions for questions, ideas, and community collaboration. A Discord community can be added when there is enough moderation capacity to keep it useful, safe, and connected back to the public repository.
+
 ## Contribution Flow
 
 1. Discover a need through an issue, roadmap item, or discussion.
@@ -39,6 +43,8 @@ If this is your first contribution:
 - Tighten mobile layout, accessibility, or copy on a single page.
 - Add small exam, game, or newsletter content improvements.
 
+Detailed guidance: [docs/community/GOOD_FIRST_ISSUES.md](./docs/community/GOOD_FIRST_ISSUES.md).
+
 ## Discussion Templates
 
 AIByDM already includes discussion templates for:
@@ -56,6 +62,8 @@ We want contributors to feel visible and appreciated.
 - Release notes should call out meaningful contributor work.
 - High-impact documentation, design, and content improvements count as real contributions.
 - Maintainers should keep the contributors graph and changelog current.
+
+Recognition process: [docs/community/CONTRIBUTOR_RECOGNITION.md](./docs/community/CONTRIBUTOR_RECOGNITION.md).
 
 ## Hall of Fame
 
@@ -82,3 +90,5 @@ Community trust depends on reliable follow-up.
 - Close the loop on unanswered questions.
 - Document product decisions in the repo, not just in private chats.
 - Treat onboarding and recognition as part of the product.
+
+Maintainer guide: [docs/community/MAINTAINER_GUIDE.md](./docs/community/MAINTAINER_GUIDE.md).

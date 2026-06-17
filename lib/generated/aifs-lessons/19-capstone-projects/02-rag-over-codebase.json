@@ -1,0 +1,294 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/02-rag-over-codebase",
+  "slug": "02-rag-over-codebase",
+  "phaseSlug": "19-capstone-projects",
+  "number": "02",
+  "title": "Capstone 02 — RAG over Codebase (Cross-Repo Semantic Search)",
+  "summary": "Every serious engineering org in 2026 runs an internal code search that understands meaning, not just strings. Sourcegraph Amp, Cursor's codebase answers, Augment's enterprise graph, Aider's repomap, Pinterest's internal MCP — same shape....",
+  "motto": "Every serious engineering org in 2026 runs an internal code search that understands meaning, not just strings. Sourcegraph Amp, Cursor's codebase answers, Augment's enterprise graph, Aider's repomap, Pinterest's internal MCP — same shape. Ingest many repos, parse with tree-sitter, embed function- and class-level chunks, hybrid-search, re-rank, answer with citations. This capstone asks you to build one that handles 2M lines of code across 10 repos and survives incremental re-indexing on every git push.",
+  "type": "Capstone",
+  "languages": [
+    "Python (ingestion)",
+    "TypeScript (API + UI)"
+  ],
+  "prerequisites": [
+    "Phase 5 (NLP foundations)",
+    "Phase 7 (transformers)",
+    "Phase 11 (LLM engineering)",
+    "Phase 13 (tools)",
+    "Phase 17 (infrastructure)"
+  ],
+  "duration": "30 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Swap Voyage-code-3 for nomic-embed-code self-hosted. Measure the MRR@10 delta. Report whether the gap closes with re-ranking enabled.",
+    "Inject 20% generated code (LLM-produced boilerplate) into the corpus and re-evaluate. Observe retrieval poisoning. Add a \"generated\" flag to the payload and down-weight those hits.",
+    "Benchmark Qdrant hybrid search vs pgvector + pgvectorscale at your corpus size. Report p99 at batch size 1.",
+    "Add a sampling-based drift check: weekly, rerun the 100-question eval. Alert on MRR@10 drop > 5%.",
+    "Extend to cross-language symbol resolution: a Python function that calls a Go service over gRPC. Use the symbol graph to link them."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python (ingestion)",
+    "TypeScript (API + UI)",
+    "RAG",
+    "over",
+    "Codebase",
+    "Cross",
+    "Repo",
+    "Semantic",
+    "Search",
+    "AST-aware chunking",
+    "Hybrid search",
+    "Cross-encoder rerank",
+    "Prompt caching",
+    "Symbol graph",
+    "Citation faithfulness",
+    "Incremental re-index"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Every serious engineering org in 2026 runs an internal code search that understands meaning, not just strings. Sourcegraph Amp, Cursor's codebase answers, Augment's enterprise graph, Aider's repomap, Pinterest's internal MCP — same shape. Ingest many repos, parse with tree-sitter, embed function- and class-level chunks, hybrid-search, re-rank, answer with citations. This capstone asks you to build one that handles 2M lines of code across 10 repos and survives incremental re-indexing on every git push."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "By 2026 every frontier coding agent ships with a codebase retrieval layer because context windows alone do not solve cross-repo questions. Claude's 1M-token context helps; it does not eliminate the need for ranked retrieval. Naive cosine search over raw chunks poisons results on generated code, on monorepo duplication, and on the long tail of rarely-imported symbols. The production answer is a hybrid (dense + BM25) search over AST-aware chunks with a re-ranker, backed by a graph of symbol references.\n\nYou learn this by indexing a real fleet — not one tutorial repo — and measuring MRR@10, citation faithfulness, and incremental freshness. The failure modes are infrastructural: a 100k-file monorepo, a push that retouches half the files, a query that needs to cross four repos to answer correctly."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "An AST-aware ingestion pipeline parses each file with tree-sitter, extracts function and class nodes, and chunks at node boundaries rather than fixed token windows. Each chunk gets three representations: a dense embedding (Voyage-code-3 or nomic-embed-code), sparse BM25 terms, and a short natural-language summary. The summary adds a third retrievable modality — users ask \"how is X authorized\" and the summary mentions \"authz\", even if the code only has `check_permission`.\n\nRetrieval is hybrid. A query fires both dense and BM25 searches, merges top-k, and hands the union to a cross-encoder re-ranker (Cohere rerank-3 or bge-reranker-v2-gemma-2b). The re-ranked list goes to a long-context synthesizer (Claude Sonnet 4.7 with prompt caching, or Llama 3.3 70B self-hosted) with instructions to cite every claim by file and line range. Answers without citations are rejected by a post-filter.\n\nIncremental freshness is the infrastructure problem. Git push triggers a diff: which files changed, which symbols changed. Only affected chunks re-embed. Affected cross-file symbol edges (imports, method calls) get recomputed. The index stays consistent without reprocessing 2M lines each commit."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **Ingestion walker.** Iterate git history on every push hook. Collect changed files. For each file, parse with tree-sitter, extract function and class nodes with their full source span. Emit chunk records `{repo, path, start_line, end_line, symbol, body}`.\n\n2. **Chunk summarizer.** Batch chunks into Haiku 4.5 calls with prompt caching on the system preamble. Prompt: \"Summarize this function in one sentence, naming its public contract and side effects.\" Store summary alongside the chunk.\n\n3. **Embedding pool.** Two parallel queues: dense (Voyage-code-3 batch 128) and summary (same model, but on the summary string). Write vectors to Qdrant with payload `{repo, path, start_line, end_line, symbol, kind}`.\n\n4. **BM25 index.** Field-weighted Tantivy index: symbol name weight 4, symbol body weight 1, summary weight 2. Enables \"find the function named X\" queries alongside \"find the function that does X\".\n\n5. **Symbol graph.** For each chunk, record edges: imports (this file uses symbol Y from repo Z), calls (this function calls method M on class C), inheritance. Store in kuzu. Used at query time to expand retrieval across repo boundaries.\n\n6. **Query agent.** LangGraph with three nodes. `retrieve` fires dense + BM25 in parallel, deduplicates by (repo, path, symbol). `rerank` runs the cross-encoder on top-50 and keeps top-10. `synth` calls Claude Sonnet 4.7 with the reranked chunks in context, caches the system prompt, requires file:line citations.\n\n7. **Citation enforcement.** Parse the model output; any claim without a `(repo/path:start-end)` anchor gets flagged for re-ask or dropped. Return cited-only answer to the user.\n\n8. **Incremental re-index.** On each webhook, compute the symbol-level diff. Only re-embed chunks whose text changed. Recompute symbol edges for chunks whose imports changed. Measure: a 50-file push re-indexed in under 60 seconds for a 2M-LOC fleet.\n\n9. **Eval.** Label 100 cross-repo questions with gold file:line answers. Measure MRR@10, nDCG@10, citation faithfulness (fraction of claims with verifiable anchors), and p50/p99 latency."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n$ code-rag ask \"how is S3 multipart abort wired into our retry budget?\"\n[retrieve]  12 chunks dense + 7 chunks bm25, 16 unique after dedup\n[rerank]    top-5 kept (cohere rerank-3)\n[synth]     claude-sonnet-4.7, cache hit rate 68%, 2.1s\nanswer:\n  Multipart aborts are triggered by `AbortMultipartOnFail` in\n  services/uploader/retry.go:122-148, which decrements the per-bucket\n  retry budget defined in config/budgets.yaml:34-51 ...\n  citations: [services/uploader/retry.go:122-148, config/budgets.yaml:34-51,\n              libs/s3client/multipart.ts:44-61]\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "Deliverable skill `outputs/skill-codebase-rag.md`. Given a corpus of repos, it stands up the ingestion pipeline, the hybrid index, and the query agent, and returns a cited answer for any cross-repo question. Rubric:\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | Retrieval quality | MRR@10 and nDCG@10 on a 100-question held-out set |\n| 20 | Citation faithfulness | Fraction of answer claims with verifiable file:line anchors |\n| 20 | Latency and scale | p95 query latency at 10k QPS on the indexed corpus size |\n| 20 | Incremental indexing correctness | Time from git push to searchable on a 50-file commit |\n| 15 | UX and answer formatting | Citation clickability, snippet previews, follow-up affordance |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Swap Voyage-code-3 for nomic-embed-code self-hosted. Measure the MRR@10 delta. Report whether the gap closes with re-ranking enabled.\n\n2. Inject 20% generated code (LLM-produced boilerplate) into the corpus and re-evaluate. Observe retrieval poisoning. Add a \"generated\" flag to the payload and down-weight those hits.\n\n3. Benchmark Qdrant hybrid search vs pgvector + pgvectorscale at your corpus size. Report p99 at batch size 1.\n\n4. Add a sampling-based drift check: weekly, rerun the 100-question eval. Alert on MRR@10 drop > 5%.\n\n5. Extend to cross-language symbol resolution: a Python function that calls a Go service over gRPC. Use the symbol graph to link them."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| AST-aware chunking | \"Function-level splits\" | Cutting code at tree-sitter node boundaries instead of fixed token windows |\n| Hybrid search | \"Dense + sparse\" | Run BM25 and vector search in parallel, merge top-k, rerank |\n| Cross-encoder rerank | \"Second-stage rank\" | Model that scores each (query, candidate) pair together, more accurate than cosine |\n| Prompt caching | \"Cached system prompt\" | 2026 Claude / OpenAI feature that discounts repeat prefix tokens up to 90% |\n| Symbol graph | \"Code graph\" | Edges for imports, calls, inheritance across files and repos |\n| Citation faithfulness | \"Grounded answer rate\" | Fraction of claims a user can verify by clicking the anchor and reading the referenced span |\n| Incremental re-index | \"Push-to-search time\" | Wall-clock from git push to the changed symbols being queryable |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Sourcegraph Amp](https://ampcode.com) — production cross-repo code intelligence\n- [Sourcegraph Cody RAG architecture](https://sourcegraph.com/blog/how-cody-understands-your-codebase) — the reference deep-dive for this capstone\n- [Aider repo-map](https://aider.chat/docs/repomap.html) — tree-sitter ranked repo view\n- [Augment Code enterprise graph](https://www.augmentcode.com) — commercial symbol-graph RAG\n- [Qdrant hybrid search docs](https://qdrant.tech/documentation/concepts/hybrid-queries/) — reference implementation\n- [Voyage AI code embeddings](https://docs.voyageai.com/docs/embeddings) — Voyage-code-3 details\n- [Cohere rerank-3](https://docs.cohere.com/reference/rerank) — cross-encoder reference\n- [Pinterest MCP internal search](https://medium.com/pinterest-engineering) — internal-platform reference"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\ngit push --> webhook --> ingest worker (LlamaIndex Workflow)\n                           |\n                           v\n             tree-sitter parse + AST chunk\n                           |\n            +--------------+----------------+\n            v              v                v\n          dense        BM25 index       summary (LLM)\n        (Voyage / bge)  (Tantivy)        (Haiku 4.5)\n            |              |                |\n            +------> Qdrant / pgvector <----+\n                            |\n                            v\n                      symbol graph (Neo4j / kuzu)\n                            |\n  query --> LangGraph agent (retrieve -> rerank -> synth)\n                            |\n                            v\n                 Claude Sonnet 4.7 1M context\n                            |\n                            v\n                 answer + file:line citations\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Parsing: tree-sitter with 17 language grammars (Python, TS, Rust, Go, Java, C++, etc.)\n- Dense embeddings: Voyage-code-3 (hosted) or nomic-embed-code-v1.5 (self-host), bge-code-v1 fallback\n- Sparse index: Tantivy (Rust) with BM25F, field-weighted on symbol name vs body\n- Vector DB: Qdrant 1.12 with hybrid search, or pgvector + pgvectorscale for teams under 50M vectors\n- Chunk summary model: Claude Haiku 4.5 or Gemini 2.5 Flash, prompt-cached\n- Re-ranker: Cohere rerank-3 or bge-reranker-v2-gemma-2b self-hosted\n- Orchestration: LlamaIndex Workflows for ingestion, LangGraph for query agent\n- Synthesizer: Claude Sonnet 4.7 (1M context) with prompt caching\n- Symbol graph: Neo4j (managed) or kuzu (embedded) for import and call edges\n- Observability: Langfuse spans per retrieval + synthesis step"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why is naive cosine search over raw chunks insufficient for cross-repo code retrieval?",
+      "options": [
+        "It poisons results on generated code, monorepo duplication, and rarely imported symbols",
+        "Cosine similarity is undefined on code embeddings",
+        "Vector indexes cannot store payloads larger than 1KB",
+        "Embedding models do not see code as tokens"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does AST-aware chunking mean in the ingestion pipeline?",
+      "options": [
+        "Compressing chunks with gzip before storage",
+        "Dropping comments and whitespace before embedding",
+        "Cutting at tree-sitter node boundaries such as function and class spans",
+        "Splitting code into fixed 256-token windows"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which three retrievable modalities does each chunk get in this pipeline?",
+      "options": [
+        "Token IDs, syntax tree, and call graph",
+        "AST, IR, and bytecode",
+        "Raw text, gzip, and hash",
+        "Dense embedding, BM25 terms, and a natural-language summary"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What is the role of the cross-encoder reranker after the hybrid retrieval step?",
+      "options": [
+        "It rewrites the chunks to remove generated code",
+        "It re-embeds the query in a different model",
+        "It compresses the chunks before sending to the synthesizer",
+        "It scores each query-candidate pair together for higher accuracy than cosine alone"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why does the synthesizer reject answers without (repo/path:start-end) anchors?",
+      "options": [
+        "Citation faithfulness gates the answer so users can verify each claim",
+        "Anchors reduce token cost on the synthesis call",
+        "Anchors are needed for downstream BM25 reranking",
+        "Anchors are required by the vector database schema"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What does incremental re-index require to stay under 60 seconds on a 50-file push?",
+      "options": [
+        "Re-embedding only chunks whose text changed and recomputing affected symbol edges",
+        "Re-embedding the full 2M-LOC corpus on each commit",
+        "Dropping the symbol graph entirely",
+        "Throwing away the BM25 index and rebuilding it from scratch"
+      ],
+      "correct": 0,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Which metric measures whether retrieved claims are verifiable in the source?",
+      "options": [
+        "MRR@10",
+        "Citation faithfulness",
+        "nDCG@10",
+        "p95 query latency"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "Sourcegraph Amp",
+      "href": "https://ampcode.com",
+      "kind": "Reading"
+    },
+    {
+      "label": "Sourcegraph Cody RAG architecture",
+      "href": "https://sourcegraph.com/blog/how-cody-understands-your-codebase",
+      "kind": "Reading"
+    },
+    {
+      "label": "Aider repo-map",
+      "href": "https://aider.chat/docs/repomap.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "Augment Code enterprise graph",
+      "href": "https://www.augmentcode.com",
+      "kind": "Reading"
+    },
+    {
+      "label": "Qdrant hybrid search docs",
+      "href": "https://qdrant.tech/documentation/concepts/hybrid-queries/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Voyage AI code embeddings",
+      "href": "https://docs.voyageai.com/docs/embeddings",
+      "kind": "Reading"
+    },
+    {
+      "label": "Cohere rerank-3",
+      "href": "https://docs.cohere.com/reference/rerank",
+      "kind": "Reading"
+    },
+    {
+      "label": "Pinterest MCP internal search",
+      "href": "https://medium.com/pinterest-engineering",
+      "kind": "Reading"
+    },
+    {
+      "label": "Codebase RAG",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/outputs/skill-codebase-rag.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/README.md",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/README.md",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/package.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/package.json",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/corpus.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/corpus.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index_store.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index_store.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/retrieval.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/retrieval.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/server.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/server.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/02-rag-over-codebase"
+}

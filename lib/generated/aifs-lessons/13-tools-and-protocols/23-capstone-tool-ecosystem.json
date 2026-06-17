@@ -1,0 +1,137 @@
+{
+  "id": "ai-from-scratch/13-tools-and-protocols/23-capstone-tool-ecosystem",
+  "slug": "23-capstone-tool-ecosystem",
+  "phaseSlug": "13-tools-and-protocols",
+  "number": "23",
+  "title": "Capstone — Build a Complete Tool Ecosystem",
+  "summary": "Phase 13 taught every piece. This capstone wires them into one production-shaped system: an MCP server with tools + resources + prompts + tasks + UI, OAuth 2.1 at the edge, an RBAC gateway, a multi-server client, an A2A sub-agent call, OTe...",
+  "motto": "Phase 13 taught every piece. This capstone wires them into one production-shaped system: an MCP server with tools + resources + prompts + tasks + UI, OAuth 2.1 at the edge, an RBAC gateway, a multi-server client, an A2A sub-agent call, OTel tracing into a collector, tool-poisoning detection in CI, and an AGENTS.md + SKILL.md bundle. By the end you can defend every architectural choice.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Phase 13 · 01 through 21"
+  ],
+  "duration": "~120 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Compose an MCP server exposing tools, resources, prompts, and a task with a ui:// app.",
+    "Front the server with an OAuth 2.1 gateway that enforces RBAC and pinned hashes.",
+    "Write a multi-server client that traces with OTel GenAI attributes end-to-end.",
+    "Delegate part of a workload to an A2A sub-agent; verify opacity is preserved.",
+    "Package the whole stack with AGENTS.md + SKILL.md so other agents can drive it."
+  ],
+  "exercises": [
+    "Run code/main.py. Note the single trace id and how spans nest. Count how many primitives from Phase 13 the demo touches.",
+    "Extend the demo: add a second backend MCP server (e.g. bibliography) and confirm the gateway merges its tools into the same namespace.",
+    "Replace the fake A2A writer agent with a real one running on a subprocess. Use the Lesson 19 harness.",
+    "Add a PII redaction step in the routing gateway between the orchestrator and the LLM. Confirm emails in the user query get scrubbed.",
+    "Write an AGENTS.md for a teammate who will maintain this system. It should take under five minutes to read and give them everything they need to drive the capstone in Cursor or Codex."
+  ],
+  "topics": [
+    "Tools & Protocols",
+    "Build",
+    "Capstone",
+    "Complete",
+    "Tool",
+    "Ecosystem",
+    "Research and report",
+    "Trace hierarchy",
+    "Gateway-issued token",
+    "Merged namespace",
+    "Opacity boundary",
+    "Three-layer stack",
+    "Defense-in-depth",
+    "Spec compliance matrix"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Phase 13 taught every piece. This capstone wires them into one production-shaped system: an MCP server with tools + resources + prompts + tasks + UI, OAuth 2.1 at the edge, an RBAC gateway, a multi-server client, an A2A sub-agent call, OTel tracing into a collector, tool-poisoning detection in CI, and an AGENTS.md + SKILL.md bundle. By the end you can defend every architectural choice."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Compose an MCP server exposing tools, resources, prompts, and a task with a `ui://` app.\n- Front the server with an OAuth 2.1 gateway that enforces RBAC and pinned hashes.\n- Write a multi-server client that traces with OTel GenAI attributes end-to-end.\n- Delegate part of a workload to an A2A sub-agent; verify opacity is preserved.\n- Package the whole stack with AGENTS.md + SKILL.md so other agents can drive it."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Ship the \"research and report\" system:\n\n- User asks: \"summarize the three most-cited 2026 arXiv papers on agent protocols.\"\n- System: search arXiv via MCP; delegate paper summarization to a specialized writer agent via A2A; aggregate results; render an interactive report as an MCP Apps `ui://` resource; log every step to OTel.\n\nAll the primitives from Phase 13 show up. This is not a toy — production research-assistant systems shipped in 2026 by Anthropic (the Claude Research product), OpenAI (GPTs with Apps SDK), and third parties have this exact shape."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Architecture\n\n```\n[user] -> [client] -> [gateway (OAuth 2.1 + RBAC)] -> [research MCP server]\n                                                      |\n                                                      +- MCP tool: arxiv_search (pure)\n                                                      +- MCP resource: notes://recent\n                                                      +- MCP prompt: /research_topic\n                                                      +- MCP task: generate_report (long)\n                                                      +- MCP Apps UI: ui://report/current\n                                                      +- A2A call: writer-agent (tasks/send)\n                                                      |\n                                                      +- OTel GenAI spans\n```\n\n### Trace hierarchy\n\n```\nagent.invoke_agent\n ├── llm.chat (kick off)\n ├── mcp.call -> tools/call arxiv_search\n ├── mcp.call -> resources/read notes://recent\n ├── mcp.call -> prompts/get research_topic\n ├── a2a.tasks/send -> writer-agent\n │    └── task transitions (opaque internals)\n ├── mcp.call -> tools/call generate_report (task-augmented)\n │    └── tasks/status polling\n │    └── tasks/result (completed, returns ui:// resource)\n └── llm.chat (final synthesis)\n```\n\nOne trace id. Every span has the right `gen_ai.*` attributes.\n\n### Security posture\n\n- OAuth 2.1 + PKCE with resource indicator pinning audience to gateway.\n- Gateway holds upstream credentials; user never sees them.\n- RBAC: `alice` has `research:read`, `research:write`, can call all tools. `bob` has `research:read`, cannot call `generate_report`.\n- Pinned description manifest: dropped any server whose tool hashes changed.\n- Rule of Two audit: no tool combines untrusted input, sensitive data, and consequential action.\n\n### Rendering\n\nThe final `generate_report` task returns content blocks plus a `ui://report/current` resource. The client's host (Claude Desktop, etc.) renders the interactive dashboard in a sandbox iframe. The dashboard contains a sorted paper list, citation counts, and a button that calls `host.callTool('summarize_paper', {arxiv_id})` for any paper the user clicks.\n\n### Packaging\n\nThe whole thing ships as:\n\n```\nresearch-system/\n  AGENTS.md                     # project conventions\n  skills/\n    run-research/\n      SKILL.md                  # the top-level workflow\n  servers/\n    research-mcp/               # the MCP server\n      pyproject.toml\n      src/\n  agents/\n    writer/                     # the A2A agent\n  gateway/\n    config.yaml                 # RBAC + pinned manifest\n```\n\nUsers deploy with `docker compose up`. Claude Code, Cursor, Codex, and opencode users can drive the system by invoking the `run-research` skill.\n\n### What each Phase 13 lesson contributed\n\n| Lesson | What the capstone uses |\n|--------|------------------------|\n| 01-05 | Tool interface, provider-portability, parallel calls, schemas, linting |\n| 06-10 | MCP primitives, server, client, transports, resources + prompts |\n| 11-14 | Sampling, roots + elicitation, async tasks, `ui://` apps |\n| 15-17 | Tool poisoning, OAuth 2.1, gateway + registry |\n| 18 | A2A sub-agent delegation |\n| 19 | OTel GenAI tracing |\n| 20 | Routing gateway for the LLM layer |\n| 21 | SKILL.md + AGENTS.md packaging |"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "`code/main.py` stitches the previous lessons' patterns into one runnable demo. All stdlib, all in-process so you can read it end to end. It runs the full flow for the research-and-report scenario: handshake with gateway, OAuth 2.1 simulated, tools/list merged, generate_report as a task, A2A call to writer, ui:// resource returned, OTel spans emitted.\n\nWhat to look at:\n\n- One trace id across every hop.\n- Gateway policy blocks a second user from writing.\n- Task lifecycle goes working → completed and returns both text and ui:// content.\n- A2A call's inner state is opaque to the orchestrator.\n- AGENTS.md and SKILL.md are the only files another agent needs to reproduce the workflow."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces `outputs/skill-ecosystem-blueprint.md`. Given a product need (research, summarization, automation), the skill produces the full architecture: which MCP primitives, which gateway controls, which A2A calls, which telemetry, which packaging."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run `code/main.py`. Note the single trace id and how spans nest. Count how many primitives from Phase 13 the demo touches.\n\n2. Extend the demo: add a second backend MCP server (e.g. `bibliography`) and confirm the gateway merges its tools into the same namespace.\n\n3. Replace the fake A2A writer agent with a real one running on a subprocess. Use the Lesson 19 harness.\n\n4. Add a PII redaction step in the routing gateway between the orchestrator and the LLM. Confirm emails in the user query get scrubbed.\n\n5. Write an AGENTS.md for a teammate who will maintain this system. It should take under five minutes to read and give them everything they need to drive the capstone in Cursor or Codex."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Capstone | \"Phase-13 integration demo\" | End-to-end system using every primitive |\n| Research and report | \"The scenario\" | Search, summarize, render pattern |\n| Ecosystem | \"All the pieces together\" | Server + client + gateway + sub-agent + telemetry + package |\n| Trace hierarchy | \"Single trace id\" | Every hop's span shares the trace; parent-child via span ids |\n| Gateway-issued token | \"Transitive auth\" | Client sees only gateway's token; gateway holds upstream creds |\n| Merged namespace | \"All tools in one flat list\" | Multi-server merge at the gateway, prefix-on-collision |\n| Opacity boundary | \"A2A call hides internals\" | Sub-agent's reasoning invisible to orchestrator |\n| Three-layer stack | \"AGENTS.md + SKILL.md + MCP\" | Project context + workflow + tools |\n| Defense-in-depth | \"Multiple security layers\" | Pinned hashes, OAuth, RBAC, Rule of Two, audit log |\n| Spec compliance matrix | \"What we ship that the spec requires\" | Checklist mapping deliverables to 2025-11-25 requirements |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [MCP — Specification 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25) — consolidated reference\n- [MCP blog — 2026 roadmap](https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/) — where the protocol is heading\n- [a2a-protocol.org](https://a2a-protocol.org/latest/) — A2A v1.0 reference\n- [OpenTelemetry — GenAI semconv](https://opentelemetry.io/docs/specs/semconv/gen-ai/) — canonical tracing conventions\n- [Anthropic — Claude Agent SDK overview](https://code.claude.com/docs/en/agent-sdk/overview) — production agent runtime patterns"
+    }
+  ],
+  "quiz": [],
+  "resources": [
+    {
+      "label": "MCP — Specification 2025-11-25",
+      "href": "https://modelcontextprotocol.io/specification/2025-11-25",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP blog — 2026 roadmap",
+      "href": "https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/",
+      "kind": "Reading"
+    },
+    {
+      "label": "a2a-protocol.org",
+      "href": "https://a2a-protocol.org/latest/",
+      "kind": "Reading"
+    },
+    {
+      "label": "OpenTelemetry — GenAI semconv",
+      "href": "https://opentelemetry.io/docs/specs/semconv/gen-ai/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic — Claude Agent SDK overview",
+      "href": "https://code.claude.com/docs/en/agent-sdk/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "Ecosystem Blueprint",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/23-capstone-tool-ecosystem/outputs/skill-ecosystem-blueprint.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/23-capstone-tool-ecosystem/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/23-capstone-tool-ecosystem",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/13-tools-and-protocols/23-capstone-tool-ecosystem"
+}

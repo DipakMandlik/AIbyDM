@@ -1,0 +1,161 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/15-statistics-for-ml",
+  "slug": "15-statistics-for-ml",
+  "phaseSlug": "01-math-foundations",
+  "number": "15",
+  "title": "Statistics for Machine Learning",
+  "summary": "Statistics is how you know if your model actually works or just got lucky.",
+  "motto": "Statistics is how you know if your model actually works or just got lucky.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Phase 1",
+    "Lessons 06 (Probability and Distributions)",
+    "07 (Bayes' Theorem)"
+  ],
+  "duration": "~120 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Compute descriptive statistics, Pearson/Spearman correlation, and covariance matrices from scratch",
+    "Perform hypothesis tests (t-test, chi-squared) and interpret p-values and confidence intervals correctly",
+    "Use bootstrap resampling to construct confidence intervals for any metric without distributional assumptions",
+    "Distinguish statistical significance from practical significance using effect size measures"
+  ],
+  "exercises": [],
+  "topics": [
+    "Math Foundations",
+    "Build",
+    "Statistics",
+    "Machine",
+    "Learning",
+    "Mean",
+    "Median",
+    "Standard deviation",
+    "Percentile",
+    "IQR",
+    "Pearson correlation",
+    "Spearman correlation",
+    "Covariance matrix",
+    "Null hypothesis",
+    "p-value",
+    "Confidence interval",
+    "t-test"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Statistics is how you know if your model actually works or just got lucky."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Compute descriptive statistics, Pearson/Spearman correlation, and covariance matrices from scratch\n- Perform hypothesis tests (t-test, chi-squared) and interpret p-values and confidence intervals correctly\n- Use bootstrap resampling to construct confidence intervals for any metric without distributional assumptions\n- Distinguish statistical significance from practical significance using effect size measures"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You trained two models. Model A scores 0.87 on your test set. Model B scores 0.89. You deploy Model B. Three weeks later, production metrics are worse than before. What happened?\n\nModel B did not actually outperform Model A. The 0.02 difference was noise. Your test set was too small, or the variance too high, or both. You shipped randomness dressed up as improvement.\n\nThis happens constantly. Kaggle leaderboard shakeups. Papers that fail to reproduce. A/B tests that declare winners based on a few hundred samples. The root cause is always the same: someone skipped the statistics.\n\nStatistics gives you the tools to distinguish signal from noise. It tells you when a difference is real, how confident you should be, and how much data you need before you can trust a result. Every ML pipeline, every model comparison, every experiment needs statistics. Without it, you are guessing."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Descriptive Statistics: Summarizing Your Data\n\nBefore you model anything, you need to know what your data looks like. Descriptive statistics compress a dataset into a few numbers that capture its shape.\n\n**Measures of central tendency** answer \"where is the middle?\"\n\n```\nMean:   sum of all values / count\n        mu = (1/n) * sum(x_i)\n\nMedian: middle value when sorted\n        Robust to outliers. If you have [1, 2, 3, 4, 1000], the mean is 202\n        but the median is 3.\n\nMode:   most frequent value\n        Useful for categorical data. For continuous data, rarely informative.\n```\n\nThe mean is the balance point. The median is the halfway mark. When they diverge, your distribution is skewed. Income distributions have mean >> median (right skew from billionaires). Loss distributions during training often have mean << median (left skew from easy samples).\n\n**Measures of spread** answer \"how dispersed is the data?\"\n\n```\nVariance:   average squared deviation from the mean\n            sigma^2 = (1/n) * sum((x_i - mu)^2)\n\nStandard deviation:  square root of variance\n                     sigma = sqrt(sigma^2)\n                     Same units as the data, so more interpretable.\n\nRange:      max - min\n            Sensitive to outliers. Almost never useful alone.\n\nIQR:        Q3 - Q1 (interquartile range)\n            The range of the middle 50% of the data.\n            Robust to outliers. Used for box plots and outlier detection.\n```\n\n**Percentiles** divide sorted data into 100 equal parts. The 25th percentile (Q1) means 25% of values fall below this point. The 50th percentile is the median. The 75th percentile is Q3.\n\n```\nFor latency monitoring:\n  P50 = median latency        (typical user experience)\n  P95 = 95th percentile       (bad but not worst case)\n  P99 = 99th percentile       (tail latency, often 10x the median)\n```\n\nIn ML, you care about percentiles for inference latency, prediction confidence distributions, and understanding error distributions. A model with low average error but terrible P99 error might be useless for safety-critical applications.\n\n**Sample vs population statistics.** When computing variance from a sample, divide by (n-1) instead of n. This is Bessel's correction. It compensates for the fact that your sample mean is not the true population mean. With n in the denominator, you systematically underestimate the true variance. With (n-1), the estimate is unbiased.\n\n```\nPopulation variance: sigma^2 = (1/N) * sum((x_i - mu)^2)\nSample variance:     s^2     = (1/(n-1)) * sum((x_i - x_bar)^2)\n```\n\nIn practice: if n is large (thousands of samples), the difference is negligible. If n is small (dozens of samples), it matters.\n\n### Correlation: How Variables Move Together\n\nCorrelation measures the strength and direction of a linear relationship between two variables.\n\n**Pearson correlation coefficient** measures linear association:\n\n```\nr = sum((x_i - x_bar)(y_i - y_bar)) / (n * s_x * s_y)\n\nr = +1:  perfect positive linear relationship\nr = -1:  perfect negative linear relationship\nr =  0:  no linear relationship (but there might be a nonlinear one!)\n\nRange: [-1, 1]\n```\n\nPearson assumes the relationship is linear and both variables are roughly normally distributed. It is sensitive to outliers. A single extreme point can drag r from 0.1 to 0.9.\n\n**Spearman rank correlation** measures monotonic association:\n\n```\n1. Replace each value with its rank (1, 2, 3, ...)\n2. Compute Pearson correlation on the ranks\n\nSpearman catches any monotonic relationship, not just linear.\nIf y = x^3, Pearson gives r < 1 but Spearman gives rho = 1.\n```\n\n**When to use each:**\n\n```\nPearson:    Both variables are continuous and roughly normal.\n            You care about the linear relationship specifically.\n            No extreme outliers.\n\nSpearman:   Ordinal data (rankings, ratings).\n            Data is not normally distributed.\n            You suspect a monotonic but not linear relationship.\n            Outliers are present.\n```\n\n**The golden rule:** correlation does not imply causation. Ice cream sales and drowning deaths are correlated because both increase in summer. Your model's accuracy and the number of parameters are correlated, but adding parameters does not automatically improve accuracy (see: overfitting).\n\n### Covariance Matrix\n\nThe covariance between two variables measures how they vary together:\n\n```\nCov(X, Y) = (1/n) * sum((x_i - x_bar)(y_i - y_bar))\n\nCov(X, Y) > 0:  X and Y tend to increase together\nCov(X, Y) < 0:  when X increases, Y tends to decrease\nCov(X, Y) = 0:  no linear co-movement\n```\n\nFor d features, the covariance matrix C is a d x d matrix where C[i][j] = Cov(feature_i, feature_j). The diagonal entries C[i][i] are the variances of each feature.\n\n```\nC = | Var(x1)      Cov(x1,x2)  Cov(x1,x3) |\n    | Cov(x2,x1)  Var(x2)      Cov(x2,x3) |\n    | Cov(x3,x1)  Cov(x3,x2)  Var(x3)     |\n\nProperties:\n  - Symmetric: C[i][j] = C[j][i]\n  - Positive semi-definite: all eigenvalues >= 0\n  - Diagonal = variances\n  - Off-diagonal = covariances\n```\n\n**Connection to PCA.** PCA eigendecomposes the covariance matrix. The eigenvectors are the principal components (directions of maximum variance). The eigenvalues tell you how much variance each component captures. This is exactly what Lesson 10 covered, but now you see why the covariance matrix is the right thing to decompose: it encodes all pairwise linear relationships in your data.\n\n**Connection to correlation.** The correlation matrix is the covariance matrix of standardized variables (each divided by its standard deviation). Correlation normalizes covariance so all values fall in [-1, 1].\n\n### Hypothesis Testing\n\nHypothesis testing is a framework for making decisions under uncertainty. You start with a claim, collect data, and determine if the data is consistent with the claim.\n\n**The setup:**\n\n```\nNull hypothesis (H0):        the default assumption, usually \"no effect\"\nAlternative hypothesis (H1): what you are trying to show\n\nExample:\n  H0: Model A and Model B have the same accuracy\n  H1: Model B has higher accuracy than Model A\n```\n\n**The p-value** is the probability of seeing data as extreme as what you observed, assuming H0 is true. It is NOT the probability that H0 is true. This is the single most common misunderstanding in statistics.\n\n```\np-value = P(data this extreme | H0 is true)\n\nIf p-value < alpha (typically 0.05):\n    Reject H0. The result is \"statistically significant.\"\nIf p-value >= alpha:\n    Fail to reject H0. You do not have enough evidence.\n    This does NOT mean H0 is true.\n```\n\n**Confidence intervals** give a range of plausible values for a parameter:\n\n```\n95% confidence interval for the mean:\n    x_bar +/- z * (s / sqrt(n))\n\nwhere z = 1.96 for 95% confidence\n\nInterpretation: if you repeated this experiment many times, 95% of the\ncomputed intervals would contain the true mean. It does NOT mean there\nis a 95% probability the true mean is in this specific interval.\n```\n\nThe width of the confidence interval tells you about precision. Wide intervals mean high uncertainty. Narrow intervals mean your estimate is precise (but not necessarily accurate, if your data is biased).\n\n### The t-test\n\nThe t-test compares means. There are several flavors.\n\n**One-sample t-test:** is the population mean different from a hypothesized value?\n\n```\nt = (x_bar - mu_0) / (s / sqrt(n))\n\ndegrees of freedom = n - 1\n```\n\n**Two-sample t-test (independent):** are two group means different?\n\n```\nt = (x_bar_1 - x_bar_2) / sqrt(s1^2/n1 + s2^2/n2)\n\nThis is Welch's t-test, which does not assume equal variances.\nAlways use Welch's unless you have a specific reason for equal variances.\n```\n\n**Paired t-test:** when measurements come in pairs (same model evaluated on same data splits):\n\n```\nCompute d_i = x_i - y_i for each pair\nThen run a one-sample t-test on the d_i values against mu_0 = 0\n```\n\nIn ML, the paired t-test is common: you run both models on the same 10 cross-validation folds and compare their scores pairwise.\n\n### Chi-squared Test\n\nThe chi-squared test checks if observed frequencies match expected frequencies. Useful for categorical data.\n\n```\nchi^2 = sum((observed - expected)^2 / expected)\n\nExample: does a language model's output distribution match the\ntraining distribution across categories?\n\nCategory    Observed   Expected\nPositive       120        100\nNegative        80        100\nchi^2 = (120-100)^2/100 + (80-100)^2/100 = 4 + 4 = 8\n\nWith 1 degree of freedom, chi^2 = 8 gives p < 0.005.\nThe difference is significant.\n```\n\n### A/B Testing for ML Models\n\nA/B testing in ML is not the same as web A/B testing. Model comparison has specific challenges:\n\n```\n1. Same test set:    Both models must be evaluated on identical data.\n                     Different test sets make comparison meaningless.\n\n2. Multiple metrics: Accuracy alone is not enough. You need precision,\n                     recall, F1, latency, and fairness metrics.\n\n3. Variance:         Use cross-validation or bootstrap to estimate\n                     the variance of each metric, not just point estimates.\n\n4. Data leakage:     If the test set was used during model selection,\n                     your comparison is biased. Hold out a final test set.\n```\n\n**The procedure:**\n\n```\n1. Define your metric and significance level (alpha = 0.05)\n2. Run both models on the same k-fold cross-validation splits\n3. Collect paired scores: [(a1, b1), (a2, b2), ..., (ak, bk)]\n4. Compute differences: d_i = b_i - a_i\n5. Run a paired t-test on the differences\n6. Check: is the mean difference significantly different from 0?\n7. Compute a confidence interval for the mean difference\n8. Compute effect size (Cohen's d) to judge practical significance\n```\n\n### Statistical Significance vs Practical Significance\n\nA result can be statistically significant but practically meaningless. With enough data, even a trivial difference becomes statistically significant.\n\n```\nExample:\n  Model A accuracy: 0.9234\n  Model B accuracy: 0.9237\n  n = 1,000,000 test samples\n  p-value = 0.001\n\nStatistically significant? Yes.\nPractically significant? A 0.03% improvement is not worth the\nengineering cost of deploying a new model.\n```\n\n**Effect size** quantifies how big the difference is, independent of sample size:\n\n```\nCohen's d = (mean_1 - mean_2) / pooled_std\n\nd = 0.2:  small effect\nd = 0.5:  medium effect\nd = 0.8:  large effect\n```\n\nAlways report both the p-value and the effect size. The p-value tells you if the difference is real. The effect size tells you if it matters.\n\n### Multiple Comparison Problem\n\nWhen you test many hypotheses, some will be \"significant\" by chance. If you test 20 things at alpha = 0.05, you expect 1 false positive even when nothing is real.\n\n```\nP(at least one false positive) = 1 - (1 - alpha)^m\n\nm = 20 tests, alpha = 0.05:\nP(false positive) = 1 - 0.95^20 = 0.64\n\nYou have a 64% chance of at least one false positive.\n```\n\n**Bonferroni correction:** divide alpha by the number of tests.\n\n```\nAdjusted alpha = alpha / m = 0.05 / 20 = 0.0025\n\nOnly reject H0 if p-value < 0.0025.\nConservative but simple. Works when tests are independent.\n```\n\nIn ML, this matters when you compare a model across multiple metrics, test many hyperparameter configurations, or evaluate on multiple datasets.\n\n### Bootstrap Methods\n\nBootstrapping estimates the sampling distribution of a statistic by resampling your data with replacement. No assumptions about the underlying distribution required.\n\n**The algorithm:**\n\n```\n1. You have n data points\n2. Draw n samples WITH replacement (some points appear multiple times,\n   some not at all)\n3. Compute your statistic on this bootstrap sample\n4. Repeat B times (typically B = 1000 to 10000)\n5. The distribution of bootstrap statistics approximates the\n   sampling distribution\n```\n\n**Bootstrap confidence interval (percentile method):**\n\n```\nSort the B bootstrap statistics\n95% CI = [2.5th percentile, 97.5th percentile]\n```\n\n**Why bootstrap matters for ML:**\n\n```\n- Test set accuracy is a point estimate. Bootstrap gives you\n  confidence intervals.\n- You cannot assume metric distributions are normal (especially\n  for AUC, F1, precision at k).\n- Bootstrap works for ANY statistic: median, ratio of two means,\n  difference in AUC between two models.\n- No closed-form formula needed.\n```\n\n**Bootstrap for model comparison:**\n\n```\n1. You have predictions from Model A and Model B on the same test set\n2. For each bootstrap iteration:\n   a. Resample test indices with replacement\n   b. Compute metric_A and metric_B on the resampled set\n   c. Store diff = metric_B - metric_A\n3. 95% CI for the difference:\n   [2.5th percentile of diffs, 97.5th percentile of diffs]\n4. If the CI does not contain 0, the difference is significant\n```\n\nThis is more robust than the paired t-test because it makes no distributional assumptions.\n\n### Parametric vs Non-parametric Tests\n\n**Parametric tests** assume a specific distribution (usually normal):\n\n```\nt-test:         assumes normally distributed data (or large n by CLT)\nANOVA:          assumes normality and equal variances\nPearson r:      assumes bivariate normality\n```\n\n**Non-parametric tests** make no distributional assumptions:\n\n```\nMann-Whitney U:     compares two groups (replaces independent t-test)\nWilcoxon signed-rank: compares paired data (replaces paired t-test)\nSpearman rho:       correlation on ranks (replaces Pearson)\nKruskal-Wallis:     compares multiple groups (replaces ANOVA)\n```\n\n**When to use non-parametric:**\n\n```\n- Small sample size (n < 30) and data is clearly non-normal\n- Ordinal data (ratings, rankings)\n- Heavy outliers you cannot remove\n- Skewed distributions\n```\n\n**When to use parametric:**\n\n```\n- Large sample size (CLT makes the test statistic approximately normal)\n- Data is roughly symmetric without extreme outliers\n- More statistical power (better at detecting real differences)\n```\n\nIn ML experiments, you typically have small n (5 or 10 cross-validation folds), so non-parametric tests like Wilcoxon signed-rank are often more appropriate than t-tests.\n\n### Central Limit Theorem: Practical Implications\n\nThe CLT says the distribution of sample means approaches a normal distribution as n grows, regardless of the underlying population distribution.\n\n```\nIf X_1, X_2, ..., X_n are iid with mean mu and variance sigma^2:\n\n    X_bar ~ Normal(mu, sigma^2 / n)    as n -> infinity\n\nWorks for n >= 30 in most cases.\nFor highly skewed distributions, you might need n >= 100.\n```\n\n**Why this matters for ML:**\n\n```\n1. Justifies confidence intervals and t-tests on aggregated metrics\n2. Explains why averaging over cross-validation folds gives stable\n   estimates even when individual folds vary wildly\n3. Mini-batch gradient descent works because the average gradient\n   over a batch approximates the true gradient (CLT in action)\n4. Ensemble methods: averaging predictions from many models gives\n   more stable output than any single model\n```\n\n**What CLT does NOT do:**\n\n```\n- Does NOT make your data normal. It makes the MEAN of samples normal.\n- Does NOT work for heavy-tailed distributions with infinite variance\n  (Cauchy distribution).\n- Does NOT apply to dependent data (time series without correction).\n```\n\n### Common Statistical Mistakes in ML Papers\n\n1. **Testing on the training set.** Guarantees overfitting. Always hold out data the model never sees during training.\n\n2. **No confidence intervals.** Reporting a single accuracy number without uncertainty makes results unreproducible and unverifiable.\n\n3. **Ignoring multiple comparisons.** Testing 50 configurations and reporting the best one without correction inflates false positive rates.\n\n4. **Confusing statistical and practical significance.** A p-value of 0.001 on a 0.01% accuracy improvement is not meaningful.\n\n5. **Using accuracy on imbalanced data.** 99% accuracy on a dataset with 99% negative class means the model learned nothing. Use precision, recall, F1, or AUC.\n\n6. **Cherry-picking metrics.** Reporting only the metric where your model wins. Honest evaluation reports all relevant metrics.\n\n7. **Leaking information across train/test splits.** Normalizing before splitting, or using future data to predict the past.\n\n8. **Small test sets with no variance estimates.** Evaluating on 100 samples and claiming 2% improvement is noise, not signal.\n\n9. **Assuming independence when data is not independent.** Medical images from the same patient, multiple sentences from the same document. Observations within a group are correlated.\n\n10. **P-hacking.** Trying different tests, subsets, or exclusion criteria until you get p < 0.05. The result is an artifact of the search."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | Definition |\n|---|---|\n| Mean | Sum of values divided by count. Sensitive to outliers. |\n| Median | Middle value of sorted data. Robust to outliers. |\n| Standard deviation | Square root of variance. Measures spread in original units. |\n| Percentile | Value below which a given percentage of data falls. |\n| IQR | Interquartile range. Q3 minus Q1. The spread of the middle 50%. |\n| Pearson correlation | Measures linear association between two variables. Range [-1, 1]. |\n| Spearman correlation | Measures monotonic association using ranks. |\n| Covariance matrix | Matrix of pairwise covariances between all features. |\n| Null hypothesis | Default assumption of no effect or no difference. |\n| p-value | Probability of data this extreme given the null hypothesis is true. |\n| Confidence interval | Range of plausible values for a parameter at a given confidence level. |\n| t-test | Tests whether means differ significantly. Uses the t-distribution. |\n| Chi-squared test | Tests whether observed frequencies differ from expected frequencies. |\n| Effect size | Magnitude of a difference, independent of sample size. Cohen's d is common. |\n| Bonferroni correction | Divides significance threshold by number of tests to control false positives. |\n| Bootstrap | Resampling with replacement to estimate sampling distributions. |\n| Type I error | False positive. Rejecting H0 when it is true. |\n| Type II error | False negative. Failing to reject H0 when it is false. |\n| Statistical power | Probability of correctly rejecting a false H0. Power = 1 minus Type II error rate. |\n| Central limit theorem | Sample means converge to a normal distribution as sample size grows. |\n| Parametric test | Assumes a specific distribution for the data (usually normal). |\n| Non-parametric test | Makes no distributional assumptions. Works on ranks or signs. |"
+    },
+    {
+      "key": "building-it",
+      "title": "Building It",
+      "markdown": "You will implement:\n\n1. **Descriptive statistics from scratch** (mean, median, mode, standard deviation, percentiles, IQR)\n2. **Correlation functions** (Pearson and Spearman, with the covariance matrix)\n3. **Hypothesis tests** (one-sample t-test, two-sample t-test, chi-squared test)\n4. **Bootstrap confidence intervals** (for any statistic, no assumptions needed)\n5. **A/B test simulator** (generate data, test, check for Type I and Type II errors)\n6. **Statistical vs practical significance demo** (showing that large n makes everything \"significant\")\n\nAll from scratch, using only `math` and `random`. No numpy, no scipy."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does a p-value of 0.03 mean in a hypothesis test?",
+      "options": [
+        "There is a 3% probability the null hypothesis is true",
+        "There is a 3% probability of seeing data this extreme if the null hypothesis were true",
+        "The model improved by 3%",
+        "97% of the data supports the alternative hypothesis"
+      ],
+      "correct": 1,
+      "explanation": "The p-value is the probability of observing data as extreme as what you got, assuming the null hypothesis is true. It is NOT the probability that H0 is true — this is the single most common misunderstanding in statistics."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why do you divide by (n-1) instead of n when computing sample variance?",
+      "options": [
+        "It makes the computation faster",
+        "It accounts for the fact that the sample mean is not the true population mean (Bessel's correction)",
+        "It converts the variance to standard deviation",
+        "It only applies when the sample size is odd"
+      ],
+      "correct": 1,
+      "explanation": "Bessel's correction (dividing by n-1) compensates for the bias introduced by using the sample mean instead of the true population mean. Without it, sample variance systematically underestimates the true population variance."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "You test 20 different model configurations at alpha = 0.05. What is the approximate probability of at least one false positive?",
+      "options": [
+        "5%",
+        "25%",
+        "64%",
+        "95%"
+      ],
+      "correct": 2,
+      "explanation": "P(at least one false positive) = 1 - (1 - 0.05)^20 = 1 - 0.95^20 ≈ 0.64 (64%). This is the multiple comparison problem. Bonferroni correction addresses it by testing each at alpha/20 = 0.0025."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "Model A scores 0.9234 and Model B scores 0.9237 on 1 million test samples with p-value = 0.001. What should you conclude?",
+      "options": [
+        "Model B is significantly better and should be deployed immediately",
+        "The difference is statistically significant but a 0.03% improvement may not be practically significant",
+        "The test is invalid because the sample size is too large",
+        "Model A is better because it was tested first"
+      ],
+      "correct": 1,
+      "explanation": "With 1 million samples, even trivially small differences become statistically significant. The p-value confirms the difference is real, but the effect size (0.03% accuracy gain) may not justify the engineering cost of deployment. Always report both p-value and effect size."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "What advantage does bootstrap have over the paired t-test for comparing two ML models?",
+      "options": [
+        "Bootstrap always produces smaller p-values",
+        "Bootstrap requires no distributional assumptions and works for any metric (AUC, F1, median)",
+        "Bootstrap needs fewer samples to reach significance",
+        "Bootstrap can only be used with neural networks"
+      ],
+      "correct": 1,
+      "explanation": "Bootstrap resampling estimates the sampling distribution of any statistic by resampling with replacement. Unlike the t-test, it does not assume normality. It works for any metric — AUC, F1, precision@k, median — without needing a closed-form formula."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Statistical Testing",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml/outputs/skill-statistical-testing.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "statistics.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml/code/statistics.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/15-statistics-for-ml"
+}

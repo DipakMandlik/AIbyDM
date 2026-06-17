@@ -1,0 +1,293 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/16-github-issue-to-pr-agent",
+  "slug": "16-github-issue-to-pr-agent",
+  "phaseSlug": "19-capstone-projects",
+  "number": "16",
+  "title": "Capstone 16 — GitHub Issue-to-PR Autonomous Agent",
+  "summary": "AWS Remote SWE Agents, Cursor Background Agents, OpenAI Codex cloud, and Google Jules all ship the same 2026 product shape: label an issue, get a PR. Run an agent in a cloud sandbox, verify tests pass, and post a review-ready PR with ratio...",
+  "motto": "AWS Remote SWE Agents, Cursor Background Agents, OpenAI Codex cloud, and Google Jules all ship the same 2026 product shape: label an issue, get a PR. Run an agent in a cloud sandbox, verify tests pass, and post a review-ready PR with rationale. The hard parts are reproducing the repo's build environment automatically, preventing credential leakage, enforcing per-repo budgets, and making sure the agent cannot force-push. This capstone builds the self-hosted version and compares it on cost and pass rate to the hosted alternatives.",
+  "type": "Capstone",
+  "languages": [
+    "Python (agent)",
+    "TypeScript (GitHub App)",
+    "YAML (Actions)"
+  ],
+  "prerequisites": [
+    "Phase 11 (LLM engineering)",
+    "Phase 13 (tools)",
+    "Phase 14 (agents)",
+    "Phase 15 (autonomous)",
+    "Phase 17 (infrastructure)"
+  ],
+  "duration": "30 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Add a \"fix flaky test\" mode: the label @agent stabilize-flake TestX runs the test 50 times in-sandbox and proposes a minimal change that stabilizes it.",
+    "Compare cost vs Cursor Background Agents on three shared issues. Report which tools win where.",
+    "Implement a budget dashboard: per-repo per-day cost, per-user cost. Alert on anomaly.",
+    "Build a \"dry-run\" mode that opens a draft PR without running CI, so reviewers can examine the plan cheap.",
+    "Add a retention policy: PR branches older than 7 days without merge get deleted automatically."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python (agent)",
+    "TypeScript (GitHub App)",
+    "YAML (Actions)",
+    "GitHub",
+    "Issue",
+    "Autonomous",
+    "Agent",
+    "GitHub App",
+    "Async cloud agent",
+    "Environment inference",
+    "Verification",
+    "Coverage delta",
+    "Per-repo budget",
+    "Rationale"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> AWS Remote SWE Agents, Cursor Background Agents, OpenAI Codex cloud, and Google Jules all ship the same 2026 product shape: label an issue, get a PR. Run an agent in a cloud sandbox, verify tests pass, and post a review-ready PR with rationale. The hard parts are reproducing the repo's build environment automatically, preventing credential leakage, enforcing per-repo budgets, and making sure the agent cannot force-push. This capstone builds the self-hosted version and compares it on cost and pass rate to the hosted alternatives."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "The async cloud coding agent is a separate product category from interactive coding agents (capstone 01). The UX is a GitHub label. You label an issue `@agent fix this`, a worker spins up in a cloud sandbox, clones the repo, runs tests, edits files, verifies, and opens a PR with the agent's rationale in the body. No interactive loop, no terminal. AWS Remote SWE Agents, Cursor Background Agents, OpenAI Codex cloud, Google Jules, and Factory Droids all converge on this.\n\nThe engineering challenges are concrete: environment reproduction (the agent has to build the repo from scratch without a cached dev image), flaky tests (must be re-run or isolated), credential scoping (a GitHub App with minimal fine-grained permissions), budget enforcement per repo per day, and no-force-push policy. The capstone measures pass rate, cost, and safety vs the hosted alternatives."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "The trigger is a GitHub webhook (issue label or PR comment). A dispatcher enqueues work to ECS Fargate or Lambda. The worker pulls the repo into a Daytona or E2B sandbox with a generic Dockerfile inferred from the repo (language, framework). The agent runs a mini-swe-agent or SWE-agent v2 loop against Claude Opus 4.7 or GPT-5.4-Codex. It iterates: read code, propose fix, apply patch, run tests.\n\nVerification is the gating step. Full CI must pass in the sandbox before the PR opens. Coverage delta is computed; if negative beyond a threshold, the PR opens but gets labeled `needs-review`. The agent posts the rationale as the PR description plus an `@agent` thread the reviewer can ping for follow-ups.\n\nSafety is scoped through two different GitHub surfaces: the App provides a short-lived installation token with `workflows: read` and narrow repo contents/PR scopes; branch protection (not app permissions) enforces \"no direct writes to `main`\" and \"no force-push\" — the app is never added to the bypass list. Path-scoped read-only access to `.github/workflows` is not a real GitHub App primitive, so the agent's allow-list on file edits has to enforce that at the worker. Budget ceilings per repo per day are enforced at the dispatcher (e.g., max 5 PRs per repo per day, $20 per PR)."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **GitHub App.** Fine-grained installation token: issues read+write, pull_requests write, contents read+write, workflows read. Branch protection (the only surface that can do this) enforces \"no direct push to `main`\" and \"no force-push\"; the app is not in the bypass list. The worker enforces \"no writes under `.github/workflows`\" as an allow-list check on the proposed diff, since GitHub App permissions are not path-scoped.\n\n2. **Webhook receiver.** Lambda function accepts issue label / PR comment webhooks. Filters by label `@agent fix this`. Enqueues to SQS.\n\n3. **Dispatcher.** Pops tasks from SQS. Enforces per-repo per-day budget. Spins up an ECS Fargate task with the repo URL, issue body, and a fresh Daytona sandbox.\n\n4. **Environment inference.** Detect language (Python, Node, Go, Rust) and package manager (uv, pnpm, go mod, cargo). Generate a Dockerfile on the fly if one does not exist.\n\n5. **Agent loop.** mini-swe-agent or SWE-agent v2 with Claude Opus 4.7. Tools: ripgrep, tree-sitter repo-map, read_file, edit_file, run_tests, git. Hard limits: $20 cost, 30 min wall-clock, 30 agent turns.\n\n6. **Verification.** After the loop concludes, run the full test suite in-sandbox. Compute coverage delta via jacoco / coverage.py. If CI red: halt, do not open PR. If coverage drops more than 2%: open PR with `needs-review` label.\n\n7. **PR posting.** Push the agent branch. Open PR via GitHub API with: title, rationale, diff summary, trace URL, cost, turns.\n\n8. **Credential hygiene.** Worker runs with a short-lived GitHub App installation token. Logs are scrubbed for secrets before archival.\n\n9. **Eval.** 30 seeded internal issues of varying difficulty. Measure pass rate, PR quality (diff size, style, coverage), cost, latency. Compare with Cursor Background Agents and AWS Remote SWE Agents on the same issues."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n# on github.com\n  - user labels issue #842 with `@agent fix this`\n  - PR #1903 appears 14 minutes later\n  - body:\n    > Fixed NPE in widget.dedupe() caused by null comparator entry.\n    > Added regression test widget_test.go::TestDedupeNullComparator.\n    > Coverage delta: +0.12%\n    > Turns: 7  Cost: $1.80  Trace: langfuse:...\n    > Label: needs-review\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-issue-to-pr.md` is the deliverable. A GitHub App + async cloud worker that turns labeled issues into review-ready PRs with bounded cost and scoped credentials.\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | Pass rate on 30 issues | End-to-end success (CI green + coverage OK) |\n| 20 | PR quality | Diff size, coverage delta, style conformance |\n| 20 | Cost and latency per resolved issue | $ and wall-clock per PR |\n| 20 | Safety | Scoped token, per-repo budget, no force-push, credential hygiene |\n| 15 | Operator UX | Rationale comments, retry affordance, @-mention follow-up |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a \"fix flaky test\" mode: the label `@agent stabilize-flake TestX` runs the test 50 times in-sandbox and proposes a minimal change that stabilizes it.\n\n2. Compare cost vs Cursor Background Agents on three shared issues. Report which tools win where.\n\n3. Implement a budget dashboard: per-repo per-day cost, per-user cost. Alert on anomaly.\n\n4. Build a \"dry-run\" mode that opens a draft PR without running CI, so reviewers can examine the plan cheap.\n\n5. Add a retention policy: PR branches older than 7 days without merge get deleted automatically."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| GitHub App | \"Scoped bot identity\" | App with fine-grained permissions + short-lived installation token |\n| Async cloud agent | \"Background agent\" | Non-interactive worker that runs in a cloud sandbox, not a terminal |\n| Environment inference | \"Dockerfile synthesis\" | Detect language + package manager, generate a Dockerfile if absent |\n| Verification | \"CI-in-sandbox\" | Run the full test suite inside the worker before opening a PR |\n| Coverage delta | \"Coverage preservation\" | Change in test coverage % from base to agent branch |\n| Per-repo budget | \"Daily ceiling\" | Dollar and PR-count cap enforced at the dispatcher |\n| Rationale | \"PR body explanation\" | Agent's summary of what changed and why; required in the PR body |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [AWS Remote SWE Agents](https://github.com/aws-samples/remote-swe-agents) — the canonical async cloud agent reference\n- [SWE-agent](https://github.com/SWE-agent/SWE-agent) — CLI reference\n- [Cursor Background Agents](https://docs.cursor.com/background-agent) — commercial alternative\n- [OpenAI Codex (cloud)](https://openai.com/codex) — hosted competitor\n- [Google Jules](https://jules.google) — Google's hosted version\n- [Factory Droids](https://www.factory.ai) — alternate commercial reference\n- [GitHub App documentation](https://docs.github.com/en/apps) — scoped bot identity\n- [Daytona cloud sandboxes](https://daytona.io) — reference sandbox"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\nGitHub issue labeled `@agent fix` or PR comment\n            |\n            v\n    GitHub App webhook -> AWS Lambda dispatcher\n            |\n            v\n    ECS Fargate task (or GitHub Actions self-hosted runner)\n       - pull repo\n       - infer Dockerfile (language, package manager)\n       - Daytona / E2B sandbox with target runtime\n       - clone -> git worktree -> agent branch\n            |\n            v\n    mini-swe-agent / SWE-agent v2 loop\n       Claude Opus 4.7 or GPT-5.4-Codex\n       tools: ripgrep, tree-sitter, read/edit, run_tests, git\n            |\n            v\n    verify CI passes in-sandbox + coverage delta check\n            |\n            v (verified)\n    git push + open PR via GitHub App\n       PR body = rationale + diff summary + trace URL\n       label: needs-review\n            |\n            v\n    operator reviews; can @-mention agent for follow-ups\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Trigger: GitHub App with fine-grained token; webhook receiver via Lambda or Fly.io\n- Worker: ECS Fargate task (or GitHub Actions self-hosted runner)\n- Sandbox: Daytona devcontainer or E2B sandbox per task\n- Agent loop: mini-swe-agent baseline or SWE-agent v2 over Claude Opus 4.7 / GPT-5.4-Codex\n- Retrieval: tree-sitter repo-map + ripgrep\n- Verification: full CI in-sandbox + coverage delta gate\n- Observability: Langfuse with per-PR trace archive linked from the PR body\n- Budget: per-repo daily dollar ceiling; max PRs per repo per day"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "How is the async cloud coding agent triggered in production?",
+      "options": [
+        "A long-lived SSH session into a VM",
+        "A GitHub webhook fired by an issue label or PR comment, dispatched to a sandbox worker",
+        "A scheduled cron job hitting the repo",
+        "A manual file upload"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why must the agent run with a short-lived GitHub App installation token rather than a personal access token?",
+      "options": [
+        "Apps avoid GitHub rate limits entirely",
+        "App tokens grant fine-grained, scoped, short-lived credentials suited for per-task workers",
+        "Personal access tokens cannot open PRs",
+        "Apps require less code than PATs"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Which two protections prevent the agent from clobbering main?",
+      "options": [
+        "Requiring a captcha per push",
+        "Branch protection enforcing no direct push or force-push to main, with the app not on the bypass list",
+        "Encrypting the repo before clone",
+        "Disabling git on the worker"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Why is path-scoped protection for .github/workflows enforced at the worker rather than as a GitHub App permission?",
+      "options": [
+        "Workflows are stored outside the repo",
+        "Path scoping is impossible in any form",
+        "GitHub App permissions are not path-scoped, so the worker's allow-list check on the proposed diff is the right place to enforce it",
+        ".github/workflows is a virtual path"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What gating happens after the agent loop concludes, before opening a PR?",
+      "options": [
+        "The reviewer model rewrites the diff",
+        "Full CI runs in the sandbox; coverage delta is computed; PRs with a regression beyond a threshold are labeled needs-review",
+        "The PR opens immediately with no checks",
+        "The repo is force-pushed to main"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Which budget knobs does the dispatcher enforce per repo per day?",
+      "options": [
+        "Only a wall-clock cap",
+        "Unlimited PRs and unlimited cost",
+        "A dollar ceiling per PR plus a maximum number of PRs per repo per day",
+        "Only a turn cap"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What goes into the PR body that the agent posts?",
+      "options": [
+        "Only the diff",
+        "Rationale, diff summary, trace URL, cost, and turn count so reviewers can audit and follow up",
+        "A generated changelog only",
+        "Nothing; the PR has an empty body"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "AWS Remote SWE Agents",
+      "href": "https://github.com/aws-samples/remote-swe-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "SWE-agent",
+      "href": "https://github.com/SWE-agent/SWE-agent",
+      "kind": "Reading"
+    },
+    {
+      "label": "Cursor Background Agents",
+      "href": "https://docs.cursor.com/background-agent",
+      "kind": "Reading"
+    },
+    {
+      "label": "OpenAI Codex (cloud)",
+      "href": "https://openai.com/codex",
+      "kind": "Reading"
+    },
+    {
+      "label": "Google Jules",
+      "href": "https://jules.google",
+      "kind": "Reading"
+    },
+    {
+      "label": "Factory Droids",
+      "href": "https://www.factory.ai",
+      "kind": "Reading"
+    },
+    {
+      "label": "GitHub App documentation",
+      "href": "https://docs.github.com/en/apps",
+      "kind": "Reading"
+    },
+    {
+      "label": "Daytona cloud sandboxes",
+      "href": "https://daytona.io",
+      "kind": "Reading"
+    },
+    {
+      "label": "Issue To Pr",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/outputs/skill-issue-to-pr.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/README.md",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/README.md",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/package.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/package.json",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/agent.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/src/agent.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/src/index.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/router.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/src/router.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/server.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/src/server.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/types.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent/code/ts/src/types.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/16-github-issue-to-pr-agent",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/16-github-issue-to-pr-agent"
+}

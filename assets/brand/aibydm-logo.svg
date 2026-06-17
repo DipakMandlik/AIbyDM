@@ -1,0 +1,6 @@
+<svg width='180' height='180' viewBox='0 0 180 180' fill='none' xmlns='http://www.w3.org/2000/svg'>
+  <rect width='180' height='180' rx='36' fill='#0f172a'/>
+  <path d='M42 119V61h19l30 34V61h17v58H91L59 83v36H42Z' fill='#f8fafc'/>
+  <path d='M116 61h28c12 0 22 10 22 22v36h-17V83c0-2-1-4-2-5l-41 41h-23l45-45h-12V61Z' fill='#38bdf8'/>
+  <path d='M118 119h31v-17h17v17c0 10-8 18-18 18h-30v-18Z' fill='#a3e635'/>
+</svg>

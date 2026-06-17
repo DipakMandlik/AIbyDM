@@ -6,7 +6,7 @@ import { TrackDetail } from "@/components/learn/track-detail";
 import { tracks } from "@/lib/content";
 
 export function generateStaticParams() {
-  return tracks.map((t) => ({ slug: t.slug }));
+  return tracks.filter((t) => t.slug !== "ai-foundations").map((t) => ({ slug: t.slug }));
 }
 
 export async function generateMetadata({

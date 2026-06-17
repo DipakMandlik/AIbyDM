@@ -1,0 +1,232 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/09-hybrid-memory-mem0",
+  "slug": "09-hybrid-memory-mem0",
+  "phaseSlug": "14-agent-engineering",
+  "number": "09",
+  "title": "Hybrid Memory: Vector + Graph + KV (Mem0)",
+  "summary": "Mem0 (Chhikara et al., 2025) treats memory as three stores in parallel — vector for semantic similarity, KV for fast fact lookup, graph for entity-relationship reasoning. A scoring layer fuses the three on retrieval. This is the 2026 produ...",
+  "motto": "Mem0 (Chhikara et al., 2025) treats memory as three stores in parallel — vector for semantic similarity, KV for fast fact lookup, graph for entity-relationship reasoning. A scoring layer fuses the three on retrieval. This is the 2026 production standard for external memory.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phase 14 · 07 (MemGPT)",
+    "Phase 14 · 08 (Letta Blocks)"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Explain why a single store (vector only, graph only, KV only) is insufficient for agent memory.",
+    "Name Mem0's three parallel stores and what each one optimizes for.",
+    "Describe Mem0's fusion scoring — relevance, importance, recency — and why it is a weighted sum, not a hierarchy.",
+    "Implement a toy three-store memory in stdlib with an add() that writes to all three and a search() that fuses results."
+  ],
+  "exercises": [
+    "Replace the toy vector similarity with a real embedding model (sentence-transformers, Ollama, OpenAI embeddings). Measure recall@10 on a synthetic long conversation. Does the ranking drift over 1000 writes?",
+    "Add a temporal query: search(query, as_of=timestamp). Return only records valid at or before that time. Which store needs the most work?",
+    "Implement a conflict detector: if an incoming fact contradicts a graph edge, invalidate the old edge and log both. Test on \"user lives in Berlin\" -> \"user lives in Lisbon.\"",
+    "Port the fusion scorer to include a user_feedback dimension (thumbs-up on retrieved records). How do you prevent gaming (the agent only returns records it already liked)?",
+    "Read the Mem0 docs (docs.mem0.ai). Port the toy to mem0 client calls. Compare retrieval quality on the same 20 test queries."
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "Hybrid",
+    "Memory",
+    "Vector",
+    "Graph",
+    "Mem0",
+    "Hybrid memory",
+    "Fact extraction",
+    "Fusion scoring",
+    "Scope",
+    "Mem0g",
+    "Temporal invalidation",
+    "Embedding drift"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Mem0 (Chhikara et al., 2025) treats memory as three stores in parallel — vector for semantic similarity, KV for fast fact lookup, graph for entity-relationship reasoning. A scoring layer fuses the three on retrieval. This is the 2026 production standard for external memory."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Explain why a single store (vector only, graph only, KV only) is insufficient for agent memory.\n- Name Mem0's three parallel stores and what each one optimizes for.\n- Describe Mem0's fusion scoring — relevance, importance, recency — and why it is a weighted sum, not a hierarchy.\n- Implement a toy three-store memory in stdlib with an `add()` that writes to all three and a `search()` that fuses results."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "One store is wrong for one of three query classes:\n\n- **Semantic similarity** — \"what did we discuss about agent drift last week?\" Vector wins; KV and graph miss.\n- **Fact lookup** — \"what is the user's phone number?\" KV wins; vector is wasteful, graph is overkill.\n- **Relationship reasoning** — \"which customers share the same billing entity?\" Graph wins; vector and KV cannot answer.\n\nProduction agents issue all three in one session. A single-store memory is always wrong for two of them. Mem0's contribution is wiring all three behind a single `add`/`search` surface with a scoring function that fuses them."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Three stores in parallel\n\nMem0 (arXiv:2504.19413, April 2025) on `add(text, user_id, metadata)`:\n\n1. Extract candidate facts from the text (an LLM-driven step).\n2. Write each fact to the vector store (embedding) for semantic search.\n3. Write each fact to the KV store keyed on (user_id, fact_type, entity) for O(1) lookup.\n4. Write each fact to the graph store (Mem0g) as typed edges for relationship queries.\n\nOn `search(query, user_id)`:\n\n1. Vector store returns top-k by embedding cosine.\n2. KV store returns direct hits keyed on query-derived (user_id, type, entity).\n3. Graph store returns subgraph reachable from query entities.\n4. A scoring layer fuses the three.\n\n### Fusion scoring\n\n```\nscore = w_relevance * relevance(q, record)\n      + w_importance * importance(record)\n      + w_recency * recency(record)\n```\n\n- **Relevance** — vector cosine, KV exact match, graph path weight.\n- **Importance** — tagged at write time or learned (some facts matter more: names, IDs, policies).\n- **Recency** — exponential decay over time since last write or read.\n\nWeights are tuned per product. Higher `w_recency` for chat agents; higher `w_importance` for compliance agents; higher `w_relevance` for retrieval agents.\n\n### Mem0g and temporal reasoning\n\nMem0g adds a conflict detector. When a new fact contradicts an existing edge, the existing edge is marked invalid but not deleted. Temporal queries (\"what was the user's city in March?\") traverse the valid-at-time subgraph.\n\nThis is the compliance-grade behavior Letta's invalidation pattern generalizes.\n\n### Benchmark numbers\n\nThe Mem0 paper reports (2025):\n\n- **LoCoMo** (long-form conversation memory): 91.6\n- **LongMemEval** (long-horizon episodic memory): 93.4\n- **BEAM 1M** (1M-token memory benchmark): 64.1\n\nComparison baselines (full-context 128k LLM, flat vector store, flat KV) all lose by 10+ points. Benchmarks alone don't justify choice — operational shape does — but the numbers show the fusion design is not a rounding error.\n\n### Scope taxonomy\n\nMem0 splits memory by scope:\n\n- **User memory** — persists across sessions, keyed on `user_id`.\n- **Session memory** — persists within one thread.\n- **Agent memory** — per-agent instance state.\n\nEvery write picks one scope. Retrieval can query across scopes with per-scope weights. Mixing scopes without thought is how you get \"the assistant told Alice about Bob's project\" incidents.\n\n### Where this pattern goes wrong\n\n- **Embedding drift.** Vector results that look right on the first hundred queries degrade as the corpus grows. Add periodic re-embedding of the top-N-used records.\n- **KV schema creep.** `(user_id, type, entity)` looks simple until every team adds their own `type`. Audit the type set quarterly.\n- **Graph explosion.** One noisy extractor adds 50 edges per message. Cap graph writes per `add` call; drop low-confidence edges."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements the three-store pattern in stdlib:\n\n- `VectorStore` — naive token-overlap similarity as an embedding stand-in.\n- `KVStore` — dict keyed on `(user_id, fact_type, entity)`.\n- `GraphStore` — typed edges (subject, relation, object, valid).\n- `Mem0` — top-level facade with `add()`, `search()`, fusion scoring, and scope-aware retrieval.\n- A worked trace on a multi-user, multi-session conversation.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nThe output shows three separate recall paths plus the fused top-k. Flip the scoring weights at the top of `main()` and watch the ranking change."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- **Mem0 (Apache 2.0)** — production-ready. Self-host with Postgres + Qdrant + Neo4j, or use the managed cloud.\n- **Letta** — three-tier core/recall/archival; bring your own vector and graph backends.\n- **Zep** — commercial alternative with temporal KG and fact extraction.\n- **Custom builds** — when you need exact control over the extractor (compliance) or fusion weights (voice agents where recency dominates)."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-hybrid-memory.md` generates a three-store memory scaffold with a fusion scorer, scope taxonomy, and temporal invalidation wired in."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Replace the toy vector similarity with a real embedding model (sentence-transformers, Ollama, OpenAI embeddings). Measure recall@10 on a synthetic long conversation. Does the ranking drift over 1000 writes?\n2. Add a temporal query: `search(query, as_of=timestamp)`. Return only records valid at or before that time. Which store needs the most work?\n3. Implement a conflict detector: if an incoming fact contradicts a graph edge, invalidate the old edge and log both. Test on \"user lives in Berlin\" -> \"user lives in Lisbon.\"\n4. Port the fusion scorer to include a `user_feedback` dimension (thumbs-up on retrieved records). How do you prevent gaming (the agent only returns records it already liked)?\n5. Read the Mem0 docs (`docs.mem0.ai`). Port the toy to `mem0` client calls. Compare retrieval quality on the same 20 test queries."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Hybrid memory | \"Vector plus graph plus KV\" | Three stores written in parallel, fused on retrieval |\n| Fact extraction | \"Memory ingestion\" | LLM step that breaks text into (entity, relation, fact) tuples |\n| Fusion scoring | \"Relevance ranking\" | Weighted sum of relevance, importance, recency |\n| Scope | \"Memory namespace\" | user / session / agent — determines who sees what |\n| Mem0g | \"Memory graph\" | Typed edges with temporal validity for relationship queries |\n| Temporal invalidation | \"Soft delete\" | Mark contradicted edges invalid; never delete |\n| Embedding drift | \"Retrieval rot\" | Vector quality degrades as corpus grows; re-embed periodically |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Chhikara et al., Mem0 (arXiv:2504.19413)](https://arxiv.org/abs/2504.19413) — the original paper\n- [Mem0 docs](https://docs.mem0.ai/platform/overview) — production API, SDKs, managed cloud\n- [Packer et al., MemGPT (arXiv:2310.08560)](https://arxiv.org/abs/2310.08560) — the virtual-context predecessor\n- [Letta, Memory Blocks blog](https://www.letta.com/blog/memory-blocks) — the three-tier sibling design"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Which query class does a KV store handle best?",
+      "options": [
+        "Semantic similarity over long conversations",
+        "Direct fact lookup keyed by (user, type, entity)",
+        "Reachability across customers sharing a billing entity",
+        "Temporal queries valid-at-time"
+      ],
+      "correct": 1,
+      "explanation": "KV is O(1) on exact keys; vector is for similarity, graph is for relationships."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What are the three stores Mem0 writes in parallel on each add()?",
+      "options": [
+        "Vector, KV, graph",
+        "Cache, queue, log",
+        "Postgres, Redis, ClickHouse",
+        "Embedding, attention, FFN"
+      ],
+      "correct": 0,
+      "explanation": "Mem0 fans every write out to vector, KV, and graph stores."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "What three dimensions feed Mem0's fusion score?",
+      "options": [
+        "Relevance, importance, recency",
+        "Precision, recall, F1",
+        "Latency, throughput, cost",
+        "Confidence, perplexity, BLEU"
+      ],
+      "correct": 0,
+      "explanation": "Score is a weighted sum of relevance, importance, and recency; weights tune per product."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does Mem0g do when an incoming fact contradicts an existing edge?",
+      "options": [
+        "Deletes the edge",
+        "Marks the existing edge invalid but does not delete it, so temporal queries can still traverse",
+        "Raises an exception",
+        "Rewrites the user_id"
+      ],
+      "correct": 1,
+      "explanation": "Soft invalidation preserves history for temporal (valid-at-time) queries."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "Why does the lesson recommend tuning fusion weights per product?",
+      "options": [
+        "Providers require it",
+        "Recency dominates for chat agents while importance dominates for compliance agents and relevance dominates for retrieval agents",
+        "Vector libraries reject equal weights",
+        "It is required by Apache 2.0"
+      ],
+      "correct": 1,
+      "explanation": "Different products want different bias on relevance/importance/recency; one set of weights does not fit all."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What is the scope taxonomy Mem0 uses?",
+      "options": [
+        "Public, private, secret",
+        "User, session, agent",
+        "Local, regional, global",
+        "Read, write, admin"
+      ],
+      "correct": 1,
+      "explanation": "Scopes are user (cross-session), session (one thread), agent (per-instance state)."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "What is embedding drift in this pattern, and how does the lesson recommend mitigating it?",
+      "options": [
+        "Vectors get encrypted; rotate keys",
+        "Vector retrieval quality degrades as the corpus grows; periodically re-embed the top-N most used records",
+        "Embeddings overflow integers; switch to float64",
+        "The embedding API changes URL; pin a domain"
+      ],
+      "correct": 1,
+      "explanation": "Periodic re-embedding of hot records keeps retrieval quality steady as the corpus grows."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Chhikara et al., Mem0 (arXiv:2504.19413)",
+      "href": "https://arxiv.org/abs/2504.19413",
+      "kind": "Reading"
+    },
+    {
+      "label": "Mem0 docs",
+      "href": "https://docs.mem0.ai/platform/overview",
+      "kind": "Reading"
+    },
+    {
+      "label": "Packer et al., MemGPT (arXiv:2310.08560)",
+      "href": "https://arxiv.org/abs/2310.08560",
+      "kind": "Reading"
+    },
+    {
+      "label": "Letta, Memory Blocks blog",
+      "href": "https://www.letta.com/blog/memory-blocks",
+      "kind": "Reading"
+    },
+    {
+      "label": "Hybrid Memory",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/09-hybrid-memory-mem0/outputs/skill-hybrid-memory.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/09-hybrid-memory-mem0/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/09-hybrid-memory-mem0",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/09-hybrid-memory-mem0"
+}

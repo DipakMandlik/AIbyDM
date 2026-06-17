@@ -1,0 +1,204 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/47-checkpoint-save-resume",
+  "slug": "47-checkpoint-save-resume",
+  "phaseSlug": "19-capstone-projects",
+  "number": "47",
+  "title": "Checkpoint Save and Resume",
+  "summary": "Train interrupts kill runs; checkpoints let them continue. Save model, optimizer, scheduler, loss history, step counter, and RNG state, atomically, so a kill at any moment leaves a valid file on disk.",
+  "motto": "Train interrupts kill runs; checkpoints let them continue. Save model, optimizer, scheduler, loss history, step counter, and RNG state, atomically, so a kill at any moment leaves a valid file on disk.",
+  "type": "Build",
+  "languages": [
+    "Python"
+  ],
+  "prerequisites": [
+    "Phase 19 lessons 42 to 45"
+  ],
+  "duration": "~90 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Capture the full training state into a single payload that can be reloaded into a fresh process.",
+    "Implement atomic save with write-to-temp then rename so a crash never leaves a half-written file.",
+    "Restore the RNG state for Python, NumPy, and PyTorch so the post-resume loss matches the uninterrupted baseline.",
+    "Build a sharded checkpoint layout for models that no longer fit in a single file, with hash-verified shards and a JSON index."
+  ],
+  "exercises": [
+    "Replace round-robin sharding with sharding by parameter group (layers ending in .weight vs .bias). When is each layout preferable?",
+    "Extend the save loop to keep the last K checkpoints and prune older ones. What is the right K when the disk is small?",
+    "Add a --ckpt-every-seconds flag that triggers a save on a wallclock interval, not just step count.",
+    "Add a checksum verification path that runs at startup, scans every checkpoint in the directory, and reports which ones are corrupt.",
+    "Implement a migrate_v1_to_v2 function that adds a new field to the payload and bumps the schema string. Make load tolerate both versions."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Build",
+    "Python",
+    "Checkpoint",
+    "Save",
+    "Resume",
+    "Atomic save",
+    "State dict",
+    "Sharded checkpoint",
+    "RNG state",
+    "Mid-epoch resume"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Train interrupts kill runs; checkpoints let them continue. Save model, optimizer, scheduler, loss history, step counter, and RNG state, atomically, so a kill at any moment leaves a valid file on disk."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Capture the full training state into a single payload that can be reloaded into a fresh process.\n- Implement atomic save with write-to-temp then rename so a crash never leaves a half-written file.\n- Restore the RNG state for Python, NumPy, and PyTorch so the post-resume loss matches the uninterrupted baseline.\n- Build a sharded checkpoint layout for models that no longer fit in a single file, with hash-verified shards and a JSON index."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You set a training job for 18 hours. The wallclock cap is 4 hours. The cluster reboots at hour 11 because someone above your pay grade approved a kernel upgrade. Without checkpoints you start over. Without resume you also lose the optimizer state that took the first 11 hours to learn, so even if the model weights survived, the AdamW moments are gone and the next step lurches in a direction the training trajectory had already moved past.\n\nThe right artifact is a single file that holds everything needed to continue: model parameters, optimizer state, scheduler state, the loss history for plots, the current step and epoch and batch-in-epoch counters, and the RNG state for every source of randomness. Without the RNG state the resumed loss curve is a different curve. Same model, same data, different shuffle, different dropout mask, different number on the dashboard.\n\nAtomic save is the other half of the contract. Writing into the final filename means a crash mid-write leaves a corrupt file; the resume reads garbage. Writing into a temporary file in the same directory and then renaming means a crash mid-write leaves the previous good file untouched. The rename is atomic on POSIX file systems."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart TD\n  ckpt[checkpoint payload] --> m[model state_dict]\n  ckpt --> o[optimizer state_dict]\n  ckpt --> s[scheduler state_dict]\n  ckpt --> tr[train state: step, epoch, batch_in_epoch, losses]\n  ckpt --> rng[rng state: python, numpy, torch_cpu, torch_cuda]\n  ckpt --> meta[wall_saved_at, schema]\n  ckpt --> write[atomic write: tmp file then os.replace]\n```\n\n### The five state buckets\n\n| Bucket | Why it matters |\n|--------|----------------|\n| Model | Weights and buffers; what the model is. |\n| Optimizer | Momentum and adaptive moments; without these the next step is a different optimization problem. |\n| Scheduler | Where the learning rate is on its curve; cosine schedules in particular care. |\n| Train counters | Step, epoch, batch-in-epoch, plus the loss history that draws the dashboard. |\n| RNG state | Determinism for dropout, data shuffling, and any sampling inside the model. |\n\n### Atomic save\n\n```mermaid\nflowchart LR\n  payload[payload] --> tmpf[write to .ckpt.pt.XXXX.tmp]\n  tmpf --> rename[os.replace to ckpt.pt]\n  rename --> done[ckpt.pt is valid]\n  crash1[crash before rename] --> orig[ckpt.pt unchanged]\n  crash2[crash after rename] --> done\n```\n\nTwo rules. First, the temporary file lives in the same directory as the target so the rename stays within the same file system; cross-device renames are not atomic. Second, the temporary name is unique per attempt so two writers do not stomp.\n\n### Sharded checkpoints\n\nWhen the model gets large the single-file payload becomes too big to load fast, too big to inspect, and too painful when a network share hiccups mid-read. The fix is to split the parameter state into shards and write a small index that ties them together.\n\n```mermaid\nflowchart LR\n  state[state_dict] --> split[split keys round robin into N shards]\n  split --> s0[model.shard-000.pt]\n  split --> s1[model.shard-001.pt]\n  split --> sN[model.shard-NNN.pt]\n  s0 --> idx[index.json]\n  s1 --> idx\n  sN --> idx\n  meta[meta.pt: optimizer + scheduler + train_state + rng] --> idx\n```\n\nThe index records the shard count, the sha256 of each shard, and the sha256 of the meta file. The loader fails loudly when any hash mismatches. The shards can land on different physical disks; the meta is small and reads first.\n\n### Resume continues mid epoch\n\nA resume that snaps to the start of the next epoch wastes anywhere from minutes to a day. The fix is `(epoch, batch_in_epoch)` plus the RNG state. After load, the training loop fast-forwards the random number generator past the batches already consumed in the current epoch and continues from `batch_in_epoch`. The lesson code does this exactly; the assertion is that the loss trajectory after resume matches the uninterrupted baseline within 1e-4."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` provides four primitives and a demo driver.\n\n### Step 1: capture and restore RNG state\n\n`capture_rng_state` returns a dict with Python's `random.getstate`, NumPy's `np.random.get_state`, and PyTorch CPU and CUDA RNG bytes. `restore_rng_state` reverses it. The CPU tensor is a uint8 byte buffer that PyTorch's RNG knows how to consume.\n\n### Step 2: atomic save\n\n`atomic_save` writes the payload to a temp file in the target directory, then `os.replace` swaps it into the final name. `atomic_write_json` does the same for the sharded index.\n\n### Step 3: full checkpoint round trip\n\n`save_checkpoint` packages the model, optimizer, scheduler, train state, and RNG into one dict. `load_checkpoint` reverses it and returns a `TrainState`. The schema field is the upgrade hook: future format changes bump the version string and the loader dispatches.\n\n### Step 4: sharded variant\n\n`save_sharded_checkpoint` round-robins the parameter keys across N shards, writes each shard with its own atomic save, writes a meta file with optimizer and scheduler and train state, and writes the JSON index with shard sha256s. `load_sharded_checkpoint` verifies every shard before merging.\n\n### Step 5: resume demo\n\n`run_resume_demo` trains a small model for `total_steps`, saves a checkpoint at `interrupt_at`, then continues. A second process restores the checkpoint and runs the remaining steps. The function returns the max absolute difference between the two loss trajectories after the interruption point. With RNG restored, the difference is zero or floating-point noise.\n\nRun it:\n\n```bash\npython3 code/main.py\n```\n\nThe single-file and sharded demos both assert max-diff under 1e-4. The summary lands in `outputs/resume-demo.json`."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Production training stacks ship checkpointing as part of the trainer. The shape is the same: model + optimizer + scheduler + counters + RNG, written atomically, named by step so the latest is easy to find. Sharded layouts power large model loading with parallel reads; the index.json is what makes that work.\n\nThree patterns to enforce:\n\n- **Schema is a string in the payload.** Migrations branch on it. Without it you cannot evolve the format without breaking old runs.\n- **Sha256 every shard.** A silently truncated download is the worst kind of bug; the loader fails fast or it fails late.\n- **Keep checkpoint cadence honest.** Save every N steps and every wallclock-minute, whichever is shorter. Otherwise the long step that crashes wastes a full window of work."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-checkpoint-save-resume.md` is the recipe for any new training script: payload shape, atomic write, RNG capture, sharded index. Drop the skill into a repo, wire `save_checkpoint` at the periodic save site, wire `load_checkpoint` at startup, and the run survives kills."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Replace round-robin sharding with sharding by parameter group (layers ending in `.weight` vs `.bias`). When is each layout preferable?\n2. Extend the save loop to keep the last K checkpoints and prune older ones. What is the right K when the disk is small?\n3. Add a `--ckpt-every-seconds` flag that triggers a save on a wallclock interval, not just step count.\n4. Add a checksum verification path that runs at startup, scans every checkpoint in the directory, and reports which ones are corrupt.\n5. Implement a `migrate_v1_to_v2` function that adds a new field to the payload and bumps the schema string. Make load tolerate both versions."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Atomic save | \"Write and pray\" | Write to a temp file in the same directory, then os.replace into the target name |\n| State dict | \"The weights\" | Model parameters and buffers, keyed by parameter name |\n| Sharded checkpoint | \"Big model file\" | Multiple files, one per shard, plus a meta file and a JSON index with sha256s |\n| RNG state | \"Random seed\" | Captured state for python random, numpy, torch CPU, torch CUDA; not just the seed |\n| Mid-epoch resume | \"Restart\" | Fast-forward the RNG and continue from the next batch in the same epoch |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- POSIX `rename` semantics for the atomicity claim that `os.replace` relies on.\n- PyTorch documentation on `torch.save` and `torch.load`, including `map_location` for cross-device restores.\n- Phase 19 lesson 46 covers the gradient accumulation that this lesson's checkpoint payload survives across.\n- Phase 19 lesson 48 covers the distributed wrappers whose state dict format this scheme accommodates.\n- The Linux kernel `fsync` documentation for the durability guarantee behind atomic rename."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Which set best describes a complete training checkpoint?",
+      "options": [
+        "Model weights only",
+        "Model state, optimizer state, scheduler state, step counters, loss history, and RNG state for python, numpy, torch CPU, torch CUDA",
+        "Just the loss history",
+        "Anything torch.save() can serialize"
+      ],
+      "correct": 1,
+      "explanation": "Resume must walk the same trajectory. Without optimizer moments, scheduler position, and RNG state the resumed loss is a different curve."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why does the saver write to a temporary file and then rename instead of writing the target name directly?",
+      "options": [
+        "Faster I/O",
+        "POSIX rename within the same directory is atomic, so a crash mid-write leaves the previous good file in place rather than a half-written file at the target name",
+        "It dedupes the file",
+        "It bypasses fsync"
+      ],
+      "correct": 1,
+      "explanation": "atomic_save calls os.replace from a temp file in the same directory. Cross-device renames lose atomicity, which is why the temp file must live in the target directory."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why does a sharded checkpoint store a sha256 in index.json per shard?",
+      "options": [
+        "For SEO",
+        "So the loader can detect a truncated or tampered shard at load time instead of silently merging a bad state_dict",
+        "To compress the file",
+        "Because torch requires it"
+      ],
+      "correct": 1,
+      "explanation": "load_sharded_checkpoint asserts each shard's actual hash matches the recorded one and the meta file's hash too. Silent corruption is the worst failure mode."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "How does resume continue at the right offset inside the current epoch?",
+      "options": [
+        "It skips to the next epoch boundary",
+        "TrainState records (epoch, batch_in_epoch) and the RNG state is restored, so the loader fast-forwards the generator past the batches already consumed before continuing",
+        "It uses a special database",
+        "It always restarts from step 0"
+      ],
+      "correct": 1,
+      "explanation": "Without (epoch, batch_in_epoch) you snap to the next epoch boundary and waste work. Without RNG you see different batches. Both are required."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What does the schema field on the payload buy you?",
+      "options": [
+        "Nothing",
+        "A migration hook: future format changes bump the schema string and the loader can dispatch on it instead of breaking old runs",
+        "A pretty filename",
+        "Compression"
+      ],
+      "correct": 1,
+      "explanation": "The lesson uses ckpt.v1; the next version is ckpt.v2 with a migrate function. Without the field, format evolution requires breakage."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Reading the resume demo summary, what does max_loss_diff_after_resume near 0 prove?",
+      "options": [
+        "Nothing useful",
+        "That the post-resume loss trajectory matches the uninterrupted baseline within floating point noise, which means the RNG state and the optimizer state were both restored faithfully",
+        "That the model is good",
+        "That the disk is fast"
+      ],
+      "correct": 1,
+      "explanation": "If you forget RNG you see a different curve and a non-trivial diff. If you forget optimizer state the diff is huge. The near-zero number is the contract."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Resume Demo",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/47-checkpoint-save-resume/outputs/resume-demo.json",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Checkpoint Save Resume",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/47-checkpoint-save-resume/outputs/skill-checkpoint-save-resume.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/47-checkpoint-save-resume/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "test_main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/47-checkpoint-save-resume/code/test_main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/47-checkpoint-save-resume",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/47-checkpoint-save-resume"
+}

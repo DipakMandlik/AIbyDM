@@ -1,0 +1,163 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/12-debugging-and-profiling",
+  "slug": "12-debugging-and-profiling",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "12",
+  "title": "Debugging and Profiling",
+  "summary": "The worst AI bugs don't crash. They train silently on garbage and report a beautiful loss curve.",
+  "motto": "The worst AI bugs don't crash. They train silently on garbage and report a beautiful loss curve.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Lesson 1 (Dev Environment)",
+    "basic PyTorch familiarity"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Use conditional breakpoint() and debug_print to inspect tensor shapes, dtypes, and NaN values mid-training",
+    "Profile training loops with cProfile, line_profiler, and tracemalloc to find bottlenecks",
+    "Detect common AI bugs: shape mismatches, NaN loss, data leakage, and wrong-device tensors",
+    "Set up TensorBoard to visualize loss curves, weight histograms, and gradient distributions"
+  ],
+  "exercises": [
+    "Run debug_tools.py and read through each section's output. Modify the dummy model to introduce a NaN (hint: divide by zero in the forward pass) and watch the detector catch it.",
+    "Profile a training loop with cProfile and identify the slowest function.",
+    "Use tracemalloc to find which line in your data loading pipeline allocates the most memory.",
+    "Set up TensorBoard for a simple training run and identify whether the model is overfitting.",
+    "Use breakpoint() inside a training loop. Practice inspecting tensor shapes, devices, and gradient values from the debugger prompt."
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Build",
+    "Debugging",
+    "Profiling"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> The worst AI bugs don't crash. They train silently on garbage and report a beautiful loss curve."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Use conditional `breakpoint()` and `debug_print` to inspect tensor shapes, dtypes, and NaN values mid-training\n- Profile training loops with `cProfile`, `line_profiler`, and `tracemalloc` to find bottlenecks\n- Detect common AI bugs: shape mismatches, NaN loss, data leakage, and wrong-device tensors\n- Set up TensorBoard to visualize loss curves, weight histograms, and gradient distributions"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "AI code fails differently than regular code. A web app crashes with a stack trace. A misconfigured training loop runs for 8 hours, burns $200 in GPU time, and produces a model that predicts the mean of every input. The code never errored. The bug was a tensor on the wrong device, a forgotten `.detach()`, or labels leaking into features.\n\nYou need debugging tools that catch these silent failures before they waste your time and compute."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "AI debugging operates at three levels:\n\n```mermaid\ngraph TD\n    L3[\"3. Training Dynamics<br/>Loss curves, gradient norms, activations\"] --> L2\n    L2[\"2. Tensor Operations<br/>Shapes, dtypes, devices, NaN/Inf values\"] --> L1\n    L1[\"1. Standard Python<br/>Breakpoints, logging, profiling, memory\"]\n```\n\nMost people jump straight to level 3 (staring at TensorBoard). But 80% of AI bugs live at levels 1 and 2."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Part 1: Print Debugging (Yes, It Works)\n\nPrint debugging gets dismissed. It shouldn't. For tensor code, a targeted print statement beats stepping through a debugger because you need to see shapes, dtypes, and value ranges all at once.\n\n```python\ndef debug_print(name, tensor):\n    print(f\"{name}: shape={tensor.shape}, dtype={tensor.dtype}, \"\n          f\"device={tensor.device}, \"\n          f\"min={tensor.min().item():.4f}, max={tensor.max().item():.4f}, \"\n          f\"mean={tensor.mean().item():.4f}, \"\n          f\"has_nan={tensor.isnan().any().item()}\")\n```\n\nCall this after every suspicious operation. When the bug is found, remove the prints. Simple.\n\n### Part 2: Python Debugger (pdb and breakpoint)\n\nThe built-in debugger is underrated for AI work. Drop `breakpoint()` into your training loop and inspect tensors interactively.\n\n```python\ndef training_step(model, batch, criterion, optimizer):\n    inputs, labels = batch\n    outputs = model(inputs)\n    loss = criterion(outputs, labels)\n\n    if loss.item() > 100 or torch.isnan(loss):\n        breakpoint()\n\n    loss.backward()\n    optimizer.step()\n```\n\nWhen the debugger drops you in, useful commands:\n\n- `p outputs.shape` to check shapes\n- `p loss.item()` to see the loss value\n- `p torch.isnan(outputs).sum()` to count NaNs\n- `p model.fc1.weight.grad` to check gradients\n- `c` to continue, `q` to quit\n\nThis is conditional debugging. You only stop when something looks wrong. For a 10,000-step training run, that matters.\n\n### Part 3: Python Logging\n\nReplace print statements with logging when your debugging goes beyond a quick check.\n\n```python\nimport logging\n\nlogging.basicConfig(\n    level=logging.INFO,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\",\n    handlers=[\n        logging.FileHandler(\"training.log\"),\n        logging.StreamHandler()\n    ]\n)\nlogger = logging.getLogger(__name__)\n\nlogger.info(\"Starting training: lr=%.4f, batch_size=%d\", lr, batch_size)\nlogger.warning(\"Loss spike detected: %.4f at step %d\", loss.item(), step)\nlogger.error(\"NaN loss at step %d, stopping\", step)\n```\n\nLogging gives you timestamps, severity levels, and file output. When a training run fails at 3 AM, you want a log file, not terminal output that scrolled off screen.\n\n### Part 4: Timing Code Sections\n\nKnowing where time goes is the first step to optimization.\n\n```python\nimport time\n\nclass Timer:\n    def __init__(self, name=\"\"):\n        self.name = name\n\n    def __enter__(self):\n        self.start = time.perf_counter()\n        return self\n\n    def __exit__(self, *args):\n        elapsed = time.perf_counter() - self.start\n        print(f\"[{self.name}] {elapsed:.4f}s\")\n\nwith Timer(\"data loading\"):\n    batch = next(dataloader_iter)\n\nwith Timer(\"forward pass\"):\n    outputs = model(batch)\n\nwith Timer(\"backward pass\"):\n    loss.backward()\n```\n\nCommon finding: data loading takes 60% of training time. The fix is `num_workers > 0` in your DataLoader, not a faster GPU.\n\n### Part 5: cProfile and line_profiler\n\nWhen you need more than manual timers:\n\n```bash\npython -m cProfile -s cumtime train.py\n```\n\nThis shows every function call sorted by cumulative time. For line-by-line profiling:\n\n```bash\npip install line_profiler\n```\n\n```python\n@profile\ndef train_step(model, data, target):\n    output = model(data)\n    loss = F.cross_entropy(output, target)\n    loss.backward()\n    return loss\n\n# Run with: kernprof -l -v train.py\n```\n\n### Part 6: Memory Profiling\n\n#### CPU Memory with tracemalloc\n\n```python\nimport tracemalloc\n\ntracemalloc.start()\n\n# your code here\nmodel = build_model()\ndata = load_dataset()\n\nsnapshot = tracemalloc.take_snapshot()\ntop_stats = snapshot.statistics(\"lineno\")\nfor stat in top_stats[:10]:\n    print(stat)\n```\n\n#### CPU Memory with memory_profiler\n\n```bash\npip install memory_profiler\n```\n\n```python\nfrom memory_profiler import profile\n\n@profile\ndef load_data():\n    raw = read_csv(\"data.csv\")       # watch memory jump here\n    processed = preprocess(raw)       # and here\n    return processed\n```\n\nRun with `python -m memory_profiler your_script.py` to see line-by-line memory usage.\n\n#### GPU Memory with PyTorch\n\n```python\nimport torch\n\nif torch.cuda.is_available():\n    print(torch.cuda.memory_summary())\n\n    print(f\"Allocated: {torch.cuda.memory_allocated() / 1e9:.2f} GB\")\n    print(f\"Cached: {torch.cuda.memory_reserved() / 1e9:.2f} GB\")\n```\n\nWhen you hit OOM (Out of Memory):\n\n1. Reduce batch size (first thing to try, always)\n2. Use `torch.cuda.empty_cache()` to free cached memory\n3. Use `del tensor` followed by `torch.cuda.empty_cache()` for large intermediates\n4. Use mixed precision (`torch.cuda.amp`) to halve memory usage\n5. Use gradient checkpointing for very deep models\n\n### Part 7: Common AI Bugs and How to Catch Them\n\n#### Shape Mismatch\n\nThe most frequent bug. A tensor has shape `[batch, features]` when the model expects `[batch, channels, height, width]`.\n\n```python\ndef check_shapes(model, sample_input):\n    print(f\"Input: {sample_input.shape}\")\n    hooks = []\n\n    def make_hook(name):\n        def hook(module, inp, out):\n            in_shape = inp[0].shape if isinstance(inp, tuple) else inp.shape\n            out_shape = out.shape if hasattr(out, \"shape\") else type(out)\n            print(f\"  {name}: {in_shape} -> {out_shape}\")\n        return hook\n\n    for name, module in model.named_modules():\n        hooks.append(module.register_forward_hook(make_hook(name)))\n\n    with torch.no_grad():\n        model(sample_input)\n\n    for h in hooks:\n        h.remove()\n```\n\nRun this once with a sample batch. It maps every shape transformation in your model.\n\n#### NaN Loss\n\nNaN loss means something exploded. Common causes:\n\n- Learning rate too high\n- Division by zero in custom loss\n- Log of zero or negative number\n- Exploding gradients in RNNs\n\n```python\ndef detect_nan(model, loss, step):\n    if torch.isnan(loss):\n        print(f\"NaN loss at step {step}\")\n        for name, param in model.named_parameters():\n            if param.grad is not None:\n                if torch.isnan(param.grad).any():\n                    print(f\"  NaN gradient in {name}\")\n                if torch.isinf(param.grad).any():\n                    print(f\"  Inf gradient in {name}\")\n        return True\n    return False\n```\n\n#### Data Leakage\n\nYour model gets 99% accuracy on the test set. Sounds great. It's a bug.\n\n```python\ndef check_data_leakage(train_set, test_set, id_column=\"id\"):\n    train_ids = set(train_set[id_column].tolist())\n    test_ids = set(test_set[id_column].tolist())\n    overlap = train_ids & test_ids\n    if overlap:\n        print(f\"DATA LEAKAGE: {len(overlap)} samples in both train and test\")\n        return True\n    return False\n```\n\nAlso check for temporal leakage: using future data to predict the past. Sort by timestamp before splitting.\n\n#### Wrong Device\n\nTensors on different devices (CPU vs GPU) cause runtime errors. But sometimes a tensor silently stays on CPU while everything else is on GPU, and training just runs slowly.\n\n```python\ndef check_devices(model, *tensors):\n    model_device = next(model.parameters()).device\n    print(f\"Model device: {model_device}\")\n    for i, t in enumerate(tensors):\n        if t.device != model_device:\n            print(f\"  WARNING: tensor {i} on {t.device}, model on {model_device}\")\n```\n\n### Part 8: TensorBoard Basics\n\nTensorBoard shows you what's happening inside training over time.\n\n```bash\npip install tensorboard\n```\n\n```python\nfrom torch.utils.tensorboard import SummaryWriter\n\nwriter = SummaryWriter(\"runs/experiment_1\")\n\nfor step in range(num_steps):\n    loss = train_step(model, batch)\n\n    writer.add_scalar(\"loss/train\", loss.item(), step)\n    writer.add_scalar(\"lr\", optimizer.param_groups[0][\"lr\"], step)\n\n    if step % 100 == 0:\n        for name, param in model.named_parameters():\n            writer.add_histogram(f\"weights/{name}\", param, step)\n            if param.grad is not None:\n                writer.add_histogram(f\"grads/{name}\", param.grad, step)\n\nwriter.close()\n```\n\nLaunch it:\n\n```bash\ntensorboard --logdir=runs\n```\n\nWhat to look for:\n\n- **Loss not decreasing**: Learning rate too low, or model architecture issue\n- **Loss oscillating wildly**: Learning rate too high\n- **Loss goes to NaN**: Numerical instability (see NaN section above)\n- **Train loss decreasing, val loss increasing**: Overfitting\n- **Weight histograms collapsing to zero**: Vanishing gradients\n- **Gradient histograms exploding**: Need gradient clipping\n\n### Part 9: VS Code Debugger\n\nFor interactive debugging, configure VS Code with a `launch.json`:\n\n```json\n{\n    \"version\": \"0.2.0\",\n    \"configurations\": [\n        {\n            \"name\": \"Debug Training\",\n            \"type\": \"debugpy\",\n            \"request\": \"launch\",\n            \"program\": \"${file}\",\n            \"console\": \"integratedTerminal\",\n            \"justMyCode\": false\n        }\n    ]\n}\n```\n\nSet breakpoints by clicking the gutter. Use the Variables pane to inspect tensor properties. The Debug Console lets you run arbitrary Python expressions mid-execution.\n\nUseful for stepping through data preprocessing pipelines where you want to see each transformation."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Here's the debugging workflow that catches most AI bugs:\n\n1. **Before training**: Run `check_shapes` with a sample batch. Verify input and output dimensions match expectations.\n2. **First 10 steps**: Use `debug_print` on loss, outputs, and gradients. Confirm nothing is NaN and values are in reasonable ranges.\n3. **During training**: Log loss, learning rate, and gradient norms. Use TensorBoard for visualization.\n4. **When something breaks**: Drop `breakpoint()` at the failure point. Inspect tensors interactively.\n5. **For performance**: Time your data loading vs forward vs backward pass. Profile memory if you're near OOM."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "Run the debugging toolkit script:\n\n```bash\npython phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.py\n```\n\nSee `outputs/prompt-debug-ai-code.md` for a prompt that helps diagnose AI-specific bugs."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run `debug_tools.py` and read through each section's output. Modify the dummy model to introduce a NaN (hint: divide by zero in the forward pass) and watch the detector catch it.\n2. Profile a training loop with `cProfile` and identify the slowest function.\n3. Use `tracemalloc` to find which line in your data loading pipeline allocates the most memory.\n4. Set up TensorBoard for a simple training run and identify whether the model is overfitting.\n5. Use `breakpoint()` inside a training loop. Practice inspecting tensor shapes, devices, and gradient values from the debugger prompt."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What makes debugging AI/ML code fundamentally different from debugging a typical web application?",
+      "options": [
+        "AI code uses different programming languages",
+        "AI bugs often don't crash -- they silently produce incorrect results with no error messages",
+        "AI code cannot be debugged with standard tools like print statements",
+        "AI code always requires a GPU to debug"
+      ],
+      "correct": 1,
+      "explanation": "The worst AI bugs produce valid-looking output. A misconfigured training loop might run for hours without errors while the model learns nothing useful, unlike web apps that crash with stack traces."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What does a profiler measure?",
+      "options": [
+        "Whether the code produces correct output",
+        "How much time and memory each part of the code consumes",
+        "How many bugs exist in the codebase",
+        "The code coverage of unit tests"
+      ],
+      "correct": 1,
+      "explanation": "Profilers measure resource consumption -- execution time per function, memory allocation, and GPU utilization -- helping you find bottlenecks and optimize performance."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Your model achieves 99% accuracy on the test set. What AI-specific bug should you suspect first?",
+      "options": [
+        "The model has too many parameters",
+        "Data leakage -- test samples may have leaked into the training set",
+        "The learning rate is too high",
+        "The batch size is too large"
+      ],
+      "correct": 1,
+      "explanation": "Suspiciously high accuracy often indicates data leakage -- overlap between training and test data, or features that contain the target label. Always check for train/test overlap."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "What is the most common finding when profiling a training loop's time breakdown?",
+      "options": [
+        "The backward pass takes 90% of the time",
+        "Data loading takes more time than the forward and backward passes combined",
+        "Writing logs takes the most time",
+        "GPU memory allocation is the bottleneck"
+      ],
+      "correct": 1,
+      "explanation": "Data loading often takes 60%+ of training time when num_workers=0 in the DataLoader. The fix is setting num_workers > 0 to load data in parallel with GPU computation."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "You see NaN loss at step 500. Which approach will help you find the root cause?",
+      "options": [
+        "Restart training from scratch with a different random seed",
+        "Use detect_nan to check for NaN/Inf in gradients and add breakpoint() at the failure point",
+        "Increase the batch size to stabilize gradients",
+        "Switch from Adam to SGD optimizer"
+      ],
+      "correct": 1,
+      "explanation": "First identify WHERE the NaN originates by checking gradients for each parameter. A conditional breakpoint at the NaN step lets you inspect tensor values interactively. Common causes: learning rate too high, log(0), or division by zero."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Debug AI Code",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/12-debugging-and-profiling/outputs/prompt-debug-ai-code.md",
+      "kind": "Prompt"
+    },
+    {
+      "label": "debug_tools.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/12-debugging-and-profiling/code/debug_tools.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/12-debugging-and-profiling",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/12-debugging-and-profiling"
+}

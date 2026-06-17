@@ -1,0 +1,145 @@
+{
+  "id": "ai-from-scratch/13-tools-and-protocols/12-mcp-roots-and-elicitation",
+  "slug": "12-mcp-roots-and-elicitation",
+  "phaseSlug": "13-tools-and-protocols",
+  "number": "12",
+  "title": "Roots and Elicitation — Scoping and Mid-Flight User Input",
+  "summary": "Hard-coded paths break the moment a user opens a different project. Pre-filled tool arguments break when the user under-specifies. Roots scope the server to a user-controlled set of URIs; elicitation pauses mid-tool-call to ask the user fo...",
+  "motto": "Hard-coded paths break the moment a user opens a different project. Pre-filled tool arguments break when the user under-specifies. Roots scope the server to a user-controlled set of URIs; elicitation pauses mid-tool-call to ask the user for structured input via a form or URL. Two client primitives, two fixes for common MCP failure modes. SEP-1036 (URL-mode elicitation, 2025-11-25) is experimental through H1 2026 — check SDK versions before depending on it.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib",
+    "roots + elicitation demo)"
+  ],
+  "prerequisites": [
+    "Phase 13 · 07 (MCP server)"
+  ],
+  "duration": "~45 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Declare roots and respond to notifications/roots/list_changed.",
+    "Restrict server file operations to URIs inside the declared root set.",
+    "Use elicitation/create to ask the user for a confirmation or structured input mid-tool-call.",
+    "Choose between form-mode and URL-mode elicitation (the latter is experimental; drift-risk noted)."
+  ],
+  "exercises": [
+    "Run code/main.py. Trigger the disambiguation path; confirm the simulated user answer gets routed back to the tool.",
+    "Add a new tool notes_archive that requires elicitation confirmation every time (destructive hint). Check the UX: how does this compare to the model re-asking in text?",
+    "Implement URL-mode elicitation for a first-run OAuth flow. Note the drift risk and add an SDK-version guard.",
+    "Extend roots/list handling: when a notification arrives, the server should atomically re-read and rescan open file handles that might now be out of scope.",
+    "Read the SEP-1036 issue discussion thread on GitHub. Identify one open question that affects how servers should handle URL-mode callbacks."
+  ],
+  "topics": [
+    "Tools & Protocols",
+    "Build",
+    "Python (stdlib",
+    "roots + elicitation demo)",
+    "Roots",
+    "Elicitation",
+    "Scoping",
+    "Mid",
+    "Flight",
+    "User",
+    "Input",
+    "Root",
+    "roots/list",
+    "notifications/roots/list_changed",
+    "elicitation/create",
+    "Form mode",
+    "URL mode",
+    "accept / decline / cancel",
+    "Disambiguation",
+    "Flat form"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Hard-coded paths break the moment a user opens a different project. Pre-filled tool arguments break when the user under-specifies. Roots scope the server to a user-controlled set of URIs; elicitation pauses mid-tool-call to ask the user for structured input via a form or URL. Two client primitives, two fixes for common MCP failure modes. SEP-1036 (URL-mode elicitation, 2025-11-25) is experimental through H1 2026 — check SDK versions before depending on it."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Declare `roots` and respond to `notifications/roots/list_changed`.\n- Restrict server file operations to URIs inside the declared root set.\n- Use `elicitation/create` to ask the user for a confirmation or structured input mid-tool-call.\n- Choose between form-mode and URL-mode elicitation (the latter is experimental; drift-risk noted)."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Two concrete failures a notes MCP server hits in production.\n\n**Broken path assumption.** The server is written against `~/notes`. A user on a different machine with notes in `~/Documents/Notes` gets a tool call that fails silently (no file found) or worse, wrote to the wrong place.\n\n**Missing argument the user would know.** The user asks \"delete the old TPS report note\". The model calls `notes_delete(title: \"TPS report\")` but there are three matching notes from 2023, 2024, and 2025. The tool cannot guess. Failing with \"ambiguous\" is annoying; running on all three is catastrophic.\n\nRoots fix the first: the client declares at `initialize` the set of URIs the server may touch. Elicitation fixes the second: the server pauses the tool call and sends `elicitation/create` to ask the user to pick which one."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Roots\n\nThe client declares a root list at `initialize`:\n\n```json\n{\n  \"capabilities\": {\"roots\": {\"listChanged\": true}}\n}\n```\n\nServer can then call `roots/list`:\n\n```json\n{\"roots\": [{\"uri\": \"file:///Users/alice/Documents/Notes\", \"name\": \"Notes\"}]}\n```\n\nServers MUST treat roots as the boundary: any file read or write outside the root set is rejected. This is not enforced by the client (the server is still code the user trusted), but spec-compliant servers honor it.\n\nWhen the user adds or removes a root, the client sends `notifications/roots/list_changed`. The server re-calls `roots/list` and updates its boundary.\n\n### Why roots are a client primitive\n\nRoots are declared by the client because they represent the user's consent model. The user told Claude Desktop \"give this notes server access to these two directories\". The server cannot widen that scope.\n\n### Elicitation: the form-mode default\n\n`elicitation/create` takes a form schema plus a natural-language prompt:\n\n```json\n{\n  \"method\": \"elicitation/create\",\n  \"params\": {\n    \"message\": \"Delete 'TPS report'? Multiple notes match; pick one.\",\n    \"requestedSchema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"note_id\": {\n          \"type\": \"string\",\n          \"enum\": [\"note-3\", \"note-7\", \"note-14\"]\n        },\n        \"confirm\": {\"type\": \"boolean\"}\n      },\n      \"required\": [\"note_id\", \"confirm\"]\n    }\n  }\n}\n```\n\nClient renders a form, collects the user's answer, returns:\n\n```json\n{\n  \"action\": \"accept\",\n  \"content\": {\"note_id\": \"note-14\", \"confirm\": true}\n}\n```\n\nThree possible actions: `accept` (user filled it), `decline` (user closed it), `cancel` (user aborted the whole tool call).\n\nForm schemas are flat — nested objects are not supported in v1. SDKs typically reject anything more complex than a single layer.\n\n### Elicitation: URL mode (SEP-1036, experimental)\n\nNew in 2025-11-25. Instead of a schema, the server sends a URL:\n\n```json\n{\n  \"method\": \"elicitation/create\",\n  \"params\": {\n    \"message\": \"Sign in to GitHub\",\n    \"url\": \"https://github.com/login/oauth/authorize?client_id=...\"\n  }\n}\n```\n\nClient opens the URL in a browser, waits for completion, returns when the user comes back. Useful for OAuth flows, payment authorization, and document signing where a form is insufficient.\n\nDrift-risk note: the SEP-1036 response shape is still settling; some SDKs return the callback URL, others return a completion token. Read your SDK's release notes before using URL mode in production.\n\n### When elicitation is the right tool\n\n- User confirmation before destructive actions (destructive hint + elicitation).\n- Disambiguation (pick one of N matches).\n- First-run setup (API keys, directories, preferences).\n- OAuth-style flows (URL mode).\n\n### When elicitation is wrong\n\n- Filling a tool's required arguments that the model could have asked for in prose. Use a normal re-prompt, not an elicitation dialog.\n- High-frequency calls. Elicitation interrupts the conversation; do not fire it inside a loop.\n- Anything the server could validate after the fact. Validate, return an error, let the model ask the user in text.\n\n### Human-in-the-loop bridge\n\nElicitation plus sampling together enable MCP's \"human-in-the-loop\" model. A server's agent loop can pause for either user input (elicitation) or model reasoning (sampling). Phase 13 · 11 covered sampling; this lesson covers elicitation. Put them together for full mid-loop control."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "`code/main.py` extends the notes server with:\n\n- `roots/list` response that the server re-queries after root-list-changed notifications.\n- A `notes_delete` tool that uses `elicitation/create` to disambiguate when multiple notes match.\n- A `notes_setup` tool that uses URL-mode elicitation to open a first-run config page (simulated).\n- A boundary check that refuses operations on URIs outside the declared roots.\n\nThe demo runs three scenarios: happy path (one match), disambiguation (three matches, elicitation fires), out-of-root-write (rejected)."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces `outputs/skill-elicitation-form-designer.md`. Given a tool that might need user confirmation or disambiguation, the skill designs the elicitation form schema and the message template."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run `code/main.py`. Trigger the disambiguation path; confirm the simulated user answer gets routed back to the tool.\n\n2. Add a new tool `notes_archive` that requires elicitation confirmation every time (destructive hint). Check the UX: how does this compare to the model re-asking in text?\n\n3. Implement URL-mode elicitation for a first-run OAuth flow. Note the drift risk and add an SDK-version guard.\n\n4. Extend `roots/list` handling: when a notification arrives, the server should atomically re-read and rescan open file handles that might now be out of scope.\n\n5. Read the SEP-1036 issue discussion thread on GitHub. Identify one open question that affects how servers should handle URL-mode callbacks."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Root | \"Consent boundary\" | URI the client has allowed the server to touch |\n| `roots/list` | \"Server asks for scope\" | Client returns the current root set |\n| `notifications/roots/list_changed` | \"User changed scope\" | Client signals the root set has mutated |\n| Elicitation | \"Ask the user mid-call\" | Server-initiated request for structured user input |\n| `elicitation/create` | \"The method\" | JSON-RPC method for elicitation requests |\n| Form mode | \"Schema-driven form\" | Flat JSON Schema rendered as a form in the client UI |\n| URL mode | \"Browser redirect\" | SEP-1036 experimental; opens a URL and waits |\n| `accept` / `decline` / `cancel` | \"User response outcomes\" | Three branches the server handles |\n| Disambiguation | \"Pick one\" | Common elicitation use case when a tool has N candidates |\n| Flat form | \"Top-level properties only\" | Elicitation schemas cannot nest |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [MCP — Client roots spec](https://modelcontextprotocol.io/specification/draft/client/roots) — canonical roots reference\n- [MCP — Client elicitation spec](https://modelcontextprotocol.io/specification/draft/client/elicitation) — canonical elicitation reference\n- [Cisco — What's new in MCP elicitation, structured content, OAuth enhancements](https://blogs.cisco.com/developer/whats-new-in-mcp-elicitation-structured-content-and-oauth-enhancements) — 2025-11-25 additions walk-through\n- [MCP — GitHub SEP-1036](https://github.com/modelcontextprotocol/modelcontextprotocol) — URL-mode elicitation proposal (experimental, drift-risk)\n- [The New Stack — How elicitation brings human-in-the-loop to AI tools](https://thenewstack.io/how-elicitation-in-mcp-brings-human-in-the-loop-to-ai-tools/) — UX walkthrough"
+    }
+  ],
+  "quiz": [],
+  "resources": [
+    {
+      "label": "MCP — Client roots spec",
+      "href": "https://modelcontextprotocol.io/specification/draft/client/roots",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP — Client elicitation spec",
+      "href": "https://modelcontextprotocol.io/specification/draft/client/elicitation",
+      "kind": "Reading"
+    },
+    {
+      "label": "Cisco — What's new in MCP elicitation, structured content, OAuth enhancements",
+      "href": "https://blogs.cisco.com/developer/whats-new-in-mcp-elicitation-structured-content-and-oauth-enhancements",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP — GitHub SEP-1036",
+      "href": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+      "kind": "Reading"
+    },
+    {
+      "label": "The New Stack — How elicitation brings human-in-the-loop to AI tools",
+      "href": "https://thenewstack.io/how-elicitation-in-mcp-brings-human-in-the-loop-to-ai-tools/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Elicitation Form Designer",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/outputs/skill-elicitation-form-designer.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/12-mcp-roots-and-elicitation/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/12-mcp-roots-and-elicitation",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/13-tools-and-protocols/12-mcp-roots-and-elicitation"
+}

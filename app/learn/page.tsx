@@ -7,7 +7,7 @@ import { TrackGrid } from "@/components/learn/track-grid";
 
 export const metadata: Metadata = {
   title: "Learn AI - AIByDM",
-  description: "Structured AI learning tracks with guided progression, hands-on projects, and clear milestones.",
+  description: "Structured AI learning with AI From Scratch, phase progression, hands-on projects, and clear milestones.",
 };
 
 export default function LearnPage() {
@@ -16,12 +16,12 @@ export default function LearnPage() {
       <SiteNav />
       <PageHero
         eyebrow="Learn"
-        title="Structured paths"
-        highlight="from curious to capable."
-        description="Guided tracks that take you step by step from the fundamentals of AI to shipping real projects. Pick a path, follow the milestones, and learn by building."
+        title="Learn by phase"
+        highlight="from scratch to shipped."
+        description="Start with AI From Scratch, a phase-based curriculum that takes you from setup and math foundations through LLMs, agents, infrastructure, safety, and capstones. Keep exploring focused AIByDM tracks when you need a smaller path."
         meta={[
-          { value: "4", label: "Tracks" },
-          { value: "400+", label: "Lessons" },
+          { value: "20", label: "Phases" },
+          { value: "500+", label: "Lessons" },
           { value: "Free", label: "Forever" },
         ]}
       />
@@ -31,3 +31,4 @@ export default function LearnPage() {
     </main>
   );
 }
+

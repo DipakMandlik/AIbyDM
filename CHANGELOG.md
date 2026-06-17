@@ -33,5 +33,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Kept validation, deployment, CodeQL, and dependency review workflows in the public release surface.
 - Prepared GitHub Pages, release notes, discussions, and repository discoverability for open-source growth.
 
-[Unreleased]: https://github.com/DipakMandlik/AIbyDM/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/DipakMandlik/AIbyDM/releases/tag/v0.1.0
+[Unreleased]: https://github.com/DipakMandlik/AIByDM/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/DipakMandlik/AIByDM/releases/tag/v0.1.0

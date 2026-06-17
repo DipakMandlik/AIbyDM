@@ -7,10 +7,10 @@ get help depends on what you need.
 
 | Need              | Use                                                                                    |
 | ----------------- | -------------------------------------------------------------------------------------- |
-| General questions | [GitHub Discussions](https://github.com/DipakMandlik/AIbyDM/discussions)               |
-| Bug reports       | [Bug report issue form](https://github.com/DipakMandlik/AIbyDM/issues/new/choose)      |
-| Feature ideas     | [Feature request issue form](https://github.com/DipakMandlik/AIbyDM/issues/new/choose) |
-| Content requests  | [Content request issue form](https://github.com/DipakMandlik/AIbyDM/issues/new/choose) |
+| General questions | [GitHub Discussions](https://github.com/DipakMandlik/AIByDM/discussions)               |
+| Bug reports       | [Bug report issue form](https://github.com/DipakMandlik/AIByDM/issues/new/choose)      |
+| Feature ideas     | [Feature request issue form](https://github.com/DipakMandlik/AIByDM/issues/new/choose) |
+| Content requests  | [Content request issue form](https://github.com/DipakMandlik/AIByDM/issues/new/choose) |
 | Security concerns | Follow [SECURITY.md](SECURITY.md)                                                      |
 
 ## Response Expectations

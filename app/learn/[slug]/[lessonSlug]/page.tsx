@@ -13,10 +13,12 @@ import {
 } from "@/lib/content";
 
 export function generateStaticParams() {
-  return getAllLessons().map(({ track, lesson }) => ({
-    slug: track.slug,
-    lessonSlug: lesson.slug,
-  }));
+  return getAllLessons()
+    .filter(({ track }) => track.slug !== "ai-foundations")
+    .map(({ track, lesson }) => ({
+      slug: track.slug,
+      lessonSlug: lesson.slug,
+    }));
 }
 
 export async function generateMetadata({
@@ -25,6 +27,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string; lessonSlug: string }>;
 }): Promise<Metadata> {
   const { slug, lessonSlug } = await params;
+  if (slug === "ai-foundations") notFound();
   const match = getLesson(slug, lessonSlug);
   if (!match) return { title: "Lesson not found - AIByDM" };
   return {

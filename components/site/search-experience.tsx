@@ -8,7 +8,9 @@ import { getSearchItems, type SearchKind } from "@/lib/content";
 const filters: { label: string; value: "all" | SearchKind }[] = [
   { label: "All", value: "all" },
   { label: "Learn", value: "track" },
+  { label: "Phases", value: "phase" },
   { label: "Lessons", value: "lesson" },
+  { label: "Topics", value: "topic" },
   { label: "Projects", value: "project" },
   { label: "Tools", value: "tool" },
   { label: "Games", value: "game" },
@@ -18,7 +20,7 @@ const filters: { label: string; value: "all" | SearchKind }[] = [
 
 function matchesFilter(kind: SearchKind, filter: "all" | SearchKind) {
   if (filter === "all") return true;
-  if (filter === "track") return kind === "track" || kind === "module";
+  if (filter === "track") return kind === "track" || kind === "module" || kind === "phase" || kind === "topic";
   return kind === filter;
 }
 
@@ -56,7 +58,7 @@ export function SearchExperience() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             className="w-full bg-transparent text-xl outline-none placeholder:text-muted-foreground"
-            placeholder="Search tracks, lessons, projects, tools..."
+            placeholder="Search phases, lessons, topics, projects, tools..."
             autoFocus
           />
         </label>
@@ -114,3 +116,4 @@ export function SearchExperience() {
     </section>
   );
 }
+

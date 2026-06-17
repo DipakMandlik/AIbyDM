@@ -1,0 +1,171 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/08-editor-setup",
+  "slug": "08-editor-setup",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "08",
+  "title": "Editor Setup",
+  "summary": "Your editor is your co-pilot. Configure it once so it stays out of your way and starts pulling its weight.",
+  "motto": "Your editor is your co-pilot. Configure it once so it stays out of your way and starts pulling its weight.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Phase 0",
+    "Lesson 01"
+  ],
+  "duration": "~20 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Install VS Code with essential extensions for Python, Jupyter, linting, and remote SSH",
+    "Configure format-on-save, type checking, and notebook output scrolling for AI workflows",
+    "Set up Remote SSH to edit and debug code on remote GPU machines as if they were local",
+    "Evaluate editor alternatives (Cursor, Windsurf, Neovim) and their tradeoffs for AI work"
+  ],
+  "exercises": [
+    "Install VS Code and all extensions listed in Step 2",
+    "Copy the settings.json from this lesson into your VS Code config",
+    "Open a Python file and verify that Pylance shows type hints and Black formats on save",
+    "If you have access to a remote machine, set up Remote SSH and open a folder on it"
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Build",
+    "Editor",
+    "Setup",
+    "LSP",
+    "Pylance",
+    "Remote SSH",
+    "Format on save"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Your editor is your co-pilot. Configure it once so it stays out of your way and starts pulling its weight."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Install VS Code with essential extensions for Python, Jupyter, linting, and remote SSH\n- Configure format-on-save, type checking, and notebook output scrolling for AI workflows\n- Set up Remote SSH to edit and debug code on remote GPU machines as if they were local\n- Evaluate editor alternatives (Cursor, Windsurf, Neovim) and their tradeoffs for AI work"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You'll spend thousands of hours inside your editor writing Python, running notebooks, debugging training loops, and SSH-ing into GPU boxes. A misconfigured editor turns every session into friction: no autocomplete, no type hints, no inline errors, manual formatting, and a clunky terminal workflow.\n\nThe right setup takes 20 minutes. Skipping it costs you 20 minutes every day."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "An AI engineering editor setup needs five things:\n\n```mermaid\ngraph TD\n    L5[\"5. Remote Development<br/>SSH into GPU boxes, cloud VMs\"] --> L4\n    L4[\"4. Terminal Integration<br/>Run scripts, debug, monitor GPU\"] --> L3\n    L3[\"3. AI-Specific Settings<br/>Auto-format, type checking, rulers\"] --> L2\n    L2[\"2. Extensions<br/>Python, Jupyter, Pylance, GitLens\"] --> L1\n    L1[\"1. Base Editor<br/>VS Code — free, extensible, universal\"]\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Install VS Code\n\nVS Code is the recommended editor. It is free, runs on every OS, has first-class Jupyter notebook support, and the extension ecosystem covers everything you need for AI work.\n\nDownload it from [code.visualstudio.com](https://code.visualstudio.com/).\n\nVerify from the terminal:\n\n```bash\ncode --version\n```\n\nIf `code` is not found on macOS, open VS Code, press `Cmd+Shift+P`, type \"Shell Command\", and select \"Install 'code' command in PATH\".\n\n### Step 2: Install Essential Extensions\n\nOpen the integrated terminal in VS Code (`Ctrl+`` ` or `` Cmd+` ``) and install the extensions that matter for AI work:\n\n```bash\ncode --install-extension ms-python.python\ncode --install-extension ms-python.vscode-pylance\ncode --install-extension ms-toolsai.jupyter\ncode --install-extension eamodio.gitlens\ncode --install-extension ms-vscode-remote.remote-ssh\ncode --install-extension ms-python.debugpy\ncode --install-extension ms-python.black-formatter\ncode --install-extension charliermarsh.ruff\n```\n\nWhat each one does:\n\n| Extension | Why |\n|-----------|-----|\n| Python | Language support, virtual env detection, run/debug |\n| Pylance | Fast type checking, autocomplete, import resolution |\n| Jupyter | Run notebooks inside VS Code, variable explorer |\n| GitLens | See who changed what, inline git blame |\n| Remote SSH | Open a folder on a remote GPU box as if it were local |\n| Debugpy | Step-through debugging for Python |\n| Black Formatter | Auto-format on save, consistent style |\n| Ruff | Fast linting, catches common mistakes |\n\nThe file `code/.vscode/extensions.json` in this lesson contains the full recommendations list. When you open the project folder, VS Code will prompt you to install them.\n\n### Step 3: Configure Settings\n\nCopy the settings from `code/.vscode/settings.json` in this lesson, or apply them manually through `Settings > Open Settings (JSON)`.\n\nThe key settings for AI work:\n\n```jsonc\n{\n    \"python.analysis.typeCheckingMode\": \"basic\",\n    \"editor.formatOnSave\": true,\n    \"editor.rulers\": [88, 120],\n    \"notebook.output.scrolling\": true,\n    \"files.autoSave\": \"afterDelay\"\n}\n```\n\nWhy these matter:\n\n- **Type checking on basic**: Catches wrong argument types before you run. Saves debugging time on tensor shape mismatches and wrong API parameters.\n- **Format on save**: Never think about formatting again. Black handles it.\n- **Rulers at 88 and 120**: Black wraps at 88. The 120 marker shows when docstrings and comments are getting too long.\n- **Notebook output scrolling**: Training loops print thousands of lines. Without scrolling, the output panel explodes.\n- **Auto-save**: You will forget to save. Your training script will run stale code. Auto-save prevents that.\n\n### Step 4: Terminal Integration\n\nVS Code's integrated terminal is where you run training scripts, monitor GPUs, and manage environments.\n\nSet it up properly:\n\n```jsonc\n{\n    \"terminal.integrated.defaultProfile.osx\": \"zsh\",\n    \"terminal.integrated.defaultProfile.linux\": \"bash\",\n    \"terminal.integrated.fontSize\": 13,\n    \"terminal.integrated.scrollback\": 10000\n}\n```\n\nUseful shortcuts:\n\n| Action | macOS | Linux/Windows |\n|--------|-------|---------------|\n| Toggle terminal | `` Ctrl+` `` | `` Ctrl+` `` |\n| New terminal | `Ctrl+Shift+`` ` | `Ctrl+Shift+`` ` |\n| Split terminal | `Cmd+\\` | `Ctrl+\\` |\n\nSplit terminals are useful: one for running your script, one for monitoring GPU with `nvidia-smi -l 1` or `watch -n 1 nvidia-smi`.\n\n### Step 5: Remote Development (SSH into GPU Boxes)\n\nThis is the most important extension for AI work. You will run training on remote machines (cloud VMs, lab servers, Lambda, Vast.ai). Remote SSH lets you open the remote filesystem, edit files, run terminals, and debug as if everything were local.\n\nSetup:\n\n1. Install the Remote SSH extension (done in Step 2).\n2. Press `Ctrl+Shift+P` (or `Cmd+Shift+P`), type \"Remote-SSH: Connect to Host\".\n3. Enter `user@your-gpu-box-ip`.\n4. VS Code installs its server component on the remote machine automatically.\n\nFor passwordless access, set up SSH keys:\n\n```bash\nssh-keygen -t ed25519 -C \"your-email@example.com\"\nssh-copy-id user@your-gpu-box-ip\n```\n\nAdd the host to `~/.ssh/config` for convenience:\n\n```\nHost gpu-box\n    HostName 203.0.113.50\n    User ubuntu\n    IdentityFile ~/.ssh/id_ed25519\n    ForwardAgent yes\n```\n\nNow `Remote-SSH: Connect to Host > gpu-box` connects instantly."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "With this setup, your daily workflow looks like:\n\n1. Open the project folder in VS Code (or connect via Remote SSH to a GPU box).\n2. Write Python in the editor with autocomplete, type hints, and inline errors.\n3. Run Jupyter notebooks inline with the Jupyter extension.\n4. Use the integrated terminal for training scripts, `uv pip install`, and GPU monitoring.\n5. Review changes with GitLens before committing."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Install VS Code and all extensions listed in Step 2\n2. Copy the `settings.json` from this lesson into your VS Code config\n3. Open a Python file and verify that Pylance shows type hints and Black formats on save\n4. If you have access to a remote machine, set up Remote SSH and open a folder on it"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| LSP | \"Autocomplete engine\" | Language Server Protocol: a standard for editors to get type info, completions, and diagnostics from a language-specific server |\n| Pylance | \"The Python plugin\" | Microsoft's Python language server using Pyright for type checking and IntelliSense |\n| Remote SSH | \"Working on the server\" | VS Code extension that runs a lightweight server on a remote machine and streams the UI to your local editor |\n| Format on save | \"Auto-prettier\" | The editor runs a formatter (Black, Ruff) every time you save, so code style is always consistent |"
+    },
+    {
+      "key": "alternatives",
+      "title": "Alternatives",
+      "markdown": "### Cursor\n\n[cursor.com](https://cursor.com) is a VS Code fork with built-in AI code generation. It uses the same extension ecosystem and settings format. If you use Cursor, everything in this lesson still applies. Import the same `settings.json` and `extensions.json`.\n\n### Windsurf\n\n[windsurf.com](https://windsurf.com) is another AI-first VS Code fork. Same story: same extensions, same settings format, same Remote SSH support.\n\n### Vim/Neovim\n\nIf you already use Vim or Neovim and are productive in it, stay there. The minimum setup for AI Python work:\n\n- **pyright** or **pylsp** for type checking (via Mason or manual install)\n- **nvim-lspconfig** for language server integration\n- **jupyter-vim** or **molten-nvim** for notebook-like execution\n- **telescope.nvim** for file/symbol search\n- **none-ls.nvim** with black and ruff for formatting/linting\n\nIf you do not already use Vim, do not start now. The learning curve will compete with learning AI engineering. Use VS Code."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is a Language Server Protocol (LSP)?",
+      "options": [
+        "A protocol for transferring files between editors",
+        "A standard for editors to receive type info, completions, and diagnostics from a language-specific server",
+        "A compression format for source code files",
+        "A network protocol for remote pair programming"
+      ],
+      "correct": 1,
+      "explanation": "LSP is a standardized protocol that lets editors communicate with language servers for features like autocomplete, type checking, and error diagnostics, regardless of the editor used."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why is format-on-save useful for team projects?",
+      "options": [
+        "It reduces file sizes by removing whitespace",
+        "It ensures consistent code style across all contributors without manual formatting",
+        "It catches runtime bugs before the code is executed",
+        "It compresses the code for faster git operations"
+      ],
+      "correct": 1,
+      "explanation": "Format-on-save runs a formatter (like Black or Ruff) every time you save, ensuring all code follows the same style conventions regardless of who wrote it."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Which VS Code extension enables editing code on a remote GPU machine as if it were local?",
+      "options": [
+        "GitLens",
+        "Pylance",
+        "Remote SSH",
+        "Debugpy"
+      ],
+      "correct": 2,
+      "explanation": "Remote SSH installs a lightweight VS Code server on the remote machine and streams the UI to your local editor, letting you edit files, run terminals, and debug remotely."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "Why should 'notebook.output.scrolling' be enabled in VS Code settings for AI work?",
+      "options": [
+        "It enables horizontal scrolling for wide dataframes",
+        "It prevents training loop output (thousands of lines) from exploding the output panel",
+        "It allows scrolling between notebook cells with the mouse wheel",
+        "It enables smooth scrolling animations in the editor"
+      ],
+      "correct": 1,
+      "explanation": "Training loops can print thousands of lines of output. Without output scrolling, the notebook output panel grows unbounded, making the notebook unusable."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "What does setting 'python.analysis.typeCheckingMode' to 'basic' in VS Code accomplish?",
+      "options": [
+        "It enables syntax highlighting for Python files",
+        "It catches wrong argument types and tensor shape mismatches before running the code",
+        "It formats Python code according to PEP 8 standards",
+        "It enables Python 3.12 language features"
+      ],
+      "correct": 1,
+      "explanation": "Basic type checking with Pylance flags type mismatches, wrong argument types, and incorrect API parameters at edit time, catching bugs before you run a potentially expensive training script."
+    }
+  ],
+  "resources": [
+    {
+      "label": "vscode/extensions.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/extensions.json",
+      "kind": "Code"
+    },
+    {
+      "label": "vscode/settings.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/settings.json",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/08-editor-setup"
+}

@@ -1,0 +1,168 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/07-docker-for-ai",
+  "slug": "07-docker-for-ai",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "07",
+  "title": "Docker for AI",
+  "summary": "Containers make \"works on my machine\" a thing of the past.",
+  "motto": "Containers make \"works on my machine\" a thing of the past.",
+  "type": "Build",
+  "languages": [
+    "Docker"
+  ],
+  "prerequisites": [
+    "Phase 0",
+    "Lessons 01 and 03"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Build a GPU-enabled Docker image with CUDA, PyTorch, and AI libraries from a Dockerfile",
+    "Mount host directories as volumes to persist models, datasets, and code across container rebuilds",
+    "Configure the NVIDIA Container Toolkit to expose GPUs inside containers",
+    "Orchestrate multi-service AI applications (inference server + vector database) using Docker Compose"
+  ],
+  "exercises": [
+    "Build the Dockerfile and run python -c \"import torch; print(torch.__version__)\" inside the container",
+    "Start the docker-compose stack and verify Qdrant is accessible from the AI container at http://qdrant:6333/collections",
+    "Add flask to the Dockerfile, rebuild, and run a simple API server on port 5000. Map the port with -p 5000:5000",
+    "Measure the image size with docker images. Try switching the base image from devel to runtime and compare sizes"
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Build",
+    "Docker",
+    "Container",
+    "Image layer",
+    "NVIDIA Container Toolkit",
+    "Volume mount",
+    "Base image"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Containers make \"works on my machine\" a thing of the past."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Build a GPU-enabled Docker image with CUDA, PyTorch, and AI libraries from a Dockerfile\n- Mount host directories as volumes to persist models, datasets, and code across container rebuilds\n- Configure the NVIDIA Container Toolkit to expose GPUs inside containers\n- Orchestrate multi-service AI applications (inference server + vector database) using Docker Compose"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You trained a model on your laptop with PyTorch 2.3, CUDA 12.4, and Python 3.12. Your colleague has PyTorch 2.1, CUDA 11.8, and Python 3.10. Your model crashes on their machine. Your Dockerfile works on both.\n\nAI projects are dependency nightmares. A typical stack includes Python, PyTorch, CUDA drivers, cuDNN, system-level C libraries, and specialized packages like flash-attn that need exact compiler versions. Docker packages all of this into a single image that runs identically everywhere."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "Docker wraps your code, runtime, libraries, and system tools into an isolated unit called a container. Think of it as a lightweight virtual machine, except it shares the host OS kernel instead of running its own, so it starts in seconds instead of minutes.\n\n```mermaid\ngraph TD\n    subgraph without[\"Without Docker\"]\n        A1[\"Your machine<br/>Python 3.12<br/>CUDA 12.4<br/>PyTorch 2.3\"] -->|crashes| X1[\"???\"]\n        A2[\"Their machine<br/>Python 3.10<br/>CUDA 11.8<br/>PyTorch 2.1\"] -->|crashes| X2[\"???\"]\n        A3[\"Server<br/>Python 3.11<br/>CUDA 12.1<br/>PyTorch 2.2\"] -->|crashes| X3[\"???\"]\n    end\n\n    subgraph with_docker[\"With Docker — Same image everywhere\"]\n        B1[\"Your machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code\"]\n        B2[\"Their machine<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code\"]\n        B3[\"Server<br/>Python 3.12 | CUDA 12.4<br/>PyTorch 2.3 | Your code\"]\n    end\n```\n\n### Why AI projects need Docker more than most\n\n1. **GPU drivers are fragile.** CUDA 12.4 code does not run on CUDA 11.8. Docker isolates the CUDA toolkit inside the container while sharing the host GPU driver through the NVIDIA Container Toolkit.\n\n2. **Model weights are large.** A 7B parameter model is 14 GB in fp16. You do not want to re-download it every time you rebuild. Docker volumes let you mount a models directory from the host.\n\n3. **Multi-service architectures are common.** A real AI application is not just a Python script. It is an inference server, a vector database for RAG, maybe a web frontend. Docker Compose orchestrates all of these with one command.\n\n### Key vocabulary\n\n| Term | What it means |\n|------|---------------|\n| Image | A read-only template. Your recipe. Built from a Dockerfile. |\n| Container | A running instance of an image. Your kitchen. |\n| Dockerfile | Instructions to build an image. Layer by layer. |\n| Volume | Persistent storage that survives container restarts. |\n| docker-compose | A tool for defining multi-container applications in YAML. |\n\n### Common container patterns in AI\n\n```\nDev Container\n  Full toolkit. Editor support. Jupyter. Debugging tools.\n  Used during development and experimentation.\n\nTraining Container\n  Minimal. Just the training script and dependencies.\n  Runs on GPU clusters. No editor, no Jupyter.\n\nInference Container\n  Optimized for serving. Small image. Fast cold start.\n  Runs behind a load balancer in production.\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Install Docker\n\n```bash\n# macOS\nbrew install --cask docker\nopen /Applications/Docker.app\n\n# Ubuntu\ncurl -fsSL https://get.docker.com | sh\nsudo usermod -aG docker $USER\n# Log out and back in for group change to take effect\n```\n\nVerify:\n\n```bash\ndocker --version\ndocker run hello-world\n```\n\n### Step 2: Install NVIDIA Container Toolkit (Linux with NVIDIA GPU)\n\nThis lets Docker containers access your GPU. macOS and Windows (WSL2) users can skip this; Docker Desktop handles GPU passthrough differently on those platforms.\n\n```bash\ndistribution=$(. /etc/os-release;echo $ID$VERSION_ID)\ncurl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg\ncurl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \\\n    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \\\n    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list\n\nsudo apt-get update\nsudo apt-get install -y nvidia-container-toolkit\nsudo nvidia-ctk runtime configure --runtime=docker\nsudo systemctl restart docker\n```\n\nTest GPU access inside a container:\n\n```bash\ndocker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi\n```\n\nIf you see your GPU info, the toolkit is working.\n\n### Step 3: Understand base images\n\nChoosing the right base image saves hours of debugging.\n\n```\nnvidia/cuda:12.4.1-devel-ubuntu22.04\n  Full CUDA toolkit. Compilers included.\n  Use for: building packages that need nvcc (flash-attn, bitsandbytes)\n  Size: ~4 GB\n\nnvidia/cuda:12.4.1-runtime-ubuntu22.04\n  CUDA runtime only. No compilers.\n  Use for: running pre-built code\n  Size: ~1.5 GB\n\npytorch/pytorch:2.3.1-cuda12.4-cudnn9-runtime\n  PyTorch pre-installed on top of CUDA.\n  Use for: skipping the PyTorch install step\n  Size: ~6 GB\n\npython:3.12-slim\n  No CUDA. CPU only.\n  Use for: inference on CPU, lightweight tools\n  Size: ~150 MB\n```\n\n### Step 4: Write a Dockerfile for AI development\n\nHere is the Dockerfile in `code/Dockerfile`. Walk through it:\n\n```dockerfile\nFROM nvidia/cuda:12.4.1-devel-ubuntu22.04\n\nENV DEBIAN_FRONTEND=noninteractive\nENV PYTHONUNBUFFERED=1\n\nRUN apt-get update && apt-get install -y --no-install-recommends \\\n    python3.12 \\\n    python3.12-venv \\\n    python3.12-dev \\\n    python3-pip \\\n    git \\\n    curl \\\n    build-essential \\\n    && rm -rf /var/lib/apt/lists/*\n\nRUN update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1\n\nRUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel\n\nRUN python -m pip install --no-cache-dir \\\n    torch==2.3.1 \\\n    torchvision==0.18.1 \\\n    torchaudio==2.3.1 \\\n    --index-url https://download.pytorch.org/whl/cu124\n\nRUN python -m pip install --no-cache-dir \\\n    numpy \\\n    pandas \\\n    scikit-learn \\\n    matplotlib \\\n    jupyter \\\n    transformers \\\n    datasets \\\n    accelerate \\\n    safetensors\n\nWORKDIR /workspace\n\nVOLUME [\"/workspace\", \"/models\"]\n\nEXPOSE 8888\n\nCMD [\"python\"]\n```\n\nBuild it:\n\n```bash\ndocker build -t ai-dev -f phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile .\n```\n\nThis takes a while the first time (downloading CUDA base image + PyTorch). Subsequent builds use cached layers.\n\nRun it:\n\n```bash\ndocker run --rm -it --gpus all \\\n    -v $(pwd):/workspace \\\n    -v ~/models:/models \\\n    ai-dev python -c \"import torch; print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')\"\n```\n\nRun Jupyter inside the container:\n\n```bash\ndocker run --rm -it --gpus all \\\n    -v $(pwd):/workspace \\\n    -v ~/models:/models \\\n    -p 8888:8888 \\\n    ai-dev jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root\n```\n\n### Step 5: Volume mounts for data and models\n\nVolume mounts are critical for AI work. Without them, your 14 GB model downloads vanish when the container stops.\n\n```bash\n# Mount your code\n-v $(pwd):/workspace\n\n# Mount a shared models directory\n-v ~/models:/models\n\n# Mount datasets\n-v ~/datasets:/data\n```\n\nInside your training script, load from the mounted path:\n\n```python\nfrom transformers import AutoModel\n\nmodel = AutoModel.from_pretrained(\"/models/llama-7b\")\n```\n\nThe model lives on your host filesystem. Rebuild the container as often as you want without re-downloading.\n\n### Step 6: Docker Compose for multi-service AI apps\n\nA real RAG application needs an inference server and a vector database. Docker Compose runs both with one command.\n\nSee `code/docker-compose.yml`:\n\n```yaml\nservices:\n  ai-dev:\n    build:\n      context: .\n      dockerfile: Dockerfile\n    deploy:\n      resources:\n        reservations:\n          devices:\n            - driver: nvidia\n              count: all\n              capabilities: [gpu]\n    volumes:\n      - ../../../:/workspace\n      - ~/models:/models\n      - ~/datasets:/data\n    ports:\n      - \"8888:8888\"\n    stdin_open: true\n    tty: true\n    command: jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root\n\n  qdrant:\n    image: qdrant/qdrant:v1.12.5\n    ports:\n      - \"6333:6333\"\n      - \"6334:6334\"\n    volumes:\n      - qdrant_data:/qdrant/storage\n\nvolumes:\n  qdrant_data:\n```\n\nStart everything:\n\n```bash\ncd phases/00-setup-and-tooling/07-docker-for-ai/code\ndocker compose up -d\n```\n\nNow your AI dev container can reach the vector database at `http://qdrant:6333` by service name. Docker Compose creates a shared network automatically.\n\nTest the connection from inside the AI container:\n\n```python\nfrom qdrant_client import QdrantClient\n\nclient = QdrantClient(host=\"qdrant\", port=6333)\nprint(client.get_collections())\n```\n\nStop everything:\n\n```bash\ndocker compose down\n```\n\nAdd `-v` to also delete the qdrant volume:\n\n```bash\ndocker compose down -v\n```\n\n### Step 7: Useful Docker commands for AI work\n\n```bash\n# List running containers\ndocker ps\n\n# List all images and their sizes\ndocker images\n\n# Remove unused images (reclaim disk space)\ndocker system prune -a\n\n# Check GPU usage inside a running container\ndocker exec -it <container_id> nvidia-smi\n\n# Copy a file from container to host\ndocker cp <container_id>:/workspace/results.csv ./results.csv\n\n# View container logs\ndocker logs -f <container_id>\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "You now have a reproducible AI development environment. For the rest of this course:\n\n- Use `docker compose up` to start your dev environment and vector database together\n- Mount your code, models, and data as volumes so nothing is lost between rebuilds\n- When a lesson requires a new Python package, add it to the Dockerfile and rebuild\n- Share your Dockerfile with teammates. They get the exact same environment.\n\n### No GPU?\n\nRemove the `--gpus all` flag and the NVIDIA deploy block. The container still works for CPU-based lessons. PyTorch detects the absence of CUDA and falls back to CPU automatically."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Build the Dockerfile and run `python -c \"import torch; print(torch.__version__)\"` inside the container\n2. Start the docker-compose stack and verify Qdrant is accessible from the AI container at `http://qdrant:6333/collections`\n3. Add `flask` to the Dockerfile, rebuild, and run a simple API server on port 5000. Map the port with `-p 5000:5000`\n4. Measure the image size with `docker images`. Try switching the base image from `devel` to `runtime` and compare sizes"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Container | \"Lightweight VM\" | An isolated process using the host kernel, with its own filesystem and network |\n| Image layer | \"Cached step\" | Each Dockerfile instruction creates a layer. Unchanged layers are cached, so rebuilds are fast. |\n| NVIDIA Container Toolkit | \"GPU in Docker\" | A runtime hook that exposes host GPUs to containers via `--gpus` flag |\n| Volume mount | \"Shared folder\" | A directory on the host mapped into the container. Changes persist after the container stops. |\n| Base image | \"Starting point\" | The `FROM` image your Dockerfile builds on top of. Determines what is pre-installed. |"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is the primary difference between a Docker container and a virtual machine?",
+      "options": [
+        "Containers are slower but more secure than VMs",
+        "Containers share the host OS kernel while VMs run their own full OS",
+        "Containers can only run Linux while VMs support any OS",
+        "There is no practical difference"
+      ],
+      "correct": 1,
+      "explanation": "Containers share the host kernel and isolate at the process level, making them start in seconds. VMs run a complete guest OS with its own kernel, requiring more resources and slower startup."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is a Dockerfile?",
+      "options": [
+        "A configuration file for the Docker daemon",
+        "A set of instructions for building a Docker image layer by layer",
+        "A log file that records container activity",
+        "A file that lists running containers"
+      ],
+      "correct": 1,
+      "explanation": "A Dockerfile contains sequential instructions (FROM, RUN, COPY, etc.) that Docker executes to build an image. Each instruction creates a cached layer."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Why are volume mounts critical for AI development with Docker?",
+      "options": [
+        "Volumes make containers run faster by using host disk speed",
+        "Volumes persist data (models, datasets, code) across container rebuilds so you don't re-download gigabytes each time",
+        "Volumes are required for Python packages to install correctly",
+        "Volumes allow multiple containers to share the same GPU"
+      ],
+      "correct": 1,
+      "explanation": "Without volumes, everything inside a container is lost when it stops. Volume mounts map host directories into the container, so model weights (14+ GB) and datasets survive rebuilds."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "What does the NVIDIA Container Toolkit enable?",
+      "options": [
+        "Installing CUDA drivers inside the container",
+        "Exposing host GPUs to Docker containers via the --gpus flag",
+        "Running NVIDIA GPU containers on AMD hardware",
+        "Compiling CUDA code during the Docker build process"
+      ],
+      "correct": 1,
+      "explanation": "The NVIDIA Container Toolkit is a runtime hook that exposes host GPUs to containers. The CUDA toolkit lives inside the container, but the GPU driver is shared from the host."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "In a Docker Compose file for AI, how does the 'ai-dev' service reach the 'qdrant' vector database?",
+      "options": [
+        "By using the host machine's IP address and port",
+        "By using the service name 'qdrant' as the hostname, since Compose creates a shared network",
+        "By mounting a shared volume between the two containers",
+        "By configuring a VPN between the containers"
+      ],
+      "correct": 1,
+      "explanation": "Docker Compose automatically creates a shared network where services can reach each other by name. The ai-dev container connects to 'http://qdrant:6333' using the service name as hostname."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Dockerfile",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile",
+      "kind": "Code"
+    },
+    {
+      "label": "docker-compose.yml",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/docker-compose.yml",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/07-docker-for-ai"
+}

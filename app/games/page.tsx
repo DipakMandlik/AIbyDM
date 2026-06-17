@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Play, Trophy } from "lucide-react";
 import { SiteNav } from "@/components/site/site-nav";
 import { SiteFooter } from "@/components/site/site-footer";
 import { PageHero } from "@/components/site/page-hero";
@@ -33,24 +33,32 @@ export default function GamesPage() {
               <Link
                 key={game.slug}
                 href={getGameHref(game.slug)}
-                className="group flex min-h-[320px] flex-col bg-background p-8 transition-colors hover:bg-foreground/[0.02]"
+                className={"group flex min-h-[320px] flex-col bg-background p-8 transition-colors hover:bg-foreground/[0.02] " + (game.featured ? "md:col-span-2 xl:col-span-2" : "")}
               >
                 <div className="mb-8 flex items-start justify-between gap-4">
-                  <span className="font-mono text-xs text-muted-foreground">{game.type}</span>
-                  <ArrowUpRight className="h-5 w-5 text-muted-foreground opacity-0 transition-all group-hover:opacity-100" />
+                  <span className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    {game.featured ? <Trophy className="h-4 w-4" aria-hidden="true" /> : null}
+                    {game.featured ? "Flagship" : game.type}
+                  </span>
+                  <ArrowUpRight className="h-5 w-5 text-muted-foreground opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
                 </div>
-                <h2 className="font-display text-3xl">{game.title}</h2>
+                <h2 className={"font-display " + (game.featured ? "text-4xl md:text-5xl" : "text-3xl")}>{game.title}</h2>
                 <p className="mt-4 flex-1 leading-relaxed text-muted-foreground">
                   {game.description}
                 </p>
-                <div className="mt-8 flex flex-wrap gap-2">
-                  <span className="border border-foreground/10 px-3 py-1 font-mono text-xs">
-                    {game.difficulty}
-                  </span>
-                  <span className="border border-foreground/10 px-3 py-1 font-mono text-xs">
-                    {game.duration}
-                  </span>
+                <div className="mt-8 grid gap-2 sm:grid-cols-2">
+                  <GameMeta label="Difficulty" value={game.difficulty} />
+                  <GameMeta label="Duration" value={game.duration} />
+                  {game.questionCount ? <GameMeta label="Questions" value={String(game.questionCount)} /> : null}
+                  {game.xpReward ? <GameMeta label="XP" value={String(game.xpReward)} /> : null}
+                  {game.completionRate ? <GameMeta label="Completion" value={game.completionRate} /> : null}
                 </div>
+                {game.featured ? (
+                  <span className="mt-8 inline-flex min-h-12 w-fit items-center gap-2 rounded-full bg-foreground px-6 text-sm font-medium text-background">
+                    <Play className="h-4 w-4 fill-current" aria-hidden="true" />
+                    {game.ctaLabel ?? "Start"}
+                  </span>
+                ) : null}
               </Link>
             ))}
           </div>
@@ -58,5 +66,13 @@ export default function GamesPage() {
       </section>
       <SiteFooter />
     </main>
+  );
+}
+
+function GameMeta({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="border border-foreground/10 px-3 py-2 font-mono text-xs">
+      <span className="text-muted-foreground">{label}: </span>{value}
+    </span>
   );
 }

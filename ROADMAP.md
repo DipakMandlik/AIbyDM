@@ -1,54 +1,56 @@
-# AIByDM Roadmap
+# AIByDM Public Roadmap
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
-AIByDM is being built as a flagship open-source learning platform for practical AI builders. This
-roadmap shows the major product phases, what is already taking shape, and where contributors can
-help next.
+AIByDM is being built as a flagship open-source learning platform for practical AI builders. The roadmap is public so learners, contributors, maintainers, educators, and sponsors can see what is active now and what is coming next.
 
 ## Roadmap Phases
 
-| Phase   | Focus            | Status  | What success looks like                                                                 |
-| ------- | ---------------- | ------- | --------------------------------------------------------------------------------------- |
-| Phase 1 | Learn Platform   | Active  | Structured curriculum, lesson pages, stage-based progression, and clear learning paths  |
-| Phase 2 | Tools Directory  | Active  | Practical AI tool entries with use cases, licensing, and contributor submissions        |
-| Phase 3 | Games            | Active  | Short practice loops, concept drills, and replayable reinforcement experiences          |
-| Phase 4 | Exams            | Active  | Reusable question banks, explanations, scoring flows, and interview prep                |
-| Phase 5 | Newsletter       | Active  | Editorial updates, release notes, and community signal around what is shipping next     |
-| Phase 6 | Community        | Next    | Discussions cadence, contributor recognition, first issue flows, and project operations |
-| Phase 7 | AI Tutor         | Planned | Guided assistance layer for recommending lessons, tools, and practice sequences         |
-| Phase 8 | Certification    | Planned | Milestone-based validation, shareable achievements, and structured readiness checks     |
-| Phase 9 | Interactive Labs | Planned | Hands-on labs, sandboxes, and build-along workflows for practical AI systems            |
+| Phase | Focus | Status | Success looks like |
+| --- | --- | --- | --- |
+| Phase 1 | AI Learning Platform | Active | Structured tracks, lessons, projects, progress loops, and clear learning paths. |
+| Phase 2 | Tools Directory | Active | Curated AI tools with categories, use cases, pricing notes, alternatives, and contribution flow. |
+| Phase 3 | Games Platform | Active | Practice games that reinforce AI concepts through repeatable drills and feedback. |
+| Phase 4 | Certification Center | Planned | Exam banks, readiness checks, role-based paths, and shareable achievement structure. |
+| Phase 5 | Newsletter | Active | Editorial updates, release notes, ecosystem signal, and contributor highlights. |
+| Phase 6 | Community | Next | Discussions cadence, contributor recognition, good first issues, and maintainer operating rhythm. |
+| Phase 7 | AI Tutor | Planned | Guided recommendations across lessons, tools, projects, games, and exams. |
+| Phase 8 | Interactive Labs | Planned | Browser-based labs, build-along workflows, and practical AI engineering exercises. |
+| Phase 9 | Enterprise Academy | Future | Team learning paths, internal enablement templates, governance docs, and enterprise-ready academy workflows. |
 
 ## Current Priorities
 
-### Learn Platform
+### Phase 1: AI Learning Platform
 
-- Expand authored lesson coverage.
-- Ship deeper track pages and learner progress loops.
-- Tighten navigation between lessons, practice, and assessments.
+- Expand AI From Scratch lesson coverage and project depth.
+- Improve track navigation, learner progress, and lesson-to-project continuity.
+- Keep content metadata consistent and easy to review.
 
-### Tools Directory
+### Phase 2: Tools Directory
 
 - Grow the catalog with strong curation standards.
-- Add comparison views and better categorization.
-- Make contribution of new tool entries smoother.
+- Add comparison views, alternatives, and practical adoption guidance.
+- Make tool submissions simple for contributors.
 
-### Games and Exams
+### Phase 3: Games Platform
 
-- Turn seeded content into richer interactive experiences.
-- Connect games and assessments directly to tracks.
-- Add more topic coverage and feedback loops.
+- Turn seeded practice loops into richer interactive experiences.
+- Connect games to relevant lessons and exam objectives.
+- Add scoring, repeatability, and feedback patterns.
 
-### Community and Operations
+### Phase 6: Community
 
-- Improve contributor onboarding.
-- Publish a reliable release rhythm.
-- Recognize community contributions consistently.
+- Maintain useful issue labels and good first issues.
+- Recognize contributors in releases and community docs.
+- Keep discussions, support paths, and contribution workflows active.
 
-## How to Contribute to the Roadmap
+## Contributor Opportunities
 
-- Open an issue for focused feature requests.
-- Start a discussion for broader product direction or architecture ideas.
-- Link roadmap phases in pull requests when your work moves a phase forward.
-- Suggest sequencing changes when user value or contributor capacity changes.
+- Content: lessons, examples, projects, exam questions, and newsletter notes.
+- Product: navigation, search, progress tracking, games, and labs.
+- Docs: onboarding, architecture, deployment, and contributor operations.
+- Community: triage, discussions, labels, recognition, and release support.
+
+## How to Influence the Roadmap
+
+Open a focused issue for scoped work, start a GitHub Discussion for broader product direction, or link a roadmap phase in your pull request when your work moves the platform forward.

@@ -1,0 +1,150 @@
+{
+  "id": "ai-from-scratch/09-reinforcement-learning/08-ppo",
+  "slug": "08-ppo",
+  "phaseSlug": "09-reinforcement-learning",
+  "number": "08",
+  "title": "Proximal Policy Optimization (PPO)",
+  "summary": "A2C throws away each rollout after one update. PPO wraps the policy gradient in a clipped importance ratio so you can do 10+ epochs on the same data without the policy exploding. Schulman et al. (2017). Still the default policy-gradient al...",
+  "motto": "A2C throws away each rollout after one update. PPO wraps the policy gradient in a clipped importance ratio so you can do 10+ epochs on the same data without the policy exploding. Schulman et al. (2017). Still the default policy-gradient algorithm in 2026.",
+  "type": "Build",
+  "languages": [
+    "Python"
+  ],
+  "prerequisites": [],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Easy. Run PPO on 4×4 GridWorld with ε=0.2, K=4. Compare sample efficiency to A2C (one epoch per rollout) at matched env steps.",
+    "Medium. Sweep K ∈ {1, 4, 10, 30}. Plot return vs env steps and track mean KL per update. At what K does KL explode on this task?",
+    "Hard. Replace the clipped surrogate with an adaptive KL penalty (β doubled if KL > 2·target, halved if KL < target/2). Compare final return, stability, and clip-free-ness."
+  ],
+  "topics": [
+    "Reinforcement Learning",
+    "Build",
+    "Python",
+    "Proximal",
+    "Policy",
+    "Optimization",
+    "PPO",
+    "Importance ratio",
+    "Clipped surrogate",
+    "Trust region",
+    "KL penalty",
+    "Clip fraction",
+    "Multi-epoch training",
+    "On-policy-ish",
+    "PPO-KL"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> A2C throws away each rollout after one update. PPO wraps the policy gradient in a clipped importance ratio so you can do 10+ epochs on the same data without the policy exploding. Schulman et al. (2017). Still the default policy-gradient algorithm in 2026."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A2C (Lesson 07) is on-policy: the gradient `E_{π_θ}[A · ∇ log π_θ]` requires data sampled from the *current* `π_θ`. Take one update, and `π_θ` changes; the data you used is now off-policy. Re-use it and your gradient is biased.\n\nRollouts are expensive. On Atari, one rollout across 8 envs × 128 steps = 1024 transitions and a dozen seconds of environment time. Throwing that away after one gradient step is wasteful.\n\nTrust Region Policy Optimization (TRPO, Schulman 2015) was the first fix: constrain each update so the KL divergence between old and new policy stays below `δ`. Theoretically clean, but requires a conjugate-gradient solve per update. Nobody runs TRPO in 2026.\n\nPPO (Schulman et al. 2017) replaces the hard trust-region constraint with a simple clipped objective. One extra line of code. Ten epochs per rollout. No conjugate gradients. Good-enough theoretical guarantees. Nine years later it is still the default policy-gradient algorithm for everything from MuJoCo to RLHF."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "![PPO clipped surrogate objective: ratio clipping at 1 ± ε](../assets/ppo.svg)\n\n**The importance ratio.**\n\n`r_t(θ) = π_θ(a_t | s_t) / π_{θ_old}(a_t | s_t)`\n\nThis is the likelihood ratio of the new policy vs the policy that collected the data. `r_t = 1` means no change. `r_t = 2` means the new policy is twice as likely to take `a_t` as the old.\n\n**The clipped surrogate.**\n\n`L^{CLIP}(θ) = E_t [ min( r_t(θ) A_t, clip(r_t(θ), 1-ε, 1+ε) A_t ) ]`\n\nTwo terms:\n\n- If the advantage `A_t > 0` and the ratio tries to grow past `1 + ε`, the clip flattens the gradient — don't push a good action further than `+ε` above old probability.\n- If the advantage `A_t < 0` and the ratio tries to grow past `1 - ε` (meaning we would make a bad action more likely compared to its clipped reduction), the clip caps the gradient — don't push a bad action below `-ε`.\n\nThe `min` handles the other direction: if the ratio has moved in the *beneficial* direction, you still get the gradient (no clipping on the side that would hurt you).\n\nTypical `ε = 0.2`. Plot the objective as a function of `r_t`: a piecewise-linear function with a flat roof on the \"good side\" and a flat floor on the \"bad side.\"\n\n**The full PPO loss.**\n\n`L(θ, φ) = L^{CLIP}(θ) - c_v · (V_φ(s_t) - V_t^{target})² + c_e · H(π_θ(·|s_t))`\n\nSame actor-critic structure as A2C. Three coefficients, usually `c_v = 0.5`, `c_e = 0.01`, `ε = 0.2`.\n\n**The training loop.**\n\n1. Collect `N × T` transitions across `N` parallel envs for `T` steps each.\n2. Compute advantages (GAE), freeze them as constants.\n3. Freeze `π_{θ_old}` as a snapshot of current `π_θ`.\n4. For `K` epochs, for each minibatch of `(s, a, A, V_target, log π_old(a|s))`:\n   - Compute `r_t(θ) = exp(log π_θ(a|s) - log π_old(a|s))`.\n   - Apply `L^{CLIP}` + value loss + entropy.\n   - Gradient step.\n5. Discard the rollout. Return to step 1.\n\n`K = 10` and minibatches of 64 is a standard hyperparameter set. PPO is robust: the exact numbers rarely matter within ±50%.\n\n**KL-penalty variant.** The original paper proposed an alternative using an adaptive KL penalty: `L = L^{PG} - β · KL(π_θ || π_old)` with `β` adjusted based on observed KL. The clipping version became dominant; the KL variant survives in RLHF (where KL to the reference policy is a separate constraint you always want anyway)."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: capture `log π_old(a | s)` at rollout time\n\n```python\nfor step in range(T):\n    probs = softmax(logits(theta, state_features(s)))\n    a = sample(probs, rng)\n    s_next, r, done = env.step(s, a)\n    buffer.append({\n        \"s\": s, \"a\": a, \"r\": r, \"done\": done,\n        \"v_old\": value(w, state_features(s)),\n        \"log_pi_old\": log(probs[a] + 1e-12),\n    })\n    s = s_next\n```\n\nThe snapshot is taken once, at rollout time. It does not change during the update epochs.\n\n### Step 2: compute GAE advantages (Lesson 07)\n\nSame as A2C. Normalize across the batch.\n\n### Step 3: clipped surrogate update\n\n```python\nfor _ in range(K_EPOCHS):\n    for mb in minibatches(buffer, size=64):\n        for rec in mb:\n            x = state_features(rec[\"s\"])\n            probs = softmax(logits(theta, x))\n            logp = log(probs[rec[\"a\"]] + 1e-12)\n            ratio = exp(logp - rec[\"log_pi_old\"])\n            adv = rec[\"advantage\"]\n            surrogate = min(\n                ratio * adv,\n                clamp(ratio, 1 - EPS, 1 + EPS) * adv,\n            )\n            # backprop -surrogate, add value loss, subtract entropy\n            grad_logpi = onehot(rec[\"a\"]) - probs\n            if (adv > 0 and ratio >= 1 + EPS) or (adv < 0 and ratio <= 1 - EPS):\n                pg_grad = 0.0  # clipped\n            else:\n                pg_grad = ratio * adv\n            for i in range(N_ACTIONS):\n                for j in range(N_FEAT):\n                    theta[i][j] += LR * pg_grad * grad_logpi[i] * x[j]\n```\n\nThe \"clipped → zero gradient\" pattern is the heart of PPO. If the new policy has already drifted too far in the beneficial direction, the update stops.\n\n### Step 4: value and entropy\n\nAdd standard MSE to the critic target and an entropy bonus on the actor, same as A2C.\n\n### Step 5: diagnostics\n\nThree things to watch every update:\n\n- **Mean KL** `E[log π_old - log π_θ]`. Should stay in `[0, 0.02]`. If it blows past `0.1`, reduce `K_EPOCHS` or `LR`.\n- **Clip fraction** — the fraction of samples whose ratio lies outside `[1-ε, 1+ε]`. Should be `~0.1-0.3`. If `~0`, the clip never triggers → raise `LR` or `K_EPOCHS`. If `~0.5+`, you are over-fitting the rollout → lower them.\n- **Explained variance** `1 - Var(V_target - V_pred) / Var(V_target)`. Critic quality metric. Should climb toward 1 as the critic learns."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "PPO is 2026's default RL algorithm across a surprising number of domains:\n\n| Use case | PPO variant |\n|----------|-------------|\n| MuJoCo / robotics control | PPO with Gaussian policy, GAE(0.95) |\n| Atari / discrete games | PPO with categorical policy, rolling 128-step rollouts |\n| RLHF for LLMs | PPO with KL penalty to reference model, reward from RM at end of response |\n| Large-scale game agents | IMPALA + PPO (AlphaStar, OpenAI Five) |\n| Reasoning LLMs | GRPO (Lesson 12) — PPO variant without critic |\n| Preference-only data | DPO — closed-form collapsing of PPO+KL, no online sampling |\n\nThe PPO *loss shape* — clipped surrogate + value + entropy — is the scaffolding for DPO, GRPO, and nearly every RLHF pipeline."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "Save as `outputs/skill-ppo-trainer.md`:\n\n```markdown\n---\nname: ppo-trainer\ndescription: Produce a PPO training config and a diagnostic plan for a given environment.\nversion: 1.0.0\nphase: 9\nlesson: 8\ntags: [rl, ppo, policy-gradient]\n---\n\nGiven an environment and training budget, output:\n\n1. Rollout size. `N` envs × `T` steps.\n2. Update schedule. `K` epochs, minibatch size, LR schedule.\n3. Surrogate params. `ε` (clip), `c_v`, `c_e`, advantage normalization on.\n4. Advantage. GAE(`λ`) with explicit `γ` and `λ`.\n5. Diagnostics plan. KL, clip fraction, explained variance thresholds with alerts.\n\nRefuse `K > 30` or `ε > 0.3` (unsafe trust region). Refuse any PPO run without advantage normalization or KL/clip monitoring. Flag clip fraction sustained above 0.4 as drift.\n```"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. **Easy.** Run PPO on 4×4 GridWorld with `ε=0.2, K=4`. Compare sample efficiency to A2C (one epoch per rollout) at matched env steps.\n2. **Medium.** Sweep `K ∈ {1, 4, 10, 30}`. Plot return vs env steps and track mean KL per update. At what `K` does KL explode on this task?\n3. **Hard.** Replace the clipped surrogate with an adaptive KL penalty (`β` doubled if `KL > 2·target`, halved if `KL < target/2`). Compare final return, stability, and clip-free-ness."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|-----------------------|\n| Importance ratio | \"r_t(θ)\" | `π_θ(a\\|s) / π_old(a\\|s)`; deviation from the policy that collected the data. |\n| Clipped surrogate | \"PPO's main trick\" | `min(r·A, clip(r, 1-ε, 1+ε)·A)`; flat gradient past the clip on beneficial side. |\n| Trust region | \"TRPO / PPO intent\" | Limit each update's KL to guarantee monotone improvement. |\n| KL penalty | \"Soft trust region\" | Alternative PPO: `L - β · KL(π_θ \\|\\| π_old)`. Adaptive `β`. |\n| Clip fraction | \"How often clipping triggers\" | Diagnostic — should be 0.1-0.3; outside means mistuned. |\n| Multi-epoch training | \"Data reuse\" | K epochs on each rollout; variance cost traded for sample efficiency. |\n| On-policy-ish | \"Mostly on-policy\" | PPO is nominally on-policy but K>1 epochs uses slightly-off-policy data safely. |\n| PPO-KL | \"The other PPO\" | KL-penalty variant; used in RLHF where KL-to-reference is already a constraint. |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Schulman et al. (2017). Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347) — the paper.\n- [Schulman et al. (2015). Trust Region Policy Optimization](https://arxiv.org/abs/1502.05477) — TRPO, PPO's predecessor.\n- [Andrychowicz et al. (2021). What Matters In On-Policy RL? A Large-Scale Empirical Study](https://arxiv.org/abs/2006.05990) — every PPO hyperparameter ablated.\n- [Ouyang et al. (2022). Training language models to follow instructions with human feedback](https://arxiv.org/abs/2203.02155) — InstructGPT; the PPO-in-RLHF recipe.\n- [OpenAI Spinning Up — PPO](https://spinningup.openai.com/en/latest/algorithms/ppo.html) — clean modern exposition with PyTorch.\n- [CleanRL PPO implementation](https://github.com/vwxyzjn/cleanrl) — reference single-file PPO used by many papers.\n- [Hugging Face TRL — PPOTrainer](https://huggingface.co/docs/trl/main/en/ppo_trainer) — the production recipe for PPO on language models; read alongside Lesson 09 (RLHF).\n- [Engstrom et al. (2020). Implementation Matters in Deep Policy Gradients](https://arxiv.org/abs/2005.12729) — the \"37 code-level optimizations\" paper; which PPO tricks are load-bearing and which are folklore."
+    },
+    {
+      "key": "pitfalls",
+      "title": "Pitfalls",
+      "markdown": "- **Clip coefficient mistuned.** `ε = 0.2` is the de-facto standard. Going to `0.1` makes updates too timid; `0.3+` invites instability.\n- **Too many epochs.** `K > 20` routinely destabilizes because the policy drifts far from `π_old`. Cap epochs, especially for large networks.\n- **No reward normalization.** Large reward scales eat into the clip range. Normalize rewards (running std) before computing advantages.\n- **Forgetting advantage normalization.** Per-batch zero-mean/unit-std normalization is standard. Skipping it wrecks PPO on most benchmarks.\n- **Learning rate not decayed.** PPO benefits from linear LR decay to zero. Constant LR is often worse.\n- **Importance ratio math errors.** Always `exp(log_new - log_old)` for numerical stability, not `new / old`.\n- **Wrong gradient sign.** Maximize the surrogate = *minimize* `-L^{CLIP}`. A flipped sign is the most common PPO bug."
+    }
+  ],
+  "quiz": [],
+  "resources": [
+    {
+      "label": "Schulman et al. (2017). Proximal Policy Optimization Algorithms",
+      "href": "https://arxiv.org/abs/1707.06347",
+      "kind": "Reading"
+    },
+    {
+      "label": "Schulman et al. (2015). Trust Region Policy Optimization",
+      "href": "https://arxiv.org/abs/1502.05477",
+      "kind": "Reading"
+    },
+    {
+      "label": "Andrychowicz et al. (2021). What Matters In On-Policy RL? A Large-Scale Empirical Study",
+      "href": "https://arxiv.org/abs/2006.05990",
+      "kind": "Reading"
+    },
+    {
+      "label": "Ouyang et al. (2022). Training language models to follow instructions with human feedback",
+      "href": "https://arxiv.org/abs/2203.02155",
+      "kind": "Reading"
+    },
+    {
+      "label": "OpenAI Spinning Up — PPO",
+      "href": "https://spinningup.openai.com/en/latest/algorithms/ppo.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "CleanRL PPO implementation",
+      "href": "https://github.com/vwxyzjn/cleanrl",
+      "kind": "Reading"
+    },
+    {
+      "label": "Hugging Face TRL — PPOTrainer",
+      "href": "https://huggingface.co/docs/trl/main/en/ppo_trainer",
+      "kind": "Reading"
+    },
+    {
+      "label": "Engstrom et al. (2020). Implementation Matters in Deep Policy Gradients",
+      "href": "https://arxiv.org/abs/2005.12729",
+      "kind": "Reading"
+    },
+    {
+      "label": "Ppo Trainer",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/08-ppo/outputs/skill-ppo-trainer.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/08-ppo/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/08-ppo",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/09-reinforcement-learning/08-ppo"
+}

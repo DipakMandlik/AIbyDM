@@ -1,0 +1,200 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/37-loading-pretrained-weights",
+  "slug": "37-loading-pretrained-weights",
+  "phaseSlug": "19-capstone-projects",
+  "number": "37",
+  "title": "Loading Pretrained Weights",
+  "summary": "Training a 124 million parameter model from scratch is a budget decision; loading a published checkpoint is a Tuesday. This lesson loads pretrained GPT-2 style weights from a safetensors file into the exact architecture from lesson 35, wal...",
+  "motto": "Training a 124 million parameter model from scratch is a budget decision; loading a published checkpoint is a Tuesday. This lesson loads pretrained GPT-2 style weights from a safetensors file into the exact architecture from lesson 35, walks the parameter name mapping piece by piece, and sanity generates a continuation to prove the load worked. No network, no third party loaders, no opaque magic.",
+  "type": "Build",
+  "languages": [
+    "Python"
+  ],
+  "prerequisites": [
+    "Phase 19 lessons 30 to 36"
+  ],
+  "duration": "~90 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Read a safetensors file with the safetensors Python library and inspect the tensor names and shapes.",
+    "Map each pretrained parameter name onto a parameter inside the lesson 35 GPT model.",
+    "Handle the two name conventions that differ between published GPT-2 weights and the model in this track: wte/wpe/h.N.attn.c_attn/c_proj and mlp.c_fc/c_proj versus the locally named tok_embed/pos_embed/blocks.N.attn.qkv/out_proj and mlp.fc1/fc2.",
+    "Detect and refuse a shape mismatch with a clear error before any weight assignment happens.",
+    "Generate a short continuation with the loaded weights and confirm the tokens come from the loaded distribution, not the randomly initialized one."
+  ],
+  "exercises": [
+    "Add a dtype argument to the loader that casts each tensor to a target dtype (bfloat16, float16, float32) during assignment. Confirm a float32 model can be downcast to bfloat16 and still generate.",
+    "Add an expected_layers argument that refuses to load a checkpoint whose h.N indices do not match the model's num_layers.",
+    "Plug the loader into the lesson 35 generation function and produce two side by side samples: one from random init, one from the loaded fixture.",
+    "Add an export path: write the current model state into a fresh safetensors file using the pretrained naming convention. Round trip the loader and confirm the report has zero shape mismatches.",
+    "Extend NAME_MAP to handle the LLaMA naming convention (no biases, RMSNorm, fused qkv layout) and re-run the loader on a stub LLaMA fixture you generate."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Build",
+    "Python",
+    "Loading",
+    "Pretrained",
+    "Weights",
+    "Name map",
+    "Shape mismatch",
+    "Transpose-on-load",
+    "Weight tying alias",
+    "Load report"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Training a 124 million parameter model from scratch is a budget decision; loading a published checkpoint is a Tuesday. This lesson loads pretrained GPT-2 style weights from a safetensors file into the exact architecture from lesson 35, walks the parameter name mapping piece by piece, and sanity generates a continuation to prove the load worked. No network, no third party loaders, no opaque magic."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Read a safetensors file with the `safetensors` Python library and inspect the tensor names and shapes.\n- Map each pretrained parameter name onto a parameter inside the lesson 35 GPT model.\n- Handle the two name conventions that differ between published GPT-2 weights and the model in this track: `wte/wpe/h.N.attn.c_attn/c_proj` and `mlp.c_fc/c_proj` versus the locally named `tok_embed/pos_embed/blocks.N.attn.qkv/out_proj` and `mlp.fc1/fc2`.\n- Detect and refuse a shape mismatch with a clear error before any weight assignment happens.\n- Generate a short continuation with the loaded weights and confirm the tokens come from the loaded distribution, not the randomly initialized one."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Published weights are not packaged for your architecture. They carry the names the original implementation used. The pretrained file has `transformer.h.0.attn.c_attn.weight` of shape `(2304, 768)`; your model expects `blocks.0.attn.qkv.weight` of shape `(2304, 768)` (which is the same matrix in a different layout convention) or your model uses `nn.Linear` which stores the matrix transposed. The same parameter shows up with three subtly different identities (name, shape, byte layout) and the loader has to reconcile all three.\n\nA loader that copies blindly puts the right tensor in the wrong place and you get a model that generates nonsense. A loader that refuses to copy when the shape differs but logs nothing leaves you guessing which tensor failed to land. The loader in this lesson is explicit: every assignment is logged, every shape is checked, and a `LoadReport` summarizes hits, misses, and shape mismatches so you can read what happened."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart LR\n  SF[safetensors file<br/>gpt2-stub.safetensors] --> R[Reader<br/>safe_open]\n  R --> N[Parameter name iterator]\n  N --> M[Name mapper<br/>pretrained -> local]\n  M --> S[Shape check]\n  S -- match --> A[Assign tensor<br/>under torch.no_grad]\n  S -- mismatch --> E[Log mismatch<br/>do not assign]\n  A --> RP[LoadReport]\n  E --> RP\n  RP --> G[generate<br/>sanity sample]\n```\n\nThe name mapper is just a function from string to string. The shape check is one if. The assignment happens inside `torch.no_grad()` so autograd does not track the load. The report holds the outcome of every name.\n\n### The GPT-2 naming convention\n\nPublished GPT-2 weights live under names like:\n\n| Pretrained name | Shape | Meaning |\n|-----------------|-------|---------|\n| `wte.weight` | (50257, 768) | Token embedding |\n| `wpe.weight` | (1024, 768) | Position embedding |\n| `h.N.ln_1.weight` | (768,) | LayerNorm 1 scale at block N |\n| `h.N.ln_1.bias` | (768,) | LayerNorm 1 shift at block N |\n| `h.N.attn.c_attn.weight` | (768, 2304) | Fused QKV linear weight |\n| `h.N.attn.c_attn.bias` | (2304,) | Fused QKV linear bias |\n| `h.N.attn.c_proj.weight` | (768, 768) | Attention output projection |\n| `h.N.attn.c_proj.bias` | (768,) | Attention output projection bias |\n| `h.N.ln_2.weight` | (768,) | LayerNorm 2 scale |\n| `h.N.ln_2.bias` | (768,) | LayerNorm 2 shift |\n| `h.N.mlp.c_fc.weight` | (768, 3072) | MLP fc1 weight |\n| `h.N.mlp.c_fc.bias` | (3072,) | MLP fc1 bias |\n| `h.N.mlp.c_proj.weight` | (3072, 768) | MLP fc2 weight |\n| `h.N.mlp.c_proj.bias` | (768,) | MLP fc2 bias |\n| `ln_f.weight` | (768,) | Final LayerNorm scale |\n| `ln_f.bias` | (768,) | Final LayerNorm shift |\n\nTwo surprises to plan for. The `c_attn`, `c_proj`, `c_fc` linears are stored with the matrix transposed relative to what `nn.Linear.weight` expects. The loader transposes during assignment. The LM head is not in the file at all; the model relies on weight tying with `wte`, so the head is set by aliasing once `wte` lands.\n\n### The local naming convention\n\nThe model in this track uses descriptive names:\n\n| Local name | Meaning |\n|------------|---------|\n| `tok_embed.weight` | Token embedding |\n| `pos_embed.weight` | Position embedding |\n| `blocks.N.ln1.scale` | LayerNorm 1 scale at block N |\n| `blocks.N.ln1.shift` | LayerNorm 1 shift |\n| `blocks.N.attn.qkv.weight` | Fused QKV |\n| `blocks.N.attn.qkv.bias` | Fused QKV bias |\n| `blocks.N.attn.out_proj.weight` | Attention output projection |\n| `blocks.N.attn.out_proj.bias` | Output projection bias |\n| `blocks.N.ln2.scale` | LayerNorm 2 scale |\n| `blocks.N.ln2.shift` | LayerNorm 2 shift |\n| `blocks.N.mlp.fc1.weight` | MLP fc1 |\n| `blocks.N.mlp.fc1.bias` | MLP fc1 bias |\n| `blocks.N.mlp.fc2.weight` | MLP fc2 |\n| `blocks.N.mlp.fc2.bias` | MLP fc2 bias |\n| `final_ln.scale` | Final LayerNorm scale |\n| `final_ln.shift` | Final LayerNorm shift |\n\nThe mapping is a fixed function. The lesson ships it as a dict that the loader iterates.\n\n### The stub fixture\n\nReal GPT-2 weights are 0.5 GB. The demo does not download them; it generates a small safetensors fixture at first run, with the exact GPT-2 naming convention and shapes appropriate to a 12-block model at d_model 192 instead of 768. The fixture has the right structure to exercise every code path in the loader. Swap the fixture for the real file and the loader works without modification."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` implements:\n\n- A small replica of the lesson 35 `GPTModel` so this lesson is self contained.\n- `make_pretrained_to_local(num_layers)` which expands the per-layer entries.\n- `load_safetensors(model, path)` which iterates names, maps them, checks shape, transposes the conv1d-style weights, and assigns under `torch.no_grad()`. Returns a `LoadReport`.\n- `make_stub_safetensors(path, cfg)` which generates a fixture file with the exact pretrained naming convention.\n- A demo that creates `outputs/gpt2-stub.safetensors` on first run, builds a fresh model, captures one generated continuation from random init, loads the stub, captures another continuation, prints both, and verifies the two are different (the load actually changed the model).\n\nRun it:\n\n```bash\npython3 code/main.py\n```\n\nOutput: the fixture path, a per-name load log, a `LoadReport` summary, a continuation before the load, a continuation after the load, and a shape mismatch on a single intentionally bad tensor injected into the fixture so the failure path is exercised."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "- The loader works for any safetensors file that uses the pretrained naming convention. Real GPT-2 files (small / medium / large / xl) work without code changes; only the model config differs.\n- The same pattern extends to LLaMA, Mistral, Qwen weights once you update the name map. The shape checks and the report stay identical.\n- Sanity generation after a load is a quick gate: if the post-load samples look like the pre-load samples, the load did not change the model, which means the mapping silently missed every tensor."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a `dtype` argument to the loader that casts each tensor to a target dtype (`bfloat16`, `float16`, `float32`) during assignment. Confirm a `float32` model can be downcast to `bfloat16` and still generate.\n2. Add an `expected_layers` argument that refuses to load a checkpoint whose `h.N` indices do not match the model's `num_layers`.\n3. Plug the loader into the lesson 35 generation function and produce two side by side samples: one from random init, one from the loaded fixture.\n4. Add an export path: write the current model state into a fresh safetensors file using the pretrained naming convention. Round trip the loader and confirm the report has zero shape mismatches.\n5. Extend `NAME_MAP` to handle the LLaMA naming convention (no biases, RMSNorm, fused qkv layout) and re-run the loader on a stub LLaMA fixture you generate."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Name map | \"Key remapping\" | The function from pretrained tensor names to local parameter names; usually a literal dict with one entry per layer index expanded over a loop |\n| Shape mismatch | \"Bad shape\" | The pretrained tensor exists under the mapped name but its dimensions disagree with the local parameter; the loader refuses to assign and logs the pair |\n| Transpose-on-load | \"Conv1d layout\" | Published GPT-2 stores attention and MLP projections in the transpose of what nn.Linear expects; the loader transposes during assignment |\n| Weight tying alias | \"Shared LM head\" | Setting model.lm_head.weight = model.tok_embed.weight so the head and embedding share storage; the head is not in the file because of this |\n| Load report | \"Coverage summary\" | A small dataclass that tracks loaded, missing, unexpected, and shape_mismatch lists; printing it is how you tell whether the load succeeded |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- Phase 19 lesson 35 for the architecture that receives the weights.\n- Phase 19 lesson 36 for the training loop that produces a checkpoint of the same shape.\n- Phase 10 lesson 11 (quantization) for what to do with the loaded weights when memory is tight.\n- Phase 10 lesson 13 (building a complete LLM pipeline) for the full lifecycle around load and inference."
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- `safetensors` for the on disk format and a streaming reader.\n- `torch` for the model and the assignment math.\n- No `transformers`, no `huggingface_hub`, no network calls."
+    },
+    {
+      "key": "production-patterns-in-the-wild",
+      "title": "Production patterns in the wild",
+      "markdown": "Three patterns make the loader survive contact with weights you did not create.\n\n**Always validate the file before any assignment.** Open the file, list every tensor name with its dtype and shape, run the full mapping with shape checks, and only on success start assigning. Half-loaded models are silent failure machines.\n\n**Log every assignment with the source name and the destination name.** When something looks wrong, the log tells you which tensor landed where; the alternative is reading hexdumps. The `LoadReport` dataclass in this lesson tracks `loaded`, `missing`, `unexpected`, and `shape_mismatch` lists and prints a summary at the end.\n\n**The LM head is a weight tying alias, not a separate copy.** Setting `model.lm_head.weight = model.tok_embed.weight` after loading `tok_embed` is the canonical pattern. Copying the embedding matrix into a fresh `lm_head.weight` parameter breaks tying and quietly doubles your parameter count."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why does the loader need a name map?",
+      "options": [
+        "Pretrained tensors and local parameters share the same name",
+        "Published GPT-2 weights use names like wte, wpe, h.N.attn.c_attn; the local model uses tok_embed, pos_embed, blocks.N.attn.qkv; the loader translates one onto the other",
+        "Safetensors files are encrypted",
+        "Torch requires it"
+      ],
+      "correct": 1,
+      "explanation": "The two naming conventions are different histories; the map is a literal dict expanded per layer."
+    },
+    {
+      "id": "check-2",
+      "stage": "check",
+      "question": "What is the conv1d transpose, and which tensors need it?",
+      "options": [
+        "All weight tensors",
+        "Published GPT-2 stores c_attn, c_proj, and c_fc weights in tensorflow conv1d layout, which is the transpose of what nn.Linear.weight expects; the loader calls .t() on those during assignment",
+        "Only the embedding",
+        "Only the LayerNorm scales"
+      ],
+      "correct": 1,
+      "explanation": "Three suffixes need transposing; biases and LayerNorms are already shaped correctly."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why is the LM head not in the safetensors file?",
+      "options": [
+        "It is computed at runtime from logits",
+        "Weight tying: the LM head shares storage with the token embedding (wte), so loading wte and aliasing lm_head.weight = tok_embed.weight after the load reconstructs the head",
+        "It is too large",
+        "It is loaded from a separate file"
+      ],
+      "correct": 1,
+      "explanation": "Setting lm_head.weight = tok_embed.weight after wte lands restores the alias; copying instead doubles the parameter count."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does the loader do on a shape mismatch?",
+      "options": [
+        "Pads the smaller tensor",
+        "Records the mismatch in LoadReport.shape_mismatch and refuses to assign, leaving the local parameter untouched",
+        "Crashes the process",
+        "Truncates the larger tensor"
+      ],
+      "correct": 1,
+      "explanation": "Half loaded models are silent failure machines; refusing to assign keeps the report honest."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "Why is the demo's stub fixture not a real GPT-2 download?",
+      "options": [
+        "Real files are not in safetensors format",
+        "The demo must run offline and quickly; the stub uses the exact pretrained naming convention so the loader code path is identical, and swapping in a real file changes nothing about the loader",
+        "Real weights are encrypted",
+        "Safetensors cannot store large tensors"
+      ],
+      "correct": 1,
+      "explanation": "Same code path, smaller payload; the loader works on either."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Why generate a sample before and after the load?",
+      "options": [
+        "To measure inference speed",
+        "If the post-load samples are identical to the pre-load samples, the load did not change the model, which means the mapping silently missed every tensor",
+        "To warm up the GPU cache",
+        "To set the random seed"
+      ],
+      "correct": 1,
+      "explanation": "Sanity generation is the cheapest gate: a sample fingerprint that fails to change exposes a broken load that the LoadReport summary would not catch on its own."
+    }
+  ],
+  "resources": [
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "tests/test_load.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/tests/test_load.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/37-loading-pretrained-weights"
+}

@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Play, Trophy } from "lucide-react";
 import { SiteNav } from "@/components/site/site-nav";
 import { SiteFooter } from "@/components/site/site-footer";
+import { ClaudeChallengeOverview } from "@/components/games/claude-certified-architect";
 import { games, getGame, getLessonHref, tracks } from "@/lib/content";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return games.map((game) => ({ slug: game.slug }));
@@ -25,6 +28,16 @@ export default async function GamePage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const game = getGame(slug);
   if (!game) notFound();
+
+  if (game.slug === "claude-certified-architect") {
+    return (
+      <main className="relative min-h-screen overflow-x-hidden noise-overlay">
+        <SiteNav />
+        <ClaudeChallengeOverview />
+        <SiteFooter />
+      </main>
+    );
+  }
 
   const relatedLessons = tracks
     .flatMap((track) =>

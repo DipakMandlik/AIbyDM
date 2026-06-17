@@ -6,9 +6,11 @@ Use this checklist to keep AIByDM aligned with its flagship open-source position
 
 - Repository display name: `AIByDM`
 - Tagline: `Learn AI. Build AI. Master AI.`
-- Description:
-  `Open-source AI learning platform featuring structured learning paths, projects, roadmaps, AI tools, challenges, exams, and community-driven learning.`
+- Repository description:
+  `Open-source AI learning platform for structured courses, hands-on projects, AI tools, games, exams, newsletters, and community-led learning.`
 - Website URL: `https://dipakmandlik.github.io/AIByDM/`
+- Repository homepage: `https://dipakmandlik.github.io/AIByDM/`
+- Social preview: upload `assets/social-preview.png` in GitHub repository settings.
 
 ## Topics
 
@@ -16,6 +18,7 @@ Apply these repository topics:
 
 - `ai`
 - `artificial-intelligence`
+- `ai-learning`
 - `machine-learning`
 - `deep-learning`
 - `llm`
@@ -30,10 +33,9 @@ Apply these repository topics:
 - `transformers`
 - `prompt-engineering`
 - `mlops`
-- `roadmap`
-- `career-development`
-- `opensource-community`
 - `github-pages`
+
+GitHub currently allows up to 20 topics. The list above uses the requested discovery set and leaves room for future platform-specific topics.
 
 ## GitHub Pages
 

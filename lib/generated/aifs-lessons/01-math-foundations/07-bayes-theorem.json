@@ -1,0 +1,202 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/07-bayes-theorem",
+  "slug": "07-bayes-theorem",
+  "phaseSlug": "01-math-foundations",
+  "number": "07",
+  "title": "Bayes' Theorem",
+  "summary": "Probability is about what you expect. Bayes' theorem is about what you learn.",
+  "motto": "Probability is about what you expect. Bayes' theorem is about what you learn.",
+  "type": "Build",
+  "languages": [],
+  "prerequisites": [
+    "Phase 1",
+    "Lesson 06 (Probability Fundamentals)"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Apply Bayes' theorem to compute posterior probabilities from priors, likelihoods, and evidence",
+    "Build a Naive Bayes text classifier from scratch with Laplace smoothing and log-space computation",
+    "Compare MLE and MAP estimation and explain how MAP corresponds to L2 regularization",
+    "Implement sequential Bayesian updating using Beta-Binomial conjugate priors for A/B testing"
+  ],
+  "exercises": [
+    "Multiple tests. A patient tests positive twice on independent tests (both 99% accurate, disease prevalence 1 in 10,000). What is P(sick) after both tests? Use the posterior from the first test as the prior for the second.",
+    "Smoothing impact. Run the spam classifier with smoothing values of 0.01, 0.1, 1.0, and 10.0. How do the top word probabilities change? What happens with smoothing=0 and a word that appears only in ham?",
+    "Add features. Extend the NaiveBayes class to also use message length (short/long) as a feature alongside word counts. Estimate P(short|spam) and P(short|ham) from the training data and fold it into the prediction score.",
+    "MAP by hand. Given observed data (7 heads in 10 coin flips), compute the MAP estimate of the bias using a Beta(2,2) prior. Compare it to the MLE estimate (7/10)."
+  ],
+  "topics": [
+    "Math Foundations",
+    "Build",
+    "Bayes",
+    "Theorem",
+    "Prior",
+    "Likelihood",
+    "Posterior",
+    "Evidence",
+    "Naive Bayes",
+    "Laplace smoothing",
+    "MLE",
+    "MAP",
+    "Log-probability",
+    "False positive"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Probability is about what you expect. Bayes' theorem is about what you learn."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Apply Bayes' theorem to compute posterior probabilities from priors, likelihoods, and evidence\n- Build a Naive Bayes text classifier from scratch with Laplace smoothing and log-space computation\n- Compare MLE and MAP estimation and explain how MAP corresponds to L2 regularization\n- Implement sequential Bayesian updating using Beta-Binomial conjugate priors for A/B testing"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A medical test is 99% accurate. You test positive. What are the chances you actually have the disease?\n\nMost people say 99%. The real answer depends on how rare the disease is. If 1 in 10,000 people have it, a positive result only gives you about a 1% chance of being sick. The other 99% of positive results are false alarms from healthy people.\n\nThis is not a trick question. It is Bayes' theorem. Every spam filter, every medical diagnostic, every machine learning model that quantifies uncertainty uses this exact reasoning. You start with a belief. You see evidence. You update.\n\nIf you build ML systems without understanding this, you will misinterpret model outputs, set bad thresholds, and ship overconfident predictions."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### From joint probability to Bayes\n\nYou already know from Lesson 06 that conditional probability is:\n\n```\nP(A|B) = P(A and B) / P(B)\n```\n\nAnd symmetrically:\n\n```\nP(B|A) = P(A and B) / P(A)\n```\n\nBoth expressions share the same numerator: P(A and B). Set them equal and rearrange:\n\n```\nP(A and B) = P(A|B) * P(B) = P(B|A) * P(A)\n\nTherefore:\n\nP(A|B) = P(B|A) * P(A) / P(B)\n```\n\nThat is Bayes' theorem. Four quantities, one equation.\n\n### The four parts\n\n| Part | Name | What it means |\n|------|------|---------------|\n| P(A\\|B) | Posterior | Your updated belief about A after seeing evidence B |\n| P(B\\|A) | Likelihood | How probable the evidence B is if A is true |\n| P(A) | Prior | Your belief about A before seeing any evidence |\n| P(B) | Evidence | Total probability of seeing B under all possibilities |\n\nThe evidence term P(B) acts as a normalizer. You can expand it using the law of total probability:\n\n```\nP(B) = P(B|A) * P(A) + P(B|not A) * P(not A)\n```\n\n### Medical test example\n\nA disease affects 1 in 10,000 people. The test is 99% accurate (catches 99% of sick people, gives false positives 1% of the time).\n\n```\nP(sick)          = 0.0001     (prior: disease is rare)\nP(positive|sick) = 0.99       (likelihood: test catches it)\nP(positive|healthy) = 0.01    (false positive rate)\n\nP(positive) = P(positive|sick) * P(sick) + P(positive|healthy) * P(healthy)\n            = 0.99 * 0.0001 + 0.01 * 0.9999\n            = 0.000099 + 0.009999\n            = 0.010098\n\nP(sick|positive) = P(positive|sick) * P(sick) / P(positive)\n                 = 0.99 * 0.0001 / 0.010098\n                 = 0.0098\n                 = 0.98%\n```\n\nLess than 1%. The prior dominates. When a condition is rare, even accurate tests produce mostly false positives. This is why doctors order confirmation tests.\n\n### Spam filter example\n\nYou receive an email containing the word \"lottery\". Is it spam?\n\n```\nP(spam)                = 0.3      (30% of email is spam)\nP(\"lottery\"|spam)      = 0.05     (5% of spam emails contain \"lottery\")\nP(\"lottery\"|not spam)  = 0.001    (0.1% of legitimate emails contain \"lottery\")\n\nP(\"lottery\") = 0.05 * 0.3 + 0.001 * 0.7\n             = 0.015 + 0.0007\n             = 0.0157\n\nP(spam|\"lottery\") = 0.05 * 0.3 / 0.0157\n                  = 0.955\n                  = 95.5%\n```\n\nOne word shifts the probability from 30% to 95.5%. A real spam filter applies Bayes across hundreds of words simultaneously.\n\n### Naive Bayes: independence assumption\n\nNaive Bayes extends this to multiple features by assuming all features are conditionally independent given the class:\n\n```\nP(class | feature_1, feature_2, ..., feature_n)\n  = P(class) * P(feature_1|class) * P(feature_2|class) * ... * P(feature_n|class)\n    / P(feature_1, feature_2, ..., feature_n)\n```\n\nThe \"naive\" part is the independence assumption. In text, word occurrences are not independent (\"New\" and \"York\" are correlated). But the assumption works surprisingly well in practice because the classifier only needs to rank classes, not produce calibrated probabilities.\n\nSince the denominator is the same for all classes, you can skip it and just compare numerators:\n\n```\nscore(class) = P(class) * product of P(feature_i | class)\n```\n\nPick the class with the highest score.\n\n### Maximum likelihood estimation (MLE)\n\nHow do you get P(feature|class) from training data? Count.\n\n```\nP(\"free\"|spam) = (number of spam emails containing \"free\") / (total spam emails)\n```\n\nThis is MLE: choose the parameter values that make the observed data most likely. You are maximizing the likelihood function, which for discrete counts reduces to relative frequency.\n\nProblem: if a word never appears in spam during training, MLE gives it probability zero. One unseen word kills the entire product. Fix this with Laplace smoothing:\n\n```\nP(word|class) = (count(word, class) + 1) / (total_words_in_class + vocabulary_size)\n```\n\nAdding 1 to every count ensures no probability is ever zero.\n\n### Maximum a posteriori (MAP)\n\nMLE asks: what parameters maximize P(data|parameters)?\n\nMAP asks: what parameters maximize P(parameters|data)?\n\nBy Bayes' theorem:\n\n```\nP(parameters|data) proportional to P(data|parameters) * P(parameters)\n```\n\nMAP adds a prior over the parameters themselves. If you believe parameters should be small, you encode that as a prior that penalizes large values. This is identical to L2 regularization in ML. The \"ridge\" penalty in ridge regression is literally a Gaussian prior on the weights.\n\n| Estimation | Optimizes | ML equivalent |\n|------------|-----------|---------------|\n| MLE | P(data\\|params) | Unregularized training |\n| MAP | P(data\\|params) * P(params) | L2 / L1 regularization |\n\n### Bayesian vs frequentist: the practical difference\n\nFrequentists treat parameters as fixed unknowns. They ask: \"If I repeated this experiment many times, what would happen?\"\n\nBayesians treat parameters as distributions. They ask: \"Given what I have observed, what do I believe about the parameters?\"\n\nFor building ML systems, the practical difference:\n\n| Aspect | Frequentist | Bayesian |\n|--------|-------------|----------|\n| Output | Point estimate | Distribution over values |\n| Uncertainty | Confidence intervals (about procedure) | Credible intervals (about parameter) |\n| Small data | Can overfit | Prior acts as regularization |\n| Computation | Usually faster | Often requires sampling (MCMC) |\n\nMost production ML is frequentist (SGD, point estimates). Bayesian methods shine when you need calibrated uncertainty (medical decisions, safety-critical systems) or when data is scarce (few-shot learning, cold start).\n\n### Why Bayesian thinking matters for ML\n\nThe connection is deeper than analogy:\n\n**Priors are regularization.** A Gaussian prior on weights is L2 regularization. A Laplace prior is L1. Every time you add a regularization term, you are making a Bayesian statement about what parameter values you expect.\n\n**Posteriors are uncertainty.** A single predicted probability tells you nothing about how confident the model is in that estimate. Bayesian methods give you a distribution: \"I think P(spam) is between 0.8 and 0.95.\"\n\n**Bayes updates are online learning.** Today's posterior becomes tomorrow's prior. When your model sees new data, it updates its beliefs incrementally instead of retraining from scratch.\n\n**Model comparison is Bayesian.** Bayesian information criterion (BIC), marginal likelihood, and Bayes factors all use Bayesian reasoning to choose between models without overfitting.\n\n```figure\nbayes-update\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Bayes theorem function\n\n```python\ndef bayes(prior, likelihood, false_positive_rate):\n    evidence = likelihood * prior + false_positive_rate * (1 - prior)\n    posterior = likelihood * prior / evidence\n    return posterior\n\nresult = bayes(prior=0.0001, likelihood=0.99, false_positive_rate=0.01)\nprint(f\"P(sick|positive) = {result:.4f}\")\n```\n\n### Step 2: Naive Bayes classifier\n\n```python\nimport math\nfrom collections import defaultdict\n\nclass NaiveBayes:\n    def __init__(self, smoothing=1.0):\n        self.smoothing = smoothing\n        self.class_counts = defaultdict(int)\n        self.word_counts = defaultdict(lambda: defaultdict(int))\n        self.class_word_totals = defaultdict(int)\n        self.vocab = set()\n\n    def train(self, documents, labels):\n        for doc, label in zip(documents, labels):\n            self.class_counts[label] += 1\n            words = doc.lower().split()\n            for word in words:\n                self.word_counts[label][word] += 1\n                self.class_word_totals[label] += 1\n                self.vocab.add(word)\n\n    def predict(self, document):\n        words = document.lower().split()\n        total_docs = sum(self.class_counts.values())\n        vocab_size = len(self.vocab)\n        best_class = None\n        best_score = float(\"-inf\")\n        for cls in self.class_counts:\n            score = math.log(self.class_counts[cls] / total_docs)\n            for word in words:\n                count = self.word_counts[cls].get(word, 0)\n                total = self.class_word_totals[cls]\n                score += math.log((count + self.smoothing) / (total + self.smoothing * vocab_size))\n            if score > best_score:\n                best_score = score\n                best_class = cls\n        return best_class\n```\n\nLog probabilities prevent underflow. Multiplying many small probabilities produces numbers too tiny for floating point. Summing log-probabilities is numerically stable and mathematically equivalent.\n\n### Step 3: Train on spam data\n\n```python\ntrain_docs = [\n    \"win free money now\",\n    \"free lottery ticket winner\",\n    \"claim your prize today free\",\n    \"urgent offer free cash\",\n    \"congratulations you won free\",\n    \"meeting tomorrow at noon\",\n    \"project update attached\",\n    \"can we schedule a call\",\n    \"quarterly report review\",\n    \"lunch on thursday sounds good\",\n    \"team standup notes attached\",\n    \"please review the pull request\",\n]\n\ntrain_labels = [\n    \"spam\", \"spam\", \"spam\", \"spam\", \"spam\",\n    \"ham\", \"ham\", \"ham\", \"ham\", \"ham\", \"ham\", \"ham\",\n]\n\nclassifier = NaiveBayes()\nclassifier.train(train_docs, train_labels)\n\ntest_messages = [\n    \"free money waiting for you\",\n    \"meeting rescheduled to friday\",\n    \"you won a free prize\",\n    \"please review the attached report\",\n]\n\nfor msg in test_messages:\n    print(f\"  '{msg}' -> {classifier.predict(msg)}\")\n```\n\n### Step 4: Inspect the learned probabilities\n\n```python\ndef show_top_words(classifier, cls, n=5):\n    vocab_size = len(classifier.vocab)\n    total = classifier.class_word_totals[cls]\n    probs = {}\n    for word in classifier.vocab:\n        count = classifier.word_counts[cls].get(word, 0)\n        probs[word] = (count + classifier.smoothing) / (total + classifier.smoothing * vocab_size)\n    sorted_words = sorted(probs.items(), key=lambda x: x[1], reverse=True)\n    for word, prob in sorted_words[:n]:\n        print(f\"    {word}: {prob:.4f}\")\n\nprint(\"\\nTop spam words:\")\nshow_top_words(classifier, \"spam\")\nprint(\"\\nTop ham words:\")\nshow_top_words(classifier, \"ham\")\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Scikit-learn ships production-ready naive Bayes implementations:\n\n```python\nfrom sklearn.feature_extraction.text import CountVectorizer\nfrom sklearn.naive_bayes import MultinomialNB\nfrom sklearn.metrics import classification_report\n\nvectorizer = CountVectorizer()\nX_train = vectorizer.fit_transform(train_docs)\nclf = MultinomialNB()\nclf.fit(X_train, train_labels)\n\nX_test = vectorizer.transform(test_messages)\npredictions = clf.predict(X_test)\nfor msg, pred in zip(test_messages, predictions):\n    print(f\"  '{msg}' -> {pred}\")\n```\n\nSame algorithm. CountVectorizer handles tokenization and vocabulary building. MultinomialNB handles smoothing and log-probabilities internally. Your from-scratch version does the same thing in 40 lines."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "The NaiveBayes class built here demonstrates the full pipeline: tokenization, probability estimation with Laplace smoothing, log-space prediction. The code in `code/bayes.py` runs end-to-end with no dependencies beyond Python's standard library.\n\n### Conjugate Priors\n\nWhen the prior and posterior belong to the same family of distributions, the prior is called \"conjugate.\" This makes Bayesian updating algebraically clean -- you get a closed-form posterior without numerical integration.\n\n| Likelihood | Conjugate Prior | Posterior | Example |\n|-----------|----------------|-----------|---------|\n| Bernoulli | Beta(a, b) | Beta(a + successes, b + failures) | Coin flip bias estimation |\n| Normal (known variance) | Normal(mu_0, sigma_0) | Normal(weighted mean, smaller variance) | Sensor calibration |\n| Poisson | Gamma(a, b) | Gamma(a + sum of counts, b + n) | Modeling arrival rates |\n| Multinomial | Dirichlet(alpha) | Dirichlet(alpha + counts) | Topic modeling, language models |\n\nWhy this matters: without conjugate priors, you need Monte Carlo sampling or variational inference to approximate the posterior. With conjugate priors, you just update two numbers.\n\nThe Beta distribution is the most common conjugate prior in practice. Beta(a, b) represents your belief about a probability parameter. The mean is a/(a+b). The larger a+b, the more concentrated (confident) the distribution.\n\nSpecial cases of the Beta prior:\n- Beta(1, 1) = uniform. You have no opinion about the parameter.\n- Beta(10, 10) = peaked at 0.5. You strongly believe the parameter is near 0.5.\n- Beta(1, 10) = skewed toward 0. You believe the parameter is small.\n\nThe update rule is dead simple:\n\n```\nPrior:     Beta(a, b)\nData:      s successes, f failures\nPosterior: Beta(a + s, b + f)\n```\n\nNo integrals. No sampling. Just addition.\n\n### Sequential Bayesian Updating\n\nBayesian inference is naturally sequential. Today's posterior becomes tomorrow's prior. This is how real systems learn incrementally without reprocessing all historical data.\n\nConcrete example: estimating whether a coin is fair.\n\n**Day 1: No data yet.**\nStart with Beta(1, 1) -- a uniform prior. You have no opinion.\n- Prior mean: 0.5\n- Prior is flat across [0, 1]\n\n**Day 2: Observe 7 heads, 3 tails.**\nPosterior = Beta(1 + 7, 1 + 3) = Beta(8, 4)\n- Posterior mean: 8/12 = 0.667\n- Evidence suggests the coin is biased toward heads\n\n**Day 3: Observe 5 more heads, 5 more tails.**\nUse yesterday's posterior as today's prior.\nPosterior = Beta(8 + 5, 4 + 5) = Beta(13, 9)\n- Posterior mean: 13/22 = 0.591\n- The balanced new data pulled the estimate back toward 0.5\n\n```mermaid\ngraph LR\n    A[\"Prior<br/>Beta(1,1)<br/>mean = 0.50\"] -->|\"7H, 3T\"| B[\"Posterior 1<br/>Beta(8,4)<br/>mean = 0.67\"]\n    B -->|\"becomes prior\"| C[\"Prior 2<br/>Beta(8,4)\"]\n    C -->|\"5H, 5T\"| D[\"Posterior 2<br/>Beta(13,9)<br/>mean = 0.59\"]\n```\n\nThe order of observations does not matter. Beta(1,1) updated with all 12 heads and 8 tails at once gives Beta(13, 9) -- the same result. Sequential updating and batch updating are mathematically equivalent. But sequential updating lets you make decisions at each step without storing raw data.\n\nThis is the foundation of online learning in production ML systems. Thompson sampling for bandits, incremental recommendation systems, and streaming anomaly detectors all use this pattern.\n\n### Connection to A/B Testing\n\nA/B testing is Bayesian inference in disguise.\n\nSetup: you are testing two button colors. Variant A (blue) and variant B (green). You want to know which one gets more clicks.\n\nThe Bayesian A/B test:\n\n1. **Prior.** Start with Beta(1, 1) for both variants. No prior preference.\n2. **Data.** Variant A: 50 clicks out of 1000 views. Variant B: 65 clicks out of 1000 views.\n3. **Posteriors.**\n   - A: Beta(1 + 50, 1 + 950) = Beta(51, 951). Mean = 0.051\n   - B: Beta(1 + 65, 1 + 935) = Beta(66, 936). Mean = 0.066\n4. **Decision.** Compute P(B > A) -- the probability that B's true conversion rate is higher than A's.\n\nComputing P(B > A) analytically is hard. But Monte Carlo makes it trivial:\n\n```\n1. Draw 100,000 samples from Beta(51, 951)  -> samples_A\n2. Draw 100,000 samples from Beta(66, 936)  -> samples_B\n3. P(B > A) = fraction of samples where B > A\n```\n\nIf P(B > A) > 0.95, you ship variant B. If it is between 0.05 and 0.95, you keep collecting data. If P(B > A) < 0.05, you ship variant A.\n\nAdvantages over frequentist A/B testing:\n- You get a direct probability statement: \"there is a 97% chance B is better\"\n- No p-value confusion. No \"fail to reject the null hypothesis\" hedging.\n- You can check results at any time without inflating false positive rates (no \"peeking problem\")\n- You can incorporate prior knowledge (e.g., previous tests suggest conversion rates are usually 3-8%)\n\n| Aspect | Frequentist A/B | Bayesian A/B |\n|--------|----------------|--------------|\n| Output | p-value | P(B > A) |\n| Interpretation | \"How surprising is this data if A=B?\" | \"How likely is B better than A?\" |\n| Early stopping | Inflates false positives | Safe at any point (given a well-chosen prior and correctly specified model) |\n| Prior knowledge | Not used | Encoded as Beta prior |\n| Decision rule | p < 0.05 | P(B > A) > threshold |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. **Multiple tests.** A patient tests positive twice on independent tests (both 99% accurate, disease prevalence 1 in 10,000). What is P(sick) after both tests? Use the posterior from the first test as the prior for the second.\n\n2. **Smoothing impact.** Run the spam classifier with smoothing values of 0.01, 0.1, 1.0, and 10.0. How do the top word probabilities change? What happens with smoothing=0 and a word that appears only in ham?\n\n3. **Add features.** Extend the NaiveBayes class to also use message length (short/long) as a feature alongside word counts. Estimate P(short|spam) and P(short|ham) from the training data and fold it into the prediction score.\n\n4. **MAP by hand.** Given observed data (7 heads in 10 coin flips), compute the MAP estimate of the bias using a Beta(2,2) prior. Compare it to the MLE estimate (7/10)."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Prior | \"My initial guess\" | P(hypothesis) before observing evidence. In ML: the regularization term. |\n| Likelihood | \"How well the data fits\" | P(evidence\\|hypothesis). How probable the observed data is under a specific hypothesis. |\n| Posterior | \"My updated belief\" | P(hypothesis\\|evidence). The prior multiplied by the likelihood, then normalized. |\n| Evidence | \"The normalizing constant\" | P(data) across all hypotheses. Ensures the posterior sums to 1. |\n| Naive Bayes | \"That simple text classifier\" | A classifier that assumes features are independent given the class. Works well despite the false assumption. |\n| Laplace smoothing | \"Add-one smoothing\" | Adding a small count to every feature to prevent zero probabilities from unseen data. |\n| MLE | \"Just use the frequencies\" | Choose parameters that maximize P(data\\|parameters). No prior. Can overfit with small data. |\n| MAP | \"MLE with a prior\" | Choose parameters that maximize P(data\\|parameters) * P(parameters). Equivalent to regularized MLE. |\n| Log-probability | \"Work in log space\" | Using log(P) instead of P to avoid floating-point underflow when multiplying many small numbers. |\n| False positive | \"A wrong alarm\" | The test says positive, but the true state is negative. Drives the base rate fallacy. |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [3Blue1Brown: Bayes' theorem](https://www.youtube.com/watch?v=HZGCoVF3YvM) - visual explanation with the medical test example\n- [Stanford CS229: Generative Learning Algorithms](https://cs229.stanford.edu/notes2022fall/cs229-notes2.pdf) - naive Bayes and its connection to discriminative models\n- [Think Bayes](https://greenteapress.com/wp/think-bayes/) - free book, Bayesian statistics with Python code\n- [scikit-learn Naive Bayes](https://scikit-learn.org/stable/modules/naive_bayes.html) - production implementations and when to use each variant"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "In Bayes' theorem, what is the 'prior'?",
+      "options": [
+        "The probability of the evidence",
+        "Your belief about a hypothesis before observing any evidence",
+        "The probability of the evidence given the hypothesis",
+        "The final updated probability after seeing evidence"
+      ],
+      "correct": 1,
+      "explanation": "The prior P(A) represents your initial belief about hypothesis A before seeing any data. It gets updated to the posterior P(A|B) after observing evidence B."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "A rare disease affects 1 in 10,000 people. A 99% accurate test returns positive. What is the approximate probability you have the disease?",
+      "options": [
+        "99%",
+        "About 1%",
+        "50%",
+        "10%"
+      ],
+      "correct": 1,
+      "explanation": "Despite 99% test accuracy, the disease is so rare (0.01%) that most positive results come from healthy people (false positives). Bayes' theorem gives P(sick|positive) = ~0.98%, not 99%."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "What is Laplace smoothing in a Naive Bayes classifier and why is it necessary?",
+      "options": [
+        "It normalizes feature values to have zero mean and unit variance",
+        "It adds a small count to every feature to prevent zero probabilities from unseen words, which would zero out the entire product",
+        "It smooths the decision boundary between classes",
+        "It reduces the dimensionality of the feature space"
+      ],
+      "correct": 1,
+      "explanation": "Without smoothing, a word never seen in spam training data gets P(word|spam)=0, making the entire product zero regardless of other strong spam indicators. Adding 1 to each count prevents this."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "How does MAP (Maximum A Posteriori) estimation differ from MLE (Maximum Likelihood Estimation)?",
+      "options": [
+        "MAP uses a larger dataset than MLE",
+        "MAP incorporates a prior distribution over parameters, equivalent to adding regularization, while MLE only uses the likelihood",
+        "MAP is faster to compute than MLE",
+        "MLE always produces better results than MAP"
+      ],
+      "correct": 1,
+      "explanation": "MAP maximizes P(data|params) * P(params) while MLE maximizes P(data|params) alone. The prior P(params) acts as regularization -- a Gaussian prior equals L2 regularization, a Laplace prior equals L1."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "In sequential Bayesian updating, you start with Beta(1,1) and observe 7 heads and 3 tails. What is the posterior?",
+      "options": [
+        "Beta(7, 3)",
+        "Beta(8, 4)",
+        "Beta(1.7, 1.3)",
+        "Normal(0.7, 0.1)"
+      ],
+      "correct": 1,
+      "explanation": "The Beta-Binomial conjugate update adds successes to the first parameter and failures to the second: Beta(1+7, 1+3) = Beta(8, 4). The posterior mean is 8/12 = 0.667."
+    }
+  ],
+  "resources": [
+    {
+      "label": "3Blue1Brown: Bayes' theorem",
+      "href": "https://www.youtube.com/watch?v=HZGCoVF3YvM",
+      "kind": "Reading"
+    },
+    {
+      "label": "Stanford CS229: Generative Learning Algorithms",
+      "href": "https://cs229.stanford.edu/notes2022fall/cs229-notes2.pdf",
+      "kind": "Reading"
+    },
+    {
+      "label": "Think Bayes",
+      "href": "https://greenteapress.com/wp/think-bayes/",
+      "kind": "Reading"
+    },
+    {
+      "label": "scikit-learn Naive Bayes",
+      "href": "https://scikit-learn.org/stable/modules/naive_bayes.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "Bayesian Reasoning",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem/outputs/prompt-bayesian-reasoning.md",
+      "kind": "Prompt"
+    },
+    {
+      "label": "bayes.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem/code/bayes.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/07-bayes-theorem"
+}

@@ -1,0 +1,147 @@
+{
+  "id": "ai-from-scratch/13-tools-and-protocols/09-mcp-transports",
+  "slug": "09-mcp-transports",
+  "phaseSlug": "13-tools-and-protocols",
+  "number": "09",
+  "title": "MCP Transports — stdio vs Streamable HTTP vs SSE Migration",
+  "summary": "stdio works locally and nowhere else. Streamable HTTP (2025-03-26) is the remote standard. The old HTTP+SSE transport is deprecated and being removed in mid-2026. Picking the wrong transport costs a migration; picking the right one buys a...",
+  "motto": "stdio works locally and nowhere else. Streamable HTTP (2025-03-26) is the remote standard. The old HTTP+SSE transport is deprecated and being removed in mid-2026. Picking the wrong transport costs a migration; picking the right one buys a remote-hostable MCP server with session continuity and DNS-rebinding protection.",
+  "type": "Learn",
+  "languages": [
+    "Python (stdlib",
+    "Streamable HTTP endpoint skeleton)"
+  ],
+  "prerequisites": [
+    "Phase 13 · 07",
+    "08 (MCP server and client)"
+  ],
+  "duration": "~45 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Pick between stdio and Streamable HTTP based on deployment shape (local vs remote, single-process vs fleet).",
+    "Implement the Streamable HTTP single-endpoint pattern: POST for requests, GET for session stream.",
+    "Enforce Origin validation and session-id semantics to defeat DNS-rebinding.",
+    "Migrate a legacy HTTP+SSE server to Streamable HTTP before the mid-2026 removal deadlines."
+  ],
+  "exercises": [
+    "Run code/main.py. POST an initialize from curl and observe the Mcp-Session-Id response header. POST a second request echoing the header and verify session continuity.",
+    "Add a GET handler that opens an SSE stream. Send one notifications/progress event every five seconds. Reconnect by re-GETing with the same session id and confirm the server accepts it.",
+    "Implement the last-event-id replay logic. On reconnect, replay any events generated since that id.",
+    "Extend Origin validation to support a wildcard pattern (https://*.example.com) and confirm it accepts https://app.example.com but rejects https://evil.example.com.attacker.net.",
+    "Take a legacy HTTP+SSE server from the official registry (there are several) and sketch the migration: what changes in endpoint handling, session id generation, and header semantics."
+  ],
+  "topics": [
+    "Tools & Protocols",
+    "Learn",
+    "Python (stdlib",
+    "Streamable HTTP endpoint skeleton)",
+    "MCP",
+    "Transports",
+    "stdio",
+    "Streamable",
+    "HTTP",
+    "SSE",
+    "Migration",
+    "stdio transport",
+    "Streamable HTTP",
+    "HTTP+SSE",
+    "Mcp-Session-Id",
+    "Origin allowlist",
+    "Single endpoint",
+    "last-event-id",
+    "Backwards-compat probe",
+    "Long-lived HTTP",
+    "Session revocation"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> stdio works locally and nowhere else. Streamable HTTP (2025-03-26) is the remote standard. The old HTTP+SSE transport is deprecated and being removed in mid-2026. Picking the wrong transport costs a migration; picking the right one buys a remote-hostable MCP server with session continuity and DNS-rebinding protection."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Pick between stdio and Streamable HTTP based on deployment shape (local vs remote, single-process vs fleet).\n- Implement the Streamable HTTP single-endpoint pattern: POST for requests, GET for session stream.\n- Enforce `Origin` validation and session-id semantics to defeat DNS-rebinding.\n- Migrate a legacy HTTP+SSE server to Streamable HTTP before the mid-2026 removal deadlines."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "The first MCP remote transport (2024-11) was HTTP+SSE: two endpoints, one for the client's POSTs and one Server-Sent-Events channel for the server-to-client stream. It worked. It was also clumsy: two endpoints per session, broken caches in front of some CDNs, and a hard dependency on long-lived SSE connections that some WAFs terminate aggressively.\n\nThe 2025-03-26 spec replaced it with Streamable HTTP: one endpoint, POST for client requests, GET for establishing a session stream, both sharing a `Mcp-Session-Id` header. Every server built or migrated since then uses Streamable HTTP. The old SSE mode is being deprecated — Atlassian Rovo removed it June 30, 2026; Keboola April 1, 2026; most remaining enterprise servers by end of 2026.\n\nAnd stdio still matters for local servers. Claude Desktop, VS Code, and every IDE-shaped client spawn servers via stdio. The right mental model: stdio for \"this machine\", Streamable HTTP for \"over the network\". No cross-over."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### stdio\n\n- Child-process transport. Client spawns server, communicates via stdin/stdout.\n- One JSON object per line. Newline-delimited.\n- No session id; process identity is the session.\n- No auth needed (the child inherits the parent's trust boundary).\n- Never use for remote servers — you would need SSH or socat to tunnel, at which point use Streamable HTTP.\n\n### Streamable HTTP\n\nSingle endpoint `/mcp` (or any path). Supports three HTTP methods:\n\n- **POST /mcp.** Client sends a JSON-RPC message. Server replies with either a single JSON response, or an SSE stream of one-or-more responses (useful for batched responses and notifications related to that request).\n- **GET /mcp.** Client opens a long-lived SSE channel. Server uses it for server-to-client requests (sampling, notifications, elicitation).\n- **DELETE /mcp.** Client explicitly terminates the session.\n\nSessions are identified by the `Mcp-Session-Id` header the server sets on the first response and the client echoes on every subsequent request. Session ids MUST be cryptographically random (128+ bits); client-chosen ids are rejected for safety.\n\n### Single endpoint vs two\n\nTwo-endpoint mode from the old spec is still callable in 2026 — the spec declares it \"legacy compatible\". But all new servers should be single-endpoint. The official SDKs emit single-endpoint; use the legacy mode only when talking to an unmigrated remote.\n\n### `Origin` validation and DNS-rebinding\n\nBrowsers are not MCP clients (today), but an attacker can craft a webpage that convinces a browser to POST to `localhost:1234/mcp` — where the user's local MCP server listens. If the server does not check `Origin`, the browser's same-origin policy will not save it because `Origin: http://evil.com` is valid cross-origin.\n\nThe 2025-11-25 spec requires servers to reject requests whose `Origin` is not on an allowlist. The allowlist typically contains the MCP client host (`https://claude.ai`, `vscode-webview://*`) and localhost variants for local UIs.\n\n### Session id lifecycle\n\n1. Client sends first request without `Mcp-Session-Id`.\n2. Server assigns a random id, sets `Mcp-Session-Id` on the response header.\n3. Client echoes that header on all subsequent requests and on `GET /mcp` for the stream.\n4. Session can be revoked by the server; client sees 404 on subsequent requests and must re-initialize.\n5. Client can explicitly DELETE the session for clean shutdown.\n\n### Keepalive and reconnect\n\nSSE connections drop. The client re-establishes by re-GETing with the same `Mcp-Session-Id`. Server MUST queue events missed during the outage (up to a reasonable window) and replay via the `last-event-id` header the client echoes.\n\nPhase 13 · 13 covers Tasks, which let long-running work survive even a full-session reconnect.\n\n### Backwards compatibility probe\n\nA client that wants to support both old and new servers:\n\n1. POST to `/mcp`.\n2. If response is `200 OK` with JSON or SSE, this is Streamable HTTP.\n3. If response is `200 OK` with `Content-Type: text/event-stream` AND a `Location` header pointing to a secondary endpoint, this is legacy HTTP+SSE; follow the `Location`.\n\n### Cloudflare, ngrok, and hosting\n\nProduction remote MCP servers in 2026 run on Cloudflare Workers (with their MCP Agents SDK), Vercel Functions, or containerized Node/Python. Key: your hosting must support long-lived HTTP connections for the SSE GET. Vercel's free tier caps at 10 seconds and is unsuitable. Cloudflare Workers support indefinite streams.\n\n### Gateway composition\n\nWhen you front multiple MCP servers with a gateway (Phase 13 · 17), the gateway is a single Streamable HTTP endpoint that rewrites session ids and multiplexes upstream. Tools are merged at the gateway layer; the client sees a single logical server.\n\n### Transport failure modes\n\n- **stdio SIGPIPE.** Child process death mid-write raises SIGPIPE; servers should exit cleanly. Clients should detect EOF and mark the session dead.\n- **HTTP 502 / 504.** Cloudflare, nginx, and other proxies emit these on upstream failure. Streamable HTTP clients should retry once after a short backoff.\n- **SSE connection drop.** TCP RST, proxy timeout, or client network change closes the stream. Client reconnects with `Mcp-Session-Id` and optional `last-event-id` to resume.\n- **Session revocation.** Server invalidates a session id; client sees 404 on next request. Client must re-handshake.\n- **Clock skew.** Resource-TTL calculations on the client diverge from the server. Client should treat server timestamps as authoritative.\n\n### When to bypass Streamable HTTP\n\nSome enterprises deploy MCP servers behind gRPC or message-queue transports inside their own networks. This is non-standard — MCP's spec does not formally define these. Gateways can expose a Streamable HTTP surface to MCP clients while using gRPC internally. Keep the external surface spec-compliant; the gateway owns the translation."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "`code/main.py` implements a minimal Streamable HTTP endpoint using `http.server` (stdlib). It handles POST, GET, and DELETE on `/mcp`, sets `Mcp-Session-Id` on first response, validates `Origin`, and rejects requests from non-allowlisted origins. The handler reuses the Lesson 07 notes server's dispatch logic.\n\nWhat to look at:\n\n- The POST handler reads the JSON-RPC body, dispatches, and writes a JSON response (the single-response variant; SSE variant is structurally similar).\n- The `Origin` check rejects the default `http://evil.example` probe but accepts `http://localhost`.\n- Session ids are random 128-bit hex strings; the server keeps per-session state in memory."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces `outputs/skill-mcp-transport-migrator.md`. Given an HTTP+SSE (legacy) MCP server, the skill produces a migration plan to Streamable HTTP with session-id continuity, Origin checks, and backwards-compatible probe support."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run `code/main.py`. POST an `initialize` from `curl` and observe the `Mcp-Session-Id` response header. POST a second request echoing the header and verify session continuity.\n\n2. Add a GET handler that opens an SSE stream. Send one `notifications/progress` event every five seconds. Reconnect by re-GETing with the same session id and confirm the server accepts it.\n\n3. Implement the `last-event-id` replay logic. On reconnect, replay any events generated since that id.\n\n4. Extend `Origin` validation to support a wildcard pattern (`https://*.example.com`) and confirm it accepts `https://app.example.com` but rejects `https://evil.example.com.attacker.net`.\n\n5. Take a legacy HTTP+SSE server from the official registry (there are several) and sketch the migration: what changes in endpoint handling, session id generation, and header semantics."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| stdio transport | \"Local child process\" | JSON-RPC over stdin/stdout, newline-delimited |\n| Streamable HTTP | \"The remote transport\" | Single-endpoint POST + GET + optional SSE, 2025-03-26 spec |\n| HTTP+SSE | \"Legacy\" | Two-endpoint model being removed in mid-2026 |\n| `Mcp-Session-Id` | \"Session header\" | Server-assigned random id echoed on every subsequent request |\n| `Origin` allowlist | \"DNS-rebinding defense\" | Reject requests whose Origin is not approved |\n| Single endpoint | \"One URL\" | `/mcp` handles POST / GET / DELETE for all session operations |\n| `last-event-id` | \"SSE replay\" | Header used to resume a dropped stream without missing events |\n| Backwards-compat probe | \"Old vs new detection\" | Client response-shape check that auto-selects transport |\n| Long-lived HTTP | \"SSE streaming\" | Server pushes events for minutes or hours on one TCP connection |\n| Session revocation | \"Force re-init\" | Server invalidates a session id; client must handshake again |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [MCP — Basic transports spec 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports) — canonical reference for stdio and Streamable HTTP\n- [MCP — Basic transports spec 2025-03-26](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) — the revision that introduced Streamable HTTP\n- [Cloudflare — MCP transport](https://developers.cloudflare.com/agents/model-context-protocol/transport/) — Workers-hosted Streamable HTTP patterns\n- [AWS — MCP transport mechanisms](https://builder.aws.com/content/35A0IphCeLvYzly9Sw40G1dVNzc/mcp-transport-mechanisms-stdio-vs-streamable-http) — comparison across deployment shapes\n- [Atlassian — HTTP+SSE deprecation notice](https://community.atlassian.com/forums/Atlassian-Remote-MCP-Server/HTTP-SSE-Deprecation-Notice/ba-p/3205484) — concrete migration deadline example"
+    }
+  ],
+  "quiz": [],
+  "resources": [
+    {
+      "label": "MCP — Basic transports spec 2025-11-25",
+      "href": "https://modelcontextprotocol.io/specification/2025-11-25/basic/transports",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP — Basic transports spec 2025-03-26",
+      "href": "https://modelcontextprotocol.io/specification/2025-03-26/basic/transports",
+      "kind": "Reading"
+    },
+    {
+      "label": "Cloudflare — MCP transport",
+      "href": "https://developers.cloudflare.com/agents/model-context-protocol/transport/",
+      "kind": "Reading"
+    },
+    {
+      "label": "AWS — MCP transport mechanisms",
+      "href": "https://builder.aws.com/content/35A0IphCeLvYzly9Sw40G1dVNzc/mcp-transport-mechanisms-stdio-vs-streamable-http",
+      "kind": "Reading"
+    },
+    {
+      "label": "Atlassian — HTTP+SSE deprecation notice",
+      "href": "https://community.atlassian.com/forums/Atlassian-Remote-MCP-Server/HTTP-SSE-Deprecation-Notice/ba-p/3205484",
+      "kind": "Reading"
+    },
+    {
+      "label": "MCP Transport Migrator",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/09-mcp-transports/outputs/skill-mcp-transport-migrator.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/09-mcp-transports/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/09-mcp-transports",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/13-tools-and-protocols/09-mcp-transports"
+}

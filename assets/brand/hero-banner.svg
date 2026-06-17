@@ -1,0 +1,18 @@
+<svg width='1280' height='640' viewBox='0 0 1280 640' fill='none' xmlns='http://www.w3.org/2000/svg'>
+  <rect width='1280' height='640' fill='#0b1120'/>
+  <path d='M0 520C180 430 304 600 488 500C664 405 764 262 956 306C1088 337 1172 266 1280 170V640H0V520Z' fill='#0f766e' opacity='.62'/>
+  <path d='M0 410C150 350 260 430 410 386C566 340 652 180 812 196C990 214 1044 336 1280 254V640H0V410Z' fill='#1d4ed8' opacity='.5'/>
+  <rect x='76' y='74' width='1128' height='492' rx='28' fill='#f8fafc' opacity='.05' stroke='#f8fafc' stroke-opacity='.14'/>
+  <rect x='112' y='112' width='88' height='88' rx='20' fill='#f8fafc'/>
+  <path d='M134 174V138h13l18 20v-20h10v36h-11l-19-21v21h-11Z' fill='#0f172a'/>
+  <path d='M182 138h16c7 0 12 5 12 12v24h-10v-24c0-1 0-2-1-3l-25 27h-14l27-27h-5v-9Z' fill='#0284c7'/>
+  <text x='112' y='278' fill='#f8fafc' font-family='Inter,Segoe UI,Arial,sans-serif' font-size='72' font-weight='800'>AIByDM</text>
+  <text x='112' y='342' fill='#bae6fd' font-family='Inter,Segoe UI,Arial,sans-serif' font-size='42' font-weight='700'>Learn AI. Build AI. Master AI.</text>
+  <text x='112' y='402' fill='#cbd5e1' font-family='Inter,Segoe UI,Arial,sans-serif' font-size='24'>Open-source AI learning platform for builders, educators, contributors, and teams.</text>
+  <g transform='translate(112 454)' font-family='Inter,Segoe UI,Arial,sans-serif' font-size='18' font-weight='700'>
+    <rect width='128' height='46' rx='23' fill='#38bdf8'/><text x='24' y='30' fill='#082f49'>Learn</text>
+    <rect x='148' width='128' height='46' rx='23' fill='#a3e635'/><text x='172' y='30' fill='#1a2e05'>Tools</text>
+    <rect x='296' width='128' height='46' rx='23' fill='#facc15'/><text x='320' y='30' fill='#422006'>Games</text>
+    <rect x='444' width='128' height='46' rx='23' fill='#fb7185'/><text x='468' y='30' fill='#4c0519'>Exams</text>
+  </g>
+</svg>

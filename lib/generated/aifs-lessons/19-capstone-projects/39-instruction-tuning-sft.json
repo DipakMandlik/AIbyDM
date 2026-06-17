@@ -1,0 +1,197 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/39-instruction-tuning-sft",
+  "slug": "39-instruction-tuning-sft",
+  "phaseSlug": "19-capstone-projects",
+  "number": "39",
+  "title": "Capstone Lesson 39: Instruction Tuning by Supervised Fine-Tuning",
+  "summary": "A pretrained base model can extend a sequence but cannot follow an instruction. Supervised fine-tuning is the smallest change that fixes this: feed the model paired examples of an instruction and a desired response, and train the body to p...",
+  "motto": "A pretrained base model can extend a sequence but cannot follow an instruction. Supervised fine-tuning is the smallest change that fixes this: feed the model paired examples of an instruction and a desired response, and train the body to predict the response tokens. The trick is that you only want the loss to count the response, not the instruction. This lesson builds an Alpaca-style SFT loop with a custom collate function that masks instruction tokens with ignore_index=-100, trains on 200 instruction-response pairs, and evaluates on a held-out split using exact-match.",
+  "type": "Build",
+  "languages": [
+    "Python (torch",
+    "numpy)"
+  ],
+  "prerequisites": [],
+  "duration": "~90 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Format paired instruction-response data into a single causal sequence with explicit boundary tokens.",
+    "Build a collate function that masks instruction tokens so cross-entropy only counts response tokens.",
+    "Train a tiny transformer body under the SFT objective and watch the eval metric move.",
+    "Implement greedy and temperature-sampled generation that respects the response-start boundary.",
+    "Compute held-out exact-match on generated completions."
+  ],
+  "exercises": [],
+  "topics": [
+    "Capstone Projects",
+    "Build",
+    "Python (torch",
+    "numpy)",
+    "Capstone",
+    "Lesson",
+    "Instruction",
+    "Tuning",
+    "Supervised",
+    "Fine"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> A pretrained base model can extend a sequence but cannot follow an instruction. Supervised fine-tuning is the smallest change that fixes this: feed the model paired examples of an instruction and a desired response, and train the body to predict the response tokens. The trick is that you only want the loss to count the response, not the instruction. This lesson builds an Alpaca-style SFT loop with a custom collate function that masks instruction tokens with ignore_index=-100, trains on 200 instruction-response pairs, and evaluates on a held-out split using exact-match."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Format paired instruction-response data into a single causal sequence with explicit boundary tokens.\n- Build a collate function that masks instruction tokens so cross-entropy only counts response tokens.\n- Train a tiny transformer body under the SFT objective and watch the eval metric move.\n- Implement greedy and temperature-sampled generation that respects the response-start boundary.\n- Compute held-out exact-match on generated completions."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A base model trained on next-token prediction has no idea what an instruction is. Show it the string `\"What is the capital of France?\"` and it will continue the question or invent a new sentence. The model has the language but not the format contract.\n\nThe SFT contract is a string template. Every training example becomes a single sequence with three regions:\n\n```text\n<INST> What is the capital of France? <RESP> The capital of France is Paris.\n```\n\nThe boundary tokens are special tokens reserved at training time. The model learns that everything after `<RESP>` is the response and the response is what gets graded. The base model's next-token objective still applies; it is just trained on a corpus where every example has this shape.\n\nBut there is a catch. If you feed the entire sequence to a vanilla cross-entropy loss, you are training the model to also predict the instruction tokens. The instruction is given. You want zero gradient on those positions. The fix is the mask."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart LR\n  Pair[instruction + response] --> Tmpl[apply template<br/>INST + RESP tokens]\n  Tmpl --> Tokens[token ids]\n  Tokens --> Mask[loss mask<br/>-100 on instruction]\n  Mask --> Model[transformer body + LM head]\n  Model --> CE[cross-entropy<br/>ignore_index=-100]\n  CE --> Step[backward + optimiser step]\n```\n\n`ignore_index` is a feature of `torch.nn.functional.cross_entropy`. Any target position equal to `ignore_index` contributes zero loss and zero gradient. The convention in PyTorch is `-100`. The collate function builds two tensors per example: `input_ids` (the full sequence) and `labels` (a copy of `input_ids` with the instruction positions overwritten by `-100`).\n\nThe model sees the whole sequence during the forward pass; attention can attend to the instruction. The loss only counts response tokens. This is exactly what you want: condition on the instruction, predict the response."
+    },
+    {
+      "key": "the-data",
+      "title": "The Data",
+      "markdown": "Two hundred instruction-response pairs are generated deterministically in `main.py`. They cover six task types:\n\n- factual single-shot (capital of X)\n- arithmetic\n- list extraction\n- one-sentence summary\n- code (print, sort)\n- definition\n\nEach task has a templated instruction and a deterministic response. This is intentionally simple. Exact-match is brittle, and the lesson uses a fixture where the right answer is one specific string. Real SFT datasets need fuzzy metrics; the principle is identical.\n\nSplits are 160 train, 40 test. The test set covers all six task types so per-category exact-match can be reported."
+    },
+    {
+      "key": "tokenisation-and-padding",
+      "title": "Tokenisation and Padding",
+      "markdown": "The tokeniser is byte-level with three reserved specials:\n\n- `INST_ID = 256`: marks the start of the instruction region.\n- `RESP_ID = 257`: marks the boundary between instruction and response.\n- `PAD_ID = 258`: padding for variable-length batches.\n\nThe sequence is `[INST] inst_bytes [RESP] resp_bytes [PAD]*`. The collate function:\n\n1. Tokenises each example.\n2. Pads every example in the batch to the longest sequence in the batch.\n3. Builds `labels` = `input_ids` shifted by one (causal LM target), with:\n   - The instruction region replaced by `-100`.\n   - The padding region replaced by `-100`.\n   - The `RESP_ID` boundary position itself replaced by `-100` (you do not train the model to predict the boundary token; it predicts what follows).\n\n```mermaid\nflowchart TD\n  Batch[(examples)] --> Tok[encode + insert specials]\n  Tok --> Pad[pad to longest]\n  Pad --> Shift[shift labels by one]\n  Shift --> Mask[set -100 on<br/>inst / pad / boundary]\n  Mask --> Out[(input_ids, labels)]\n```\n\nThe shift is the standard causal trick: position `i` of `input_ids` predicts position `i+1`, so `labels[i] = input_ids[i+1]` (with the final position dropped from the input and the first dropped from the target). The mask is applied after the shift to land on the right positions."
+    },
+    {
+      "key": "training",
+      "title": "Training",
+      "markdown": "```mermaid\nflowchart LR\n  DL[Train loader<br/>200 pairs] --> Fwd[forward]\n  Fwd --> Logits[B x T x V]\n  Logits --> Loss[CE with -100 mask]\n  Loss --> Bwd[backward]\n  Bwd --> Opt[Adam optimiser]\n  Opt --> Body[(updated body)]\n```\n\nThe loop is the standard PyTorch SFT loop. Adam, learning rate around 3e-4 to 1e-3, ten to twenty epochs on this fixture, no scheduler. The model is small enough (hidden 96, 2 blocks, max length 64) to train to convergence on CPU inside two minutes.\n\nEvery fifth epoch the loop runs a tiny eval pass on the held-out set and prints exact-match. Watching exact-match go from 0.0 at epoch one to something like 0.85 at epoch fifteen is the lesson's payoff: you can see the model learning the format and the answers at the same time."
+    },
+    {
+      "key": "generation",
+      "title": "Generation",
+      "markdown": "At eval time the model gets the instruction prefix `[INST] inst_bytes [RESP]` and generates tokens until either:\n\n- the sequence reaches `max_len`, or\n- the model emits a special stop heuristic: two consecutive sentence-ending bytes (`.`, `!`, `?`).\n\nThe lesson ships greedy decoding plus an optional temperature sampler. Exact-match uses greedy because temperature would make the metric stochastic. Real systems often sample, then judge fuzzily; that pipeline is lesson 41."
+    },
+    {
+      "key": "exact-match-evaluation",
+      "title": "Exact-Match Evaluation",
+      "markdown": "Exact-match is the strictest text metric. The predicted response string is normalised (lowercase, strip whitespace, collapse double spaces) and compared to the reference response, normalised the same way. The metric is either 1 or 0 per example. The aggregate is the mean.\n\nReal SFT pipelines complement exact-match with token-level F1 (lesson 41) and a judge model. Exact-match remains useful because it is unambiguous; if it says 0.7, exactly 70 percent of test instructions produced the gold response character for character."
+    },
+    {
+      "key": "what-you-will-build",
+      "title": "What you will build",
+      "markdown": "The implementation is one `main.py` plus tests.\n\n1. `InstructionTokenizer`: byte-level encoder with reserved specials. Encodes either an instruction prefix or a full pair.\n2. `make_dataset`: generates 200 pairs across six task types with a fixed seed.\n3. `SFTDataset`: returns `(input_ids, labels)` per example, already mask-prepared.\n4. `sft_collate`: dynamic padding, builds the batch tensor, sets `-100` on instruction and pad positions.\n5. `TinyGPT`: transformer body plus tied or untied LM head.\n6. `train_sft`: the SFT loop, with per-epoch eval hooks.\n7. `generate`: causal decode from a prefix, greedy or sampled, with the stop heuristic.\n8. `exact_match`: normalised string comparison, returns float in `[0, 1]`.\n9. `run_demo`: builds the data, trains for twenty epochs, evaluates, prints a per-category breakdown, exits zero on success."
+    },
+    {
+      "key": "why-the-mask-matters",
+      "title": "Why the mask matters",
+      "markdown": "Without the mask, the loss treats instruction tokens as targets. The model learns to predict the instruction. This is a different objective and produces a worse model in two ways. First, model capacity is wasted reconstructing inputs the user always provides. Second, the response loss is smaller in the gradient sum because instruction tokens outnumber response tokens in most batches; the optimiser's effective learning rate on the part you care about is lower than you intended. The mask is not a polish; it is the objective."
+    },
+    {
+      "key": "stretch-goals",
+      "title": "Stretch goals",
+      "markdown": "- Add a learning-rate warmup followed by cosine decay. SFT is more sensitive to LR than pretraining.\n- Add per-token loss logging and plot the loss curve over training. Notice that early epochs are dominated by template tokens (`<RESP>`, common prefixes) and later epochs are dominated by the actual answer tokens.\n- Extend the eval to BLEU-1 or chrF. Exact-match underestimates models that produce a paraphrase with the same answer.\n- Add a chat template with multi-turn formatting and train on a fixture that includes follow-ups.\n\nThe implementation gives you the format contract, the mask, and the loop. The objective change from base model to instruction follower is one collate function."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Before reading: you give a vanilla base model the prompt 'What is the capital of France?'. It outputs 'And what about Italy and Spain too?'. Which best diagnoses the gap?",
+      "options": [
+        "The model is missing the fact about Paris.",
+        "The model has the language model behaviour but no instruction-following format contract.",
+        "The model needs a larger vocabulary.",
+        "The base model must be reset and pretrained again."
+      ],
+      "correct": 1,
+      "explanation": "The base model can extend text but has never been shown that an instruction expects a corresponding response. SFT teaches the format contract: see instruction, emit response."
+    },
+    {
+      "id": "check-2",
+      "stage": "check",
+      "question": "The collate function sets labels[i] = -100 on instruction positions and on padding positions. Why does PyTorch cross-entropy treat these positions correctly?",
+      "options": [
+        "Cross-entropy silently drops any negative target.",
+        "ignore_index=-100 is honoured by F.cross_entropy: those positions contribute zero loss and zero gradient.",
+        "The model output at those positions is set to NaN automatically.",
+        "PyTorch normalises by sequence length so masked positions cancel out."
+      ],
+      "correct": 1,
+      "explanation": "ignore_index is a documented argument of F.cross_entropy. Targets equal to it contribute zero to loss and zero to gradients. -100 is the conventional default value."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why does `shifted_loss` slice `logits[:, :-1, :]` and `labels[:, 1:]` instead of using them at the same positions?",
+      "options": [
+        "To make the tensors the same size after the collate step.",
+        "Because the model at position i predicts the token at position i+1 under the causal next-token objective.",
+        "To exclude the final padding position automatically.",
+        "It is an optional optimisation; using same-position labels also works."
+      ],
+      "correct": 1,
+      "explanation": "Causal LM trains position i to predict token i+1. The slice aligns the prediction at position i with the gold label at position i+1, which is the standard next-token objective."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "You train without the mask: labels are equal to input_ids with no -100. The model trains but exact-match on the response is worse than with the mask. The most likely cause?",
+      "options": [
+        "The optimiser overfits the response tokens.",
+        "Most of the gradient signal goes to predicting the instruction (the largest masked region was holding it back).",
+        "Cross-entropy is unstable when the loss includes specials.",
+        "The model cannot learn the boundary token without the mask."
+      ],
+      "correct": 1,
+      "explanation": "When instruction positions count toward the loss, they dominate the gradient because there are usually more of them than response tokens. The effective learning rate on the part you care about (the response) drops, and the model spends capacity reconstructing inputs the user always supplies."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "Exact-match is 0.85 on the held-out set. A reviewer says the model paraphrases correct answers and exact-match misses those. Which metric do you add to capture this?",
+      "options": [
+        "Loss on the held-out set.",
+        "Token-level F1 against the reference, which credits overlap even when not character-identical.",
+        "Average sequence length.",
+        "Cross-entropy of the reference under the model."
+      ],
+      "correct": 1,
+      "explanation": "Token-level F1 (counted between predicted and reference tokens after normalisation) credits the model for getting most of the answer right even when surface form differs. This is lesson 41's job."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "You want to use the SFT model in a chatbot that supports multi-turn dialogue. What is the minimum change required to the data and the mask?",
+      "options": [
+        "None: SFT models always handle multi-turn out of the box.",
+        "Add a USER and ASSISTANT marker per turn, concatenate turns, and mask everything except the assistant turn currently being trained on.",
+        "Switch the loss to mean-squared error.",
+        "Increase the vocabulary."
+      ],
+      "correct": 1,
+      "explanation": "Multi-turn SFT generalises the single-turn template. Each turn gets a role marker. The mask is the union of all non-assistant positions plus padding. The training objective is unchanged."
+    }
+  ],
+  "resources": [
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/39-instruction-tuning-sft/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "tests/test_main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/39-instruction-tuning-sft/code/tests/test_main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/39-instruction-tuning-sft",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/39-instruction-tuning-sft"
+}

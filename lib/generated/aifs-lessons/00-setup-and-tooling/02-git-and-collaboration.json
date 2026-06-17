@@ -1,0 +1,155 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/02-git-and-collaboration",
+  "slug": "02-git-and-collaboration",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "02",
+  "title": "Git & Collaboration",
+  "summary": "Version control is not optional. Every experiment, every model, every lesson you build here gets tracked.",
+  "motto": "Version control is not optional. Every experiment, every model, every lesson you build here gets tracked.",
+  "type": "Learn",
+  "languages": [],
+  "prerequisites": [
+    "Phase 0",
+    "Lesson 01"
+  ],
+  "duration": "~30 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Configure git identity and use the daily workflow of add, commit, and push",
+    "Create and merge branches for isolated experiments without breaking main",
+    "Write a .gitignore that excludes model checkpoints and large binary files",
+    "Navigate the commit history with git log to understand project evolution"
+  ],
+  "exercises": [
+    "Clone this repo, create a branch called my-progress, make a file, commit it, push it",
+    "Create a .gitignore that excludes model checkpoint files (.pt, .pth, .safetensors)",
+    "Look at the commit history of this repo with git log --oneline and read how lessons were added"
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Learn",
+    "Git",
+    "Collaboration",
+    "Commit",
+    "Branch",
+    "Merge",
+    "Remote"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Version control is not optional. Every experiment, every model, every lesson you build here gets tracked."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Configure git identity and use the daily workflow of add, commit, and push\n- Create and merge branches for isolated experiments without breaking main\n- Write a `.gitignore` that excludes model checkpoints and large binary files\n- Navigate the commit history with `git log` to understand project evolution"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You're about to write hundreds of code files across 20 phases. Without version control you will lose work, break things you can't undo, and have no way to collaborate with others.\n\nGit is the tool. GitHub is where the code lives. This lesson covers what you need for this course and nothing more."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nsequenceDiagram\n    participant WD as Working Directory\n    participant SA as Staging Area\n    participant LR as Local Repo\n    participant R as Remote (GitHub)\n    WD->>SA: git add\n    SA->>LR: git commit\n    LR->>R: git push\n    R->>LR: git fetch\n    LR->>WD: git pull\n```\n\nThree things to remember:\n1. Save often (`git commit`)\n2. Push to remote (`git push`)\n3. Branch for experiments (`git checkout -b experiment`)"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Configure git\n\n```bash\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"you@example.com\"\n```\n\n### Step 2: The daily workflow\n\n```bash\ngit status\ngit add file.py\ngit commit -m \"Add perceptron implementation\"\ngit push origin main\n```\n\n### Step 3: Branching for experiments\n\n```bash\ngit checkout -b experiment/new-optimizer\n\n# ... make changes, commit ...\n\ngit checkout main\ngit merge experiment/new-optimizer\n```\n\n### Step 4: Working with this course repo\n\n```bash\ngit clone https://github.com/rohitg00/ai-engineering-from-scratch.git\ncd ai-engineering-from-scratch\n\ngit checkout -b my-progress\n# work through lessons, commit your code\ngit push origin my-progress\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "For this course, you need exactly these commands:\n\n| Command | When |\n|---------|------|\n| `git clone` | Get the course repo |\n| `git add` + `git commit` | Save your work |\n| `git push` | Back it up to GitHub |\n| `git checkout -b` | Try something without breaking main |\n| `git log --oneline` | See what you've done |\n\nThat's it. You don't need rebase, cherry-pick, or submodules for this course."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Clone this repo, create a branch called `my-progress`, make a file, commit it, push it\n2. Create a `.gitignore` that excludes model checkpoint files (`.pt`, `.pth`, `.safetensors`)\n3. Look at the commit history of this repo with `git log --oneline` and read how lessons were added"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Commit | \"Saving\" | A snapshot of your entire project at a point in time |\n| Branch | \"A copy\" | A pointer to a commit that moves forward as you work |\n| Merge | \"Combining code\" | Taking changes from one branch and applying them to another |\n| Remote | \"The cloud\" | A copy of your repo hosted somewhere else (GitHub, GitLab) |"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does 'version control' primarily help you do?",
+      "options": [
+        "Speed up code execution",
+        "Track changes to files over time and collaborate with others",
+        "Compress files to save disk space",
+        "Automatically fix bugs in your code"
+      ],
+      "correct": 1,
+      "explanation": "Version control systems like git track every change made to files, allowing you to revert to previous states and collaborate with others on the same codebase."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is a 'repository' in the context of software development?",
+      "options": [
+        "A cloud storage service like Google Drive",
+        "A collection of files and their complete change history managed by version control",
+        "A database for storing user data",
+        "A package manager for installing libraries"
+      ],
+      "correct": 1,
+      "explanation": "A repository (repo) is a directory tracked by git that contains all project files along with the full history of changes made to those files."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "What is the correct sequence for saving and backing up your work in git?",
+      "options": [
+        "git push, git add, git commit",
+        "git commit, git add, git push",
+        "git add, git commit, git push",
+        "git clone, git add, git push"
+      ],
+      "correct": 2,
+      "explanation": "First you stage changes with 'git add', then save a snapshot with 'git commit', then upload to the remote with 'git push'. This is the daily workflow."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "What does 'git checkout -b experiment/new-optimizer' do?",
+      "options": [
+        "Downloads a branch from GitHub called experiment/new-optimizer",
+        "Creates a new branch named experiment/new-optimizer and switches to it",
+        "Deletes the branch experiment/new-optimizer",
+        "Reverts all files to match the experiment/new-optimizer branch"
+      ],
+      "correct": 1,
+      "explanation": "The '-b' flag creates a new branch with the given name and immediately switches to it, allowing you to experiment without affecting the main branch."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "Why should you add '.pt', '.pth', and '.safetensors' to your .gitignore?",
+      "options": [
+        "They are Python test files that should not be committed",
+        "They are model checkpoint files that are too large for git and can be re-generated",
+        "They contain sensitive API keys",
+        "Git cannot track binary files of any kind"
+      ],
+      "correct": 1,
+      "explanation": "Model checkpoint files (.pt, .pth, .safetensors) are often gigabytes in size. Git is not designed for large binary files, so these should be excluded and re-generated or stored separately."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/02-git-and-collaboration",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/02-git-and-collaboration"
+}

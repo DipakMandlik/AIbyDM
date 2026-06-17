@@ -1,0 +1,180 @@
+{
+  "id": "ai-from-scratch/00-setup-and-tooling/04-apis-and-keys",
+  "slug": "04-apis-and-keys",
+  "phaseSlug": "00-setup-and-tooling",
+  "number": "04",
+  "title": "APIs & Keys",
+  "summary": "Every AI API works the same way: send a request, get a response. The details change, the pattern doesn't.",
+  "motto": "Every AI API works the same way: send a request, get a response. The details change, the pattern doesn't.",
+  "type": "Build",
+  "languages": [
+    "Python",
+    "TypeScript"
+  ],
+  "prerequisites": [
+    "Phase 0",
+    "Lesson 01"
+  ],
+  "duration": "~30 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Store API keys securely using environment variables and .env files",
+    "Make an LLM API call using both the Anthropic Python SDK and raw HTTP",
+    "Compare SDK-based and raw HTTP request/response formats for debugging",
+    "Identify and handle common API errors including authentication and rate limits"
+  ],
+  "exercises": [
+    "Get an Anthropic API key and make your first API call",
+    "Try the raw HTTP version and compare the response format to the SDK version",
+    "Intentionally use a wrong API key and read the error message"
+  ],
+  "topics": [
+    "Setup & Tooling",
+    "Build",
+    "Python",
+    "TypeScript",
+    "APIs",
+    "Keys",
+    "API key",
+    "Rate limit",
+    "Token",
+    "Streaming"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Every AI API works the same way: send a request, get a response. The details change, the pattern doesn't."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Store API keys securely using environment variables and `.env` files\n- Make an LLM API call using both the Anthropic Python SDK and raw HTTP\n- Compare SDK-based and raw HTTP request/response formats for debugging\n- Identify and handle common API errors including authentication and rate limits"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "Starting from Phase 11, you'll call LLM APIs (Anthropic, OpenAI, Google). In Phase 13-16 you'll build agents that use these APIs in loops. You need to know how API keys work, how to store them safely, and how to make your first API call."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nsequenceDiagram\n    participant C as Your Code\n    participant S as API Server\n    C->>S: HTTP Request (with API key)\n    S->>C: HTTP Response (JSON)\n```\n\nEvery API call has:\n1. An endpoint (URL)\n2. An API key (authentication)\n3. A request body (what you want)\n4. A response body (what you get back)"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Store API keys safely\n\nNever put API keys in code. Use environment variables.\n\n```bash\nexport ANTHROPIC_API_KEY=\"sk-ant-...\"\nexport OPENAI_API_KEY=\"sk-...\"\n```\n\nOr use a `.env` file (add it to `.gitignore`):\n\n```\nANTHROPIC_API_KEY=sk-ant-...\nOPENAI_API_KEY=sk-...\n```\n\n### Step 2: First API call (Python)\n\n```python\nimport anthropic\n\nclient = anthropic.Anthropic()\n\nresponse = client.messages.create(\n    model=\"claude-sonnet-4-20250514\",\n    max_tokens=256,\n    messages=[{\"role\": \"user\", \"content\": \"What is a neural network in one sentence?\"}]\n)\n\nprint(response.content[0].text)\n```\n\n### Step 3: First API call (TypeScript)\n\n```typescript\nimport Anthropic from \"@anthropic-ai/sdk\";\n\nconst client = new Anthropic();\n\nconst response = await client.messages.create({\n  model: \"claude-sonnet-4-20250514\",\n  max_tokens: 256,\n  messages: [{ role: \"user\", content: \"What is a neural network in one sentence?\" }],\n});\n\nconsole.log(response.content[0].text);\n```\n\n### Step 4: Raw HTTP (no SDK)\n\n```python\nimport os\nimport urllib.request\nimport json\n\nurl = \"https://api.anthropic.com/v1/messages\"\nheaders = {\n    \"Content-Type\": \"application/json\",\n    \"x-api-key\": os.environ[\"ANTHROPIC_API_KEY\"],\n    \"anthropic-version\": \"2023-06-01\",\n}\nbody = json.dumps({\n    \"model\": \"claude-sonnet-4-20250514\",\n    \"max_tokens\": 256,\n    \"messages\": [{\"role\": \"user\", \"content\": \"What is a neural network in one sentence?\"}],\n}).encode()\n\nreq = urllib.request.Request(url, data=body, headers=headers, method=\"POST\")\nwith urllib.request.urlopen(req) as resp:\n    result = json.loads(resp.read())\n    print(result[\"content\"][0][\"text\"])\n```\n\nThis is what the SDKs do under the hood. Understanding the raw HTTP call helps when debugging."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "For this course:\n\n| API | When you need it | Free tier |\n|-----|-----------------|-----------|\n| Anthropic (Claude) | Phases 11-16 (agents, tools) | $5 credit on signup |\n| OpenAI | Phase 11 (comparison) | $5 credit on signup |\n| Hugging Face | Phases 4-10 (models, datasets) | Free |\n\nYou don't need all of them right now. Set them up when the lesson requires it."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "This lesson produces:\n- `outputs/prompt-api-troubleshooter.md` - diagnose common API errors"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Get an Anthropic API key and make your first API call\n2. Try the raw HTTP version and compare the response format to the SDK version\n3. Intentionally use a wrong API key and read the error message"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| API key | \"Password for the API\" | A unique string that identifies your account and authorizes requests |\n| Rate limit | \"They're throttling me\" | Maximum requests per minute/hour to prevent abuse and ensure fair usage |\n| Token | \"A word\" (in API context) | A billing unit: input and output tokens are counted and charged separately |\n| Streaming | \"Real-time responses\" | Getting the response word by word instead of waiting for the full response |"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is an API key used for when calling an LLM service?",
+      "options": [
+        "Encrypting the data sent to the server",
+        "Authenticating your identity and authorizing requests",
+        "Compressing requests to reduce bandwidth",
+        "Selecting which programming language the server uses"
+      ],
+      "correct": 1,
+      "explanation": "An API key is a unique string that identifies your account, authorizes your requests, and allows the provider to track usage and billing."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why should API keys never be hardcoded directly in source code?",
+      "options": [
+        "Hardcoded keys make the code run slower",
+        "They can be accidentally committed to git and exposed publicly",
+        "Python cannot read string literals longer than 50 characters",
+        "API providers block keys that appear in source files"
+      ],
+      "correct": 1,
+      "explanation": "Hardcoded keys in source code risk being committed to version control and pushed to public repositories, where they can be scraped and abused by others."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "What is the recommended way to store API keys for local development?",
+      "options": [
+        "In a Python variable at the top of your script",
+        "In a .env file that is listed in .gitignore",
+        "In the README.md for easy access",
+        "In the requirements.txt alongside package versions"
+      ],
+      "correct": 1,
+      "explanation": "A .env file stores keys as environment variables and should be added to .gitignore so it is never committed to version control. SDKs read keys from environment variables automatically."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "In the raw HTTP API call to Anthropic, which header carries the API key?",
+      "options": [
+        "Authorization: Bearer sk-ant-...",
+        "x-api-key: sk-ant-...",
+        "Content-Type: application/json",
+        "anthropic-version: 2023-06-01"
+      ],
+      "correct": 1,
+      "explanation": "Anthropic's API uses the 'x-api-key' header for authentication, not the more common 'Authorization: Bearer' pattern. This is specific to their API design."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "What happens when you exceed an API's rate limit?",
+      "options": [
+        "Your API key is permanently revoked",
+        "The server returns an error (typically HTTP 429) and you must wait before retrying",
+        "Your request is queued and processed later automatically",
+        "The API silently drops your request with no response"
+      ],
+      "correct": 1,
+      "explanation": "Rate limiting returns HTTP 429 (Too Many Requests). You need to wait and retry, typically with exponential backoff. Rate limits prevent abuse and ensure fair usage."
+    }
+  ],
+  "resources": [
+    {
+      "label": "API Troubleshooter",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/outputs/prompt-api-troubleshooter.md",
+      "kind": "Prompt"
+    },
+    {
+      "label": "first_api_call.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.py",
+      "kind": "Code"
+    },
+    {
+      "label": "first_api_call.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/00-setup-and-tooling/04-apis-and-keys"
+}

@@ -1,0 +1,195 @@
+{
+  "id": "ai-from-scratch/16-multi-agent-and-swarms/01-why-multi-agent",
+  "slug": "01-why-multi-agent",
+  "phaseSlug": "16-multi-agent-and-swarms",
+  "number": "01",
+  "title": "Why Multi-Agent?",
+  "summary": "One agent hits a wall. The smart move is not a bigger agent - it is more agents.",
+  "motto": "One agent hits a wall. The smart move is not a bigger agent - it is more agents.",
+  "type": "Learn",
+  "languages": [
+    "TypeScript"
+  ],
+  "prerequisites": [
+    "Phase 14 (Agent Engineering)"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Identify the single-agent ceiling (context overflow, mixed expertise, sequential bottleneck) and explain when splitting into multiple agents is the right move",
+    "Compare orchestration patterns (pipeline, parallel fan-out, supervisor, hierarchical) and select the right one for a given task structure",
+    "Design a multi-agent system with clear role boundaries, shared state, and a communication contract",
+    "Analyze the tradeoffs of multi-agent complexity (latency, cost, debugging difficulty) versus single-agent simplicity"
+  ],
+  "exercises": [
+    "Add a fourth specialist: a \"tester\" agent that receives code from the coder and review feedback from the reviewer, then writes tests",
+    "Modify the pipeline so the reviewer can send feedback back to the coder for a revision loop (max 2 rounds)",
+    "Convert the sequential pipeline into a fan-out: run the researcher and a \"requirements analyzer\" agent in parallel, then merge their outputs before passing to the coder"
+  ],
+  "topics": [
+    "Multi-Agent & Swarms",
+    "Learn",
+    "TypeScript",
+    "Multi",
+    "Agent",
+    "Swarm",
+    "Orchestrator",
+    "Coordinator",
+    "Consensus",
+    "Emergent behavior",
+    "Fan-out / fan-in",
+    "Message passing"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> One agent hits a wall. The smart move is not a bigger agent - it is more agents."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Identify the single-agent ceiling (context overflow, mixed expertise, sequential bottleneck) and explain when splitting into multiple agents is the right move\n- Compare orchestration patterns (pipeline, parallel fan-out, supervisor, hierarchical) and select the right one for a given task structure\n- Design a multi-agent system with clear role boundaries, shared state, and a communication contract\n- Analyze the tradeoffs of multi-agent complexity (latency, cost, debugging difficulty) versus single-agent simplicity"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You built a single agent in Phase 14. It works. It can read files, run commands, call APIs, and reason about results. Then you point it at a real codebase: 200 files, three languages, tests that depend on infrastructure, and a requirement to research external APIs before writing code.\n\nThe agent chokes. Not because the LLM is dumb, but because the task exceeds what one agent loop can handle. The context window fills up with file contents. The agent forgets what it read 40 tool calls ago. It tries to be a researcher, a coder, and a reviewer all at once, and does all three poorly.\n\nThis is the single-agent ceiling. You hit it every time a task requires:\n\n- **More context than fits in one window** - reading 50 files blows past 200k tokens\n- **Different expertise at different stages** - research requires different prompting than code generation\n- **Work that can happen in parallel** - why read three files sequentially when you can read them simultaneously?"
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### The Single-Agent Ceiling\n\nA single agent is one loop, one context window, one system prompt. Picture it:\n\n```\n┌─────────────────────────────────────────┐\n│            SINGLE AGENT                 │\n│                                         │\n│  ┌───────────────────────────────────┐  │\n│  │         Context Window            │  │\n│  │                                   │  │\n│  │  research notes                   │  │\n│  │  + code files                     │  │\n│  │  + test output                    │  │\n│  │  + review feedback                │  │\n│  │  + API docs                       │  │\n│  │  + ...                            │  │\n│  │                                   │  │\n│  │  ██████████████████████ FULL ███  │  │\n│  └───────────────────────────────────┘  │\n│                                         │\n│  One system prompt tries to cover       │\n│  research + coding + review + testing   │\n│                                         │\n│  Result: mediocre at everything         │\n└─────────────────────────────────────────┘\n```\n\nThree things break:\n\n1. **Context saturation** - tool results pile up. By turn 30, the agent has consumed 150k tokens of file contents, command outputs, and prior reasoning. Critical details from turn 5 get lost.\n\n2. **Role confusion** - a system prompt that says \"you are a researcher, coder, reviewer, and tester\" produces an agent that half-researches, half-codes, and never finishes reviewing.\n\n3. **Sequential bottleneck** - the agent reads file A, then file B, then file C. Three serial LLM calls. Three serial tool executions. No parallelism.\n\n### The Multi-Agent Solution\n\nSplit the work. Give each agent one job, one context window, and one system prompt tuned for that job:\n\n```\n┌──────────────────────────────────────────────────────────┐\n│                    ORCHESTRATOR                          │\n│                                                          │\n│  \"Build a REST API for user management\"                  │\n│                                                          │\n│         ┌──────────┬──────────┬──────────┐               │\n│         │          │          │          │               │\n│         ▼          ▼          ▼          ▼               │\n│   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐  │\n│   │RESEARCHER│ │  CODER   │ │ REVIEWER │ │  TESTER  │  │\n│   │          │ │          │ │          │ │          │  │\n│   │ Reads    │ │ Writes   │ │ Checks   │ │ Runs     │  │\n│   │ docs,    │ │ code     │ │ code     │ │ tests,   │  │\n│   │ finds    │ │ based on │ │ quality, │ │ reports  │  │\n│   │ patterns │ │ research │ │ finds    │ │ results  │  │\n│   │          │ │ + spec   │ │ bugs     │ │          │  │\n│   └─────┬────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘  │\n│         │           │            │             │         │\n│         └───────────┴────────────┴─────────────┘         │\n│                          │                               │\n│                     Merge results                        │\n└──────────────────────────────────────────────────────────┘\n```\n\nEach agent has:\n- A focused system prompt (\"You are a code reviewer. Your only job is finding bugs.\")\n- Its own context window (not polluted by other agents' work)\n- A clear input/output contract (receives research notes, outputs code)\n\n### Real Systems That Do This\n\n**Claude Code subagents** - when Claude Code spawns a subagent with `Task`, it creates a child agent with a scoped task. The parent keeps its context clean. The child does focused work and returns a summary.\n\n**Devin** - runs a planner agent, a coder agent, and a browser agent. The planner breaks work into steps. The coder writes code. The browser researches documentation. Each has separate context.\n\n**Multi-agent coding teams (SWE-bench)** - top-performing systems on SWE-bench use a researcher that reads the codebase, a planner that designs the fix, and a coder that implements it. Single-agent systems score lower.\n\n**ChatGPT Deep Research** - spawns multiple search agents in parallel, each exploring a different angle, then synthesizes results.\n\n### The Spectrum\n\nMulti-agent is not binary. It is a spectrum:\n\n```\nSIMPLE ──────────────────────────────────────────── COMPLEX\n\n Single        Sub-         Pipeline      Team         Swarm\n Agent         agents\n\n ┌───┐       ┌───┐        ┌───┐───┐    ┌───┐───┐    ┌─┐┌─┐┌─┐\n │ A │       │ A │        │ A │ B │    │ A │ B │    │ ││ ││ │\n └───┘       └─┬─┘        └───┘─┬─┘    └─┬─┘─┬─┘    └┬┘└┬┘└┬┘\n               │                │        │   │       ┌┴──┴──┴┐\n             ┌─┴─┐          ┌───┘───┐    │   │       │shared │\n             │ a │          │ C │ D │  ┌─┴───┴─┐    │ state │\n             └───┘          └───┘───┘  │  msg   │    └───────┘\n                                       │  bus   │\n 1 loop      Parent +      Stage by    │       │    N peers,\n 1 context   child tasks   stage       └───────┘    emergent\n                                       Explicit      behavior\n                                       roles\n```\n\n**Single agent** - one loop, one prompt. Good for simple tasks.\n\n**Subagents** - a parent spawns children for focused subtasks. The parent maintains the plan. Children report back. This is what Claude Code does.\n\n**Pipeline** - agents run in sequence. Agent A's output becomes Agent B's input. Good for staged workflows: research -> code -> review -> test.\n\n**Team** - agents run in parallel with a shared message bus. Each has a role. An orchestrator coordinates. Good when different skills are needed simultaneously.\n\n**Swarm** - many identical or near-identical agents with shared state. No fixed orchestrator. Agents pick up work from a queue. Good for high-throughput parallel tasks.\n\n### The Four Multi-Agent Patterns\n\n#### Pattern 1: Pipeline\n\n```\nInput ──▶ Agent A ──▶ Agent B ──▶ Agent C ──▶ Output\n          (research)  (code)      (review)\n```\n\nEach agent transforms the data and passes it forward. Simple to reason about. Failure in one stage blocks the rest.\n\n#### Pattern 2: Fan-out / Fan-in\n\n```\n                ┌──▶ Agent A ──┐\n                │              │\nInput ──▶ Split ├──▶ Agent B ──├──▶ Merge ──▶ Output\n                │              │\n                └──▶ Agent C ──┘\n```\n\nSplit work across parallel agents, then merge results. Good for tasks that decompose into independent subtasks.\n\n#### Pattern 3: Orchestrator-Worker\n\n```\n                    ┌──────────┐\n                    │  Orch.   │\n                    └──┬───┬───┘\n                  task │   │ task\n                 ┌─────┘   └─────┐\n                 ▼               ▼\n           ┌──────────┐   ┌──────────┐\n           │ Worker A │   │ Worker B │\n           └──────────┘   └──────────┘\n```\n\nA smart orchestrator decides what to do, delegates to workers, and synthesizes results. The orchestrator is itself an agent with tools for spawning workers.\n\n#### Pattern 4: Peer Swarm\n\n```\n         ┌───┐ ◄──── msg ────▶ ┌───┐\n         │ A │                  │ B │\n         └─┬─┘                  └─┬─┘\n           │                      │\n      msg  │    ┌───────────┐     │ msg\n           └───▶│  Shared   │◄────┘\n                │  State    │\n           ┌───▶│  / Queue  │◄────┐\n           │    └───────────┘     │\n      msg  │                      │ msg\n         ┌─┴─┐                  ┌─┴─┐\n         │ C │ ◄──── msg ────▶ │ D │\n         └───┘                  └───┘\n```\n\nNo central orchestrator. Agents communicate peer-to-peer. Decisions emerge from interaction. Harder to debug, but scales to many agents.\n\n### When NOT to Use Multi-Agent\n\nMulti-agent adds complexity. Every message between agents is a potential failure point. Debugging goes from \"read one conversation\" to \"trace messages across five agents.\"\n\n**Stay single-agent when:**\n- The task fits in one context window (under ~100k tokens of working data)\n- You do not need different system prompts for different stages\n- Sequential execution is fast enough\n- The task is simple enough that splitting it adds more overhead than value\n\n**The complexity cost:**\n- Every agent boundary is a lossy compression step: agent A's full context gets summarized into a message for agent B\n- Coordination logic (who does what, when, in what order) is its own source of bugs\n- Latency increases: N agents means N serial LLM calls minimum, more if they need to talk back and forth\n- Cost multiplies: each agent burns tokens independently\n\nRule of thumb: if a task takes fewer than 20 tool calls and fits in 100k tokens, keep it single-agent.\n\n```figure\nswarm-messages\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: The Overloaded Single Agent\n\nHere is a single agent trying to do everything. It has one massive system prompt and one context window holding research, code, and reviews:\n\n```typescript\ntype AgentResult = {\n  content: string;\n  tokensUsed: number;\n  toolCalls: number;\n};\n\nasync function singleAgentApproach(task: string): Promise<AgentResult> {\n  const systemPrompt = `You are a full-stack developer. You must:\n1. Research the requirements\n2. Write the code\n3. Review the code for bugs\n4. Write tests\nDo ALL of these in a single conversation.`;\n\n  const contextWindow: string[] = [];\n  let totalTokens = 0;\n  let totalToolCalls = 0;\n\n  const research = await fakeLLMCall(systemPrompt, `Research: ${task}`);\n  contextWindow.push(research.output);\n  totalTokens += research.tokens;\n  totalToolCalls += research.calls;\n\n  const code = await fakeLLMCall(\n    systemPrompt,\n    `Given this research:\\n${contextWindow.join(\"\\n\")}\\n\\nNow write code for: ${task}`\n  );\n  contextWindow.push(code.output);\n  totalTokens += code.tokens;\n  totalToolCalls += code.calls;\n\n  const review = await fakeLLMCall(\n    systemPrompt,\n    `Given all previous context:\\n${contextWindow.join(\"\\n\")}\\n\\nReview the code.`\n  );\n  contextWindow.push(review.output);\n  totalTokens += review.tokens;\n  totalToolCalls += review.calls;\n\n  return {\n    content: contextWindow.join(\"\\n---\\n\"),\n    tokensUsed: totalTokens,\n    toolCalls: totalToolCalls,\n  };\n}\n```\n\nProblems with this approach:\n- The context window grows with every stage. By the review step, it contains research notes AND code AND prior reasoning.\n- The system prompt is generic. It cannot be tuned for each stage.\n- Nothing runs in parallel.\n\n### Step 2: Specialist Agents\n\nNow split it. Each agent gets one job:\n\n```typescript\ntype SpecialistAgent = {\n  name: string;\n  systemPrompt: string;\n  run: (input: string) => Promise<AgentResult>;\n};\n\nfunction createSpecialist(name: string, systemPrompt: string): SpecialistAgent {\n  return {\n    name,\n    systemPrompt,\n    run: async (input: string) => {\n      const result = await fakeLLMCall(systemPrompt, input);\n      return {\n        content: result.output,\n        tokensUsed: result.tokens,\n        toolCalls: result.calls,\n      };\n    },\n  };\n}\n\nconst researcher = createSpecialist(\n  \"researcher\",\n  \"You are a technical researcher. Read documentation, find patterns, and summarize findings. Output only the facts needed for implementation.\"\n);\n\nconst coder = createSpecialist(\n  \"coder\",\n  \"You are a senior TypeScript developer. Given requirements and research notes, write clean, tested code. Nothing else.\"\n);\n\nconst reviewer = createSpecialist(\n  \"reviewer\",\n  \"You are a code reviewer. Find bugs, security issues, and logic errors. Be specific. Cite line numbers.\"\n);\n```\n\nEach specialist has a focused prompt. Each gets a clean context window with only the input it needs.\n\n### Step 3: Coordinate Through Messages\n\nWire the specialists together with explicit message passing:\n\n```typescript\ntype AgentMessage = {\n  from: string;\n  to: string;\n  content: string;\n  timestamp: number;\n};\n\nasync function multiAgentApproach(task: string): Promise<AgentResult> {\n  const messages: AgentMessage[] = [];\n  let totalTokens = 0;\n  let totalToolCalls = 0;\n\n  const researchResult = await researcher.run(task);\n  messages.push({\n    from: \"researcher\",\n    to: \"coder\",\n    content: researchResult.content,\n    timestamp: Date.now(),\n  });\n  totalTokens += researchResult.tokensUsed;\n  totalToolCalls += researchResult.toolCalls;\n\n  const coderInput = messages\n    .filter((m) => m.to === \"coder\")\n    .map((m) => `[From ${m.from}]: ${m.content}`)\n    .join(\"\\n\");\n\n  const codeResult = await coder.run(coderInput);\n  messages.push({\n    from: \"coder\",\n    to: \"reviewer\",\n    content: codeResult.content,\n    timestamp: Date.now(),\n  });\n  totalTokens += codeResult.tokensUsed;\n  totalToolCalls += codeResult.toolCalls;\n\n  const reviewerInput = messages\n    .filter((m) => m.to === \"reviewer\")\n    .map((m) => `[From ${m.from}]: ${m.content}`)\n    .join(\"\\n\");\n\n  const reviewResult = await reviewer.run(reviewerInput);\n  messages.push({\n    from: \"reviewer\",\n    to: \"orchestrator\",\n    content: reviewResult.content,\n    timestamp: Date.now(),\n  });\n  totalTokens += reviewResult.tokensUsed;\n  totalToolCalls += reviewResult.toolCalls;\n\n  return {\n    content: messages.map((m) => `[${m.from} -> ${m.to}]: ${m.content}`).join(\"\\n\\n\"),\n    tokensUsed: totalTokens,\n    toolCalls: totalToolCalls,\n  };\n}\n```\n\nEach agent receives only the messages addressed to it. No context pollution. The researcher's 50k tokens of documentation reading never enter the reviewer's context.\n\n### Step 4: Compare\n\n```typescript\nasync function compare() {\n  const task = \"Build a rate limiter middleware for an Express.js API\";\n\n  console.log(\"=== Single Agent ===\");\n  const single = await singleAgentApproach(task);\n  console.log(`Tokens: ${single.tokensUsed}`);\n  console.log(`Tool calls: ${single.toolCalls}`);\n\n  console.log(\"\\n=== Multi-Agent ===\");\n  const multi = await multiAgentApproach(task);\n  console.log(`Tokens: ${multi.tokensUsed}`);\n  console.log(`Tool calls: ${multi.toolCalls}`);\n}\n```\n\nThe multi-agent version uses more total tokens (three agents, three separate LLM calls) but each agent's context stays clean. The quality of each stage improves because the system prompt is specialized."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "This lesson produces a reusable prompt for deciding when to go multi-agent. See `outputs/prompt-multi-agent-decision.md`."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Add a fourth specialist: a \"tester\" agent that receives code from the coder and review feedback from the reviewer, then writes tests\n2. Modify the pipeline so the reviewer can send feedback back to the coder for a revision loop (max 2 rounds)\n3. Convert the sequential pipeline into a fan-out: run the researcher and a \"requirements analyzer\" agent in parallel, then merge their outputs before passing to the coder"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Swarm | \"A hive mind of AI agents\" | A set of peer agents with shared state and no fixed leader. Behavior emerges from local interactions. |\n| Orchestrator | \"The boss agent\" | An agent whose tools include spawning and managing other agents. It plans and delegates but may not do the actual work. |\n| Coordinator | \"The traffic cop\" | A non-agent component (often just code, not an LLM) that routes messages between agents based on rules. |\n| Consensus | \"The agents agree\" | A protocol where multiple agents must reach agreement before proceeding. Used when conflicting outputs need resolution. |\n| Emergent behavior | \"The agents figured it out themselves\" | System-level patterns that arise from agent interactions but were not explicitly programmed. Can be useful or harmful. |\n| Fan-out / fan-in | \"Map-reduce for agents\" | Splitting a task across parallel agents (fan-out), then combining their results (fan-in). |\n| Message passing | \"Agents talk to each other\" | The communication mechanism between agents: structured data sent from one agent to another, replacing shared context windows. |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [The Landscape of Emerging AI Agent Architectures](https://arxiv.org/abs/2409.02977) - survey of multi-agent patterns\n- [AutoGen: Enabling Next-Gen LLM Applications](https://arxiv.org/abs/2308.08155) - Microsoft's multi-agent conversation framework\n- [Claude Code subagents documentation](https://docs.anthropic.com/en/docs/claude-code) - how Claude Code delegates with Task\n- [CrewAI documentation](https://docs.crewai.com/) - role-based multi-agent framework"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What is the 'single-agent ceiling'?",
+      "options": [
+        "The maximum number of tools an agent can use",
+        "The point where a single agent fails because the task exceeds one context window, requires different expertise, or needs parallel work",
+        "The limit on how many API calls an agent can make per minute",
+        "The maximum model size that can run on a single GPU"
+      ],
+      "correct": 1,
+      "explanation": "A single agent has one context window, one system prompt, and processes sequentially. When tasks require reading 50 files (context overflow), switching between research and coding (mixed expertise), or doing independent work simultaneously (parallelism), a single agent breaks down."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Why might you use multiple specialized agents instead of one powerful general agent?",
+      "options": [
+        "Multiple agents are always cheaper than a single large model",
+        "Each agent can have a focused system prompt, smaller context, and specialized tools, leading to better performance on its specific subtask",
+        "Multiple agents can share the same context window",
+        "General agents cannot use tools"
+      ],
+      "correct": 1,
+      "explanation": "A researcher agent optimized for search, a coder agent optimized for implementation, and a reviewer agent optimized for code quality each do their job better than a single agent trying to be all three simultaneously."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "When is a pipeline (sequential) multi-agent pattern better than a parallel fan-out pattern?",
+      "options": [
+        "When you want to minimize total latency",
+        "When each stage depends on the output of the previous stage, such as research then code then review",
+        "When all subtasks are independent of each other",
+        "When you have more GPUs than tasks"
+      ],
+      "correct": 1,
+      "explanation": "Pipeline patterns are right when work is inherently sequential: the coder needs the researcher's output, and the reviewer needs the coder's output. Parallel fan-out is better when subtasks are independent."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "What is the supervisor pattern in multi-agent systems?",
+      "options": [
+        "A human manually assigns tasks to each agent",
+        "A central orchestrator agent that decomposes the task, delegates to worker agents, collects results, and decides next steps",
+        "A monitoring system that logs agent actions for debugging",
+        "A pattern where agents vote on the best response"
+      ],
+      "correct": 1,
+      "explanation": "The supervisor agent acts as a project manager: it breaks the task into subtasks, assigns them to specialized workers, reviews their output, and decides whether to iterate or finalize. This provides centralized control over the workflow."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "What is the primary tradeoff of multi-agent systems compared to single agents?",
+      "options": [
+        "Multi-agent systems always produce lower quality results",
+        "Increased complexity, latency, and cost from multiple LLM calls and inter-agent communication, traded for better handling of complex tasks",
+        "Multi-agent systems require more training data",
+        "Multi-agent systems cannot use external tools"
+      ],
+      "correct": 1,
+      "explanation": "Every additional agent means more LLM calls (cost), more round trips (latency), and more failure modes (debugging complexity). Multi-agent is only worth it when the task genuinely exceeds what a single agent can handle."
+    }
+  ],
+  "resources": [
+    {
+      "label": "The Landscape of Emerging AI Agent Architectures",
+      "href": "https://arxiv.org/abs/2409.02977",
+      "kind": "Reading"
+    },
+    {
+      "label": "AutoGen: Enabling Next-Gen LLM Applications",
+      "href": "https://arxiv.org/abs/2308.08155",
+      "kind": "Reading"
+    },
+    {
+      "label": "Claude Code subagents documentation",
+      "href": "https://docs.anthropic.com/en/docs/claude-code",
+      "kind": "Reading"
+    },
+    {
+      "label": "CrewAI documentation",
+      "href": "https://docs.crewai.com/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Multi Agent Decision",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/outputs/prompt-multi-agent-decision.md",
+      "kind": "Prompt"
+    },
+    {
+      "label": "single_vs_multi.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/code/single_vs_multi.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/16-multi-agent-and-swarms/01-why-multi-agent"
+}

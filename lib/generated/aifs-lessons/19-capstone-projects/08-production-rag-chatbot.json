@@ -1,0 +1,298 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/08-production-rag-chatbot",
+  "slug": "08-production-rag-chatbot",
+  "phaseSlug": "19-capstone-projects",
+  "number": "08",
+  "title": "Capstone 08 — Production RAG Chatbot for a Regulated Vertical",
+  "summary": "Harvey, Glean, Mendable, and LlamaCloud all run the same production shape in 2026. Ingest with docling or Unstructured and ColPali for visuals. Hybrid search. Re-rank with bge-reranker-v2-gemma. Synthesize with Claude Sonnet 4.7 using prom...",
+  "motto": "Harvey, Glean, Mendable, and LlamaCloud all run the same production shape in 2026. Ingest with docling or Unstructured and ColPali for visuals. Hybrid search. Re-rank with bge-reranker-v2-gemma. Synthesize with Claude Sonnet 4.7 using prompt caching at 60-80% hit rate. Guard with Llama Guard 4 and NeMo Guardrails. Watch with Langfuse and Phoenix. Grade with RAGAS on a 200-question golden set. Build one in a regulated domain (legal, clinical, insurance), and the capstone is passing the golden set, the red team, and the drift dashboard.",
+  "type": "Capstone",
+  "languages": [
+    "Python (pipeline + API)",
+    "TypeScript (chat UI)"
+  ],
+  "prerequisites": [
+    "Phase 5 (NLP)",
+    "Phase 7 (transformers)",
+    "Phase 11 (LLM engineering)",
+    "Phase 12 (multimodal)",
+    "Phase 17 (infrastructure)",
+    "Phase 18 (safety)"
+  ],
+  "duration": "30 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Build a second corpus slice under a different jurisdiction (e.g., HIPAA alongside GDPR). Demonstrate role+jurisdiction filtering preventing cross-leak on a 20-question cross-jurisdiction probe.",
+    "Measure prompt-cache hit rate over a week of production traffic. Identify which queries break the cache prefix. Restructure.",
+    "Add multi-turn memory with a 10k-token summary buffer. Measure whether faithfulness drops as the conversation grows.",
+    "Swap Claude Sonnet 4.7 for Llama 3.3 70B self-hosted. Measure $/query and faithfulness delta.",
+    "Add an \"unsure\" mode: if top reranked scores are below a threshold, the agent says \"I do not have confident citations\" instead of answering. Measure false-confidence reduction."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python (pipeline + API)",
+    "TypeScript (chat UI)",
+    "Production",
+    "RAG",
+    "Chatbot",
+    "Regulated",
+    "Vertical",
+    "Prompt caching",
+    "RAGAS",
+    "Golden set",
+    "Jurisdiction tag",
+    "Citation faithfulness",
+    "Drift",
+    "Red team"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Harvey, Glean, Mendable, and LlamaCloud all run the same production shape in 2026. Ingest with docling or Unstructured and ColPali for visuals. Hybrid search. Re-rank with bge-reranker-v2-gemma. Synthesize with Claude Sonnet 4.7 using prompt caching at 60-80% hit rate. Guard with Llama Guard 4 and NeMo Guardrails. Watch with Langfuse and Phoenix. Grade with RAGAS on a 200-question golden set. Build one in a regulated domain (legal, clinical, insurance), and the capstone is passing the golden set, the red team, and the drift dashboard."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "Regulated-domain RAG (legal contracts, clinical trial protocols, insurance policies) is the most-shipped production shape of 2026 because the ROI is obvious and the stakes are concrete. Harvey (Allen & Overy) built it for legal. Mendable ships the developer-docs flavor. Glean covers enterprise search. The pattern is: ingest high-fidelity, retrieve hybrid with rerank, synthesize with citation enforcement and prompt caching, guard with multiple safety layers, and monitor drift continuously.\n\nThe hard parts are not the model. They are jurisdiction-aware compliance (HIPAA, GDPR, SOC2), citation-level auditability, cost control (prompt caching buys 60-90% discount when hit rate is high), hallucination detection via RAGAS faithfulness, and drift detection when the source documents get updated without the index catching up. This capstone asks you to ship all of it on a 200-question golden set with a red-team suite alongside."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "The pipeline has two sides. **Ingestion**: docling or Unstructured parses structured documents; ColPali handles visually rich ones; chunks get summaries, tags, and role-based access labels. Vectors go into pgvector + pgvectorscale (under 50M vectors) or Qdrant Cloud; sparse BM25 runs alongside. **Conversation**: LangGraph handles memory and multi-turn; each query runs hybrid retrieval, reranks with bge-reranker-v2-gemma-2b, synthesizes with Claude Sonnet 4.7 (prompt-cached), passes output through Llama Guard 4 and NeMo Guardrails, and emits a citation-anchored response.\n\nThe eval stack has four layers. **Golden set** (200 labeled Q/A with citations) for correctness. **Red team** (jailbreaks, PII extraction attempts, off-domain questions) for safety. **RAGAS** for faithfulness / answer relevance / context precision automatically per-turn. **Drift dashboard** (Arize Phoenix) watching retrieval quality and hallucination score weekly.\n\nPrompt caching is the cost lever. Claude 4.5+ and GPT-5+ support caching system prompts + retrieved context. At 60-80% hit rate, per-query cost drops 3-5x. The pipeline must be designed for stable prefixes (system prompt + reranked context first) to achieve high cache hit rates."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **Ingestion.** Parse your corpus (1000-10000 documents for a serious build) with Unstructured or docling. For scanned / visual-heavy pages, route through ColPali. Produce chunks with summaries, role-labels, jurisdiction tags.\n\n2. **Index.** Dense embeddings (Voyage-3 or Nomic-embed-v2) into pgvector + pgvectorscale. BM25 side-index via Tantivy. Role and jurisdiction filters as payload.\n\n3. **Hybrid retrieve.** Filter by role+jurisdiction first; then parallel dense + BM25; merge with reciprocal rank fusion; top-20 to reranker; top-5 to synth.\n\n4. **Synthesize with prompt caching.** System prompt + static policies in cache header; reranked context as cache extension; user question as uncached suffix. Target 60-80% cache hit rate in steady state.\n\n5. **Guardrails.** Llama Guard 4 on input; NeMo Guardrails rails block off-domain questions or policy-forbidden topics; Presidio scrubs accidental PII in the output; citation enforcement post-filter.\n\n6. **Golden set.** 200 Q/A pairs labeled by a domain expert with (answer, citations). Score agent on exact-citation match, answer correctness, faithfulness (RAGAS).\n\n7. **Red team.** 50 adversarial prompts: jailbreaks (PAIR, TAP), PII exfiltration attempts, off-domain, cross-jurisdiction leaks. Score with pass/fail and severity.\n\n8. **Drift dashboard.** Arize Phoenix tracks retrieval quality (nDCG, citation faithfulness) weekly. Alert on 5% drop.\n\n9. **Cost report.** Langfuse: prompt-caching hit rate, tokens per query, $/query breakdown by stage."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n$ chat --role=analyst --jurisdiction=GDPR\n> what is the data-retention obligation for EU user profiles under our contract?\n[retrieve]  hybrid top-20 filtered to GDPR + analyst-role\n[rerank]    top-5 kept\n[synth]     claude-sonnet-4.7, cache hit 74%, 0.8s\nanswer:\n  The contract (Section 12.4, Master Services Agreement dated 2024-03-11)\n  obligates EU user profile deletion within 30 days of termination per GDPR\n  Article 17. The DPA amendment (DPA-v2.1, Section 5) extends this to 14 days\n  for \"restricted\" category data.\n  citations: [MSA-2024-03-11 s12.4, DPA-v2.1 s5]\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-production-rag.md` describes the deliverable. A regulated-domain chatbot deployed with compliance labels, passed through the rubric, observed with live drift monitoring.\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | RAGAS faithfulness + answer relevance | Online scores on the golden set (200 Q/A) |\n| 20 | Citation correctness | Fraction of answers with verifiable source anchors |\n| 20 | Guardrail coverage | Llama Guard 4 pass rate + jailbreak suite results |\n| 20 | Cost / latency engineering | Prompt-cache hit rate, p95 latency, $/query |\n| 15 | Drift monitoring dashboard | Phoenix live dashboard with weekly retrieval-quality trend |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Build a second corpus slice under a different jurisdiction (e.g., HIPAA alongside GDPR). Demonstrate role+jurisdiction filtering preventing cross-leak on a 20-question cross-jurisdiction probe.\n\n2. Measure prompt-cache hit rate over a week of production traffic. Identify which queries break the cache prefix. Restructure.\n\n3. Add multi-turn memory with a 10k-token summary buffer. Measure whether faithfulness drops as the conversation grows.\n\n4. Swap Claude Sonnet 4.7 for Llama 3.3 70B self-hosted. Measure $/query and faithfulness delta.\n\n5. Add an \"unsure\" mode: if top reranked scores are below a threshold, the agent says \"I do not have confident citations\" instead of answering. Measure false-confidence reduction."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Prompt caching | \"Cached system + context\" | Claude/OpenAI feature: cached prefix tokens discounted 60-90% on hit |\n| RAGAS | \"RAG evaluator\" | Automated scoring of faithfulness, answer relevance, context precision |\n| Golden set | \"Labeled eval\" | 200+ expert-labeled Q/A with citations; the ground truth |\n| Jurisdiction tag | \"Compliance label\" | GDPR/HIPAA/SOC2 scope attached to chunks; enforced by retrieval filter |\n| Citation faithfulness | \"Grounded answer rate\" | Fraction of claims backed by retrievable source spans |\n| Drift | \"Retrieval quality decay\" | Weekly change in nDCG or citation score; alert threshold 5% |\n| Red team | \"Adversarial eval\" | Pre-release jailbreak, PII extraction, off-domain probes |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Harvey AI](https://www.harvey.ai) — reference legal production stack\n- [Glean enterprise search](https://www.glean.com) — reference RAG at enterprise scale\n- [Mendable documentation](https://mendable.ai) — developer-docs RAG reference\n- [LlamaCloud Parse + Index](https://docs.llamaindex.ai/en/stable/examples/llama_cloud/llama_parse/) — managed ingestion\n- [Anthropic prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) — the cost-lever reference\n- [RAGAS 0.2 documentation](https://docs.ragas.io/) — the canonical RAG eval framework\n- [Arize Phoenix](https://github.com/Arize-ai/phoenix) — reference drift observability\n- [Llama Guard 4](https://ai.meta.com/research/publications/llama-guard-4/) — 2026 safety classifier\n- [NeMo Guardrails v0.12](https://docs.nvidia.com/nemo-guardrails/) — policy rail framework"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\ndocuments (contracts, protocols, policies)\n      |\n      v\ndocling / Unstructured parse + ColPali for visuals\n      |\n      v\nchunks + summaries + role-labels + jurisdiction tags\n      |\n      v\npgvector + pgvectorscale  +  BM25 (Tantivy)\n      |\nquery + role + jurisdiction\n      |\n      v\nLangGraph conversational agent\n   +--- retrieve (hybrid)\n   +--- filter by role + jurisdiction\n   +--- rerank (bge-reranker-v2-gemma-2b or Voyage rerank-2)\n   +--- synthesize (Claude Sonnet 4.7, prompt cached)\n   +--- guard (Llama Guard 4 + NeMo Guardrails + Presidio output PII scrub)\n   +--- cite + return\n      |\n      v\neval:\n  RAGAS faithfulness / answer_relevance / context_precision (online)\n  Langfuse annotation queue (sampled)\n  Arize Phoenix drift (weekly)\n  red team suite (pre-release)\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Ingestion: Unstructured.io or docling for structured documents; ColPali for visually-rich PDFs\n- Vector DB: pgvector + pgvectorscale under 50M vectors; Qdrant Cloud otherwise\n- Sparse: Tantivy BM25 with field weights\n- Orchestration: LlamaIndex Workflows (ingestion) + LangGraph (conversation)\n- Re-ranker: bge-reranker-v2-gemma-2b self-hosted or Voyage rerank-2 hosted\n- LLM: Claude Sonnet 4.7 with prompt caching; fallback Llama 3.3 70B self-hosted\n- Eval: RAGAS 0.2 online, DeepEval for hallucination and jailbreak suites\n- Observability: Langfuse self-hosted with annotation queue; Arize Phoenix for drift\n- Guardrails: Llama Guard 4 input/output classifier, NeMo Guardrails v0.12 policy, Presidio PII scrub\n- Compliance: role-based access labels on chunks; jurisdiction tags for GDPR/HIPAA\n\n```figure\ncanary-rollout\n```"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "Why does prompt caching matter so much in a regulated-domain RAG chatbot?",
+      "options": [
+        "It removes the need for a vector database",
+        "At 60-80% hit rate it cuts per-query cost 3-5x by discounting stable prefix tokens",
+        "It eliminates hallucinations",
+        "It improves recall on the rerank stage"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What goes into the cache header versus the uncached suffix of each request?",
+      "options": [
+        "Random text padding to hit cache size",
+        "Only the retrieved documents",
+        "User question first, system prompt last",
+        "System prompt and static policies in the cache header, reranked context as cache extension, user question as the uncached suffix"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "How does the retrieval layer respect jurisdiction tags like GDPR or HIPAA?",
+      "options": [
+        "It runs a separate index per country",
+        "It blocks the response after generation only",
+        "It rewrites the user question per region",
+        "Role and jurisdiction filters apply before the hybrid search merge so chunks outside the user's scope are never reranked"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "Which layered guardrail combination does the synthesis stage pass output through?",
+      "options": [
+        "Only Llama Guard 4 on input",
+        "Llama Guard 4, NeMo Guardrails policy rails, and Presidio PII scrub, plus citation enforcement",
+        "Just an output PII regex",
+        "A single LLM-judge faithfulness check"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "What does the drift dashboard alert on?",
+      "options": [
+        "A change in the underlying LLM provider",
+        "Latency above 200ms",
+        "A retrieval-quality drop, for example a 5% week-over-week dip in nDCG or citation score",
+        "Any new document added to the index"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "How big is the golden set used to gate the deliverable's correctness rubric?",
+      "options": [
+        "5 demo queries",
+        "200 expert-labeled question/answer pairs with citations",
+        "20 questions",
+        "2000 synthetic questions"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Which RAGAS scores are tracked online per turn?",
+      "options": [
+        "Throughput, GPU utilization, and queue depth",
+        "BLEU, ROUGE, and METEOR",
+        "Faithfulness, answer relevance, and context precision",
+        "Token count and dollar cost"
+      ],
+      "correct": 2,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "Harvey AI",
+      "href": "https://www.harvey.ai",
+      "kind": "Reading"
+    },
+    {
+      "label": "Glean enterprise search",
+      "href": "https://www.glean.com",
+      "kind": "Reading"
+    },
+    {
+      "label": "Mendable documentation",
+      "href": "https://mendable.ai",
+      "kind": "Reading"
+    },
+    {
+      "label": "LlamaCloud Parse + Index",
+      "href": "https://docs.llamaindex.ai/en/stable/examples/llama_cloud/llama_parse/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic prompt caching",
+      "href": "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching",
+      "kind": "Reading"
+    },
+    {
+      "label": "RAGAS 0.2 documentation",
+      "href": "https://docs.ragas.io/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Arize Phoenix",
+      "href": "https://github.com/Arize-ai/phoenix",
+      "kind": "Reading"
+    },
+    {
+      "label": "Llama Guard 4",
+      "href": "https://ai.meta.com/research/publications/llama-guard-4/",
+      "kind": "Reading"
+    },
+    {
+      "label": "NeMo Guardrails v0.12",
+      "href": "https://docs.nvidia.com/nemo-guardrails/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Production RAG",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/outputs/skill-production-rag.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/README.md",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/README.md",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/package.json",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/package.json",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/index.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/index.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/server.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/server.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/session.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/session.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/stream.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/stream.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "ts/src/types.ts",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/types.ts",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/08-production-rag-chatbot"
+}

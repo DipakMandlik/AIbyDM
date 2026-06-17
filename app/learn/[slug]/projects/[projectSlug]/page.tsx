@@ -7,10 +7,12 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { getAllProjects, getLessonHref, getProject, getProjectHref, getTrackHref } from "@/lib/content";
 
 export function generateStaticParams() {
-  return getAllProjects().map(({ track, project }) => ({
-    slug: track.slug,
-    projectSlug: project.slug,
-  }));
+  return getAllProjects()
+    .filter(({ track }) => track.slug !== "ai-foundations")
+    .map(({ track, project }) => ({
+      slug: track.slug,
+      projectSlug: project.slug,
+    }));
 }
 
 export async function generateMetadata({
@@ -19,6 +21,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string; projectSlug: string }>;
 }): Promise<Metadata> {
   const { slug, projectSlug } = await params;
+  if (slug === "ai-foundations") notFound();
   const match = getProject(slug, projectSlug);
   if (!match) return { title: "Project not found - AIByDM" };
   return {

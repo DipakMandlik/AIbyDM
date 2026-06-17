@@ -1,0 +1,330 @@
+{
+  "id": "ai-from-scratch/14-agent-engineering/42-agent-workbench-capstone",
+  "slug": "42-agent-workbench-capstone",
+  "phaseSlug": "14-agent-engineering",
+  "number": "42",
+  "title": "Capstone: Ship a Reusable Agent Workbench Pack",
+  "summary": "The mini-track ends with a pack you drop into any repo. Eleven lessons of surfaces compressed into a directory you can cp -r and have an agent working reliably the next morning. The capstone is the artifact this curriculum trades on.",
+  "motto": "The mini-track ends with a pack you drop into any repo. Eleven lessons of surfaces compressed into a directory you can cp -r and have an agent working reliably the next morning. The capstone is the artifact this curriculum trades on.",
+  "type": "Build",
+  "languages": [
+    "Python (stdlib)"
+  ],
+  "prerequisites": [
+    "Phases 14 · 31 to 14 · 41"
+  ],
+  "duration": "~75 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Package the seven workbench surfaces into one drop-in directory.",
+    "Pin the schemas, scripts, and templates so a new repo gets a known-good baseline.",
+    "Add a single installer script that lays down the pack idempotently.",
+    "Decide what stays in the pack and what stays out, defending the cut for each."
+  ],
+  "exercises": [
+    "Decide which optional fifth doc deserves promotion into the canonical pack. Defend the cut.",
+    "Rewrite the installer as Python with a --dry-run flag. Compare ergonomics against bash.",
+    "Add a bin/uninstall.sh that safely removes the pack and refuses if state files have non-trivial history. What counts as non-trivial?",
+    "Add a lint_pack.py that fails when the pack drifts from VERSION. Wire it into CI for the pack's own repo.",
+    "Author the migration runbook from a hand-rolled workbench to this pack. What is the order of operations that minimizes downtime?"
+  ],
+  "topics": [
+    "Agent Engineering",
+    "Build",
+    "Python (stdlib)",
+    "Capstone",
+    "Ship",
+    "Reusable",
+    "Agent",
+    "Workbench",
+    "Pack",
+    "Workbench pack",
+    "Installer",
+    "Pack version",
+    "Drop-in pack",
+    "Forkable template"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> The mini-track ends with a pack you drop into any repo. Eleven lessons of surfaces compressed into a directory you can cp -r and have an agent working reliably the next morning. The capstone is the artifact this curriculum trades on."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Package the seven workbench surfaces into one drop-in directory.\n- Pin the schemas, scripts, and templates so a new repo gets a known-good baseline.\n- Add a single installer script that lays down the pack idempotently.\n- Decide what stays in the pack and what stays out, defending the cut for each."
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "A workbench that lives in a Google Doc, a chat history, and three half-remembered scripts is a workbench that gets rebuilt every quarter. The cure is a versioned pack: a repo or directory with the surfaces, the schemas, the scripts, and a one-command installer.\n\nYou will end this lesson with `outputs/agent-workbench-pack/` shipped on disk and a `bin/install.sh` that drops it into any target repo."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "```mermaid\nflowchart TD\n  Pack[agent-workbench-pack/] --> Docs[AGENTS.md + docs/]\n  Pack --> Schemas[schemas/]\n  Pack --> Scripts[scripts/]\n  Pack --> Bin[bin/install.sh]\n  Bin --> Repo[target repo]\n  Repo --> Surfaces[all seven workbench surfaces wired]\n```\n\n### The pack layout\n\n```\noutputs/agent-workbench-pack/\n├── AGENTS.md\n├── docs/\n│   ├── agent-rules.md\n│   ├── reliability-policy.md\n│   ├── handoff-protocol.md\n│   └── reviewer-rubric.md\n├── schemas/\n│   ├── agent_state.schema.json\n│   ├── task_board.schema.json\n│   └── scope_contract.schema.json\n├── scripts/\n│   ├── init_agent.py\n│   ├── run_with_feedback.py\n│   ├── verify_agent.py\n│   └── generate_handoff.py\n├── bin/\n│   └── install.sh\n└── README.md\n```\n\n### What stays in, what stays out\n\nIn:\n\n- Surface schemas. They are the contract.\n- The four scripts above. They are the runtime.\n- The four docs. They are the rules and the rubric.\n\nOut:\n\n- Project-specific tasks. Tasks belong on the target repo's board, not in the pack.\n- Vendor SDK calls. The pack is framework-agnostic.\n- Onboarding prose. The pack lives next to the team's existing onboarding, not inside it.\n\n### The installer\n\nA short `bin/install.sh` (or `bin/install.py`):\n\n1. Refuses to install over an existing pack without `--force`.\n2. Copies the pack into the target repo.\n3. Wires up CI if a `.github/workflows/` exists.\n4. Prints next steps: fill in the board, set acceptance commands, run the init script.\n\n### Versioning\n\nThe pack carries a `VERSION` file. Schema bumps and script changes that require migrations bump the major. Doc-only changes bump the patch. The target repo's `agent_state.json` records which pack version it was initialized against."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "`code/main.py` assembles the pack into `outputs/agent-workbench-pack/` next to the lesson, seeded with the schemas and scripts from the previous lessons in this mini-track and the docs you already wrote.\n\nRun it:\n\n```\npython3 code/main.py\n```\n\nThe script copies and pins the surfaces, writes the README, prints the pack tree, and exits zero. Re-running is idempotent."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "Three places the pack ships:\n\n- **As a directory you drop into a repo.** `cp -r outputs/agent-workbench-pack /path/to/repo`.\n- **As a public template repo.** Fork-and-customize, with `VERSION` controlling drift.\n- **As a SkillKit skill.** Wired into your agent product so a single command lays it down.\n\nThe pack is the recipe. Each install is a serving."
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-workbench-pack.md` generates a project-tuned pack: rules sharpened to the team's history, scope globs matched to the repo, rubric dimensions extended with one domain-specific entry."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Decide which optional fifth doc deserves promotion into the canonical pack. Defend the cut.\n2. Rewrite the installer as Python with a `--dry-run` flag. Compare ergonomics against bash.\n3. Add a `bin/uninstall.sh` that safely removes the pack and refuses if state files have non-trivial history. What counts as non-trivial?\n4. Add a `lint_pack.py` that fails when the pack drifts from `VERSION`. Wire it into CI for the pack's own repo.\n5. Author the migration runbook from a hand-rolled workbench to this pack. What is the order of operations that minimizes downtime?"
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|------------------------|\n| Workbench pack | \"The starter kit\" | A versioned directory carrying all seven surfaces |\n| Installer | \"Setup script\" | `bin/install.sh` that lays the pack down idempotently |\n| Pack version | \"VERSION\" | Major bumps for schema/script changes, patch for doc-only |\n| Drop-in pack | \"cp -r and go\" | Pack works without per-repo customization on day one |\n| Forkable template | \"GitHub template\" | Public repo that GitHub's \"Use this template\" can clone from |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- Phases 14 · 31 to 14 · 41 — every surface this pack bundles\n- [SkillKit](https://github.com/rohitg00/skillkit) — install this skill across 32 AI agents\n- [Nx Blog, Teach Your AI Agent How to Work in a Monorepo](https://nx.dev/blog/nx-ai-agent-skills) — single-source generator across six tools\n- [agents.md — the open spec](https://agents.md/) — what your pack's router must implement\n- [HKUDS/OpenHarness](https://github.com/HKUDS/OpenHarness) — reference implementation of a pack-equivalent\n- [andrewgarst/agentic_harness](https://github.com/andrewgarst/agentic_harness) — Redis-backed reference with eval suite\n- [Augment Code, A good AGENTS.md is a model upgrade](https://www.augmentcode.com/blog/how-to-write-good-agents-dot-md-files) — pack docs quality bar\n- [Anthropic, Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)\n- [Anthropic, Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps)\n- Phase 14 · 30 — eval-driven agent development that consumes the pack's verification gate\n- Phase 14 · 41 — the before/after benchmark this pack improves on"
+    },
+    {
+      "key": "production-patterns-in-the-wild",
+      "title": "Production patterns in the wild",
+      "markdown": "A pack is only valuable if it survives forks, updates, and an unfriendly upstream. Four patterns make that work.\n\n**`VERSION` is the contract, not the marketing.** Major bumps require a state migration. Minor bumps require a checker re-run. Patch bumps are doc-only. The installer writes `.workbench-version` into the target repo on every install; `lint_pack.py` refuses to ship if the target's lock disagrees with the pack's `VERSION`. This is how `npm`, `Cargo`, and `pyproject.toml` survive 10 years of churn; nothing about agents changes the rules.\n\n**Single source for cross-tool distribution.** Nx ships one `nx ai-setup` that lays down `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.github/copilot-instructions.md`, and an MCP server from a single config. The pack should do the same; the installer emits the symlinks (`ln -s AGENTS.md CLAUDE.md`) so a single source of truth fans out to every coding agent. Forking the pack to support one tool over another is a failure mode.\n\n**`uninstall.sh` that refuses on non-trivial state.** Uninstalling the pack must not delete the user's `agent_state.json`, `task_board.json`, or `outputs/`. The uninstaller removes the schemas, scripts, docs, and `AGENTS.md` (with `--keep-agents-md` opt-out) and refuses to proceed if state files have any uncommitted changes. State belongs to the user; the pack does not own it.\n\n**Skill-as-publishable. SkillKit-style distribution.** The pack ships as a SkillKit skill: `skillkit install agent-workbench-pack` lays it down across 32 AI agents from a single source. The pack repo is the source of truth; SkillKit is the distribution channel. Vendor lock-in collapses; the seven surfaces stay the same."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does the capstone produce?",
+      "options": [
+        "A research paper",
+        "A versioned drop-in directory (agent-workbench-pack/) with the seven surfaces plus a bin/install.sh that lays them down idempotently",
+        "A new LLM",
+        "A monitoring dashboard"
+      ],
+      "correct": 1,
+      "explanation": "The pack is the recipe; each install is a serving."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Which is NOT part of the pack layout?",
+      "options": [
+        "AGENTS.md + docs/",
+        "schemas/",
+        "scripts/",
+        "vendor_proprietary_weights/"
+      ],
+      "correct": 3,
+      "explanation": "Pack layout is AGENTS.md, docs/, schemas/, scripts/, bin/, README.md. The pack is framework- and vendor-agnostic."
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why does the pack carry a VERSION file?",
+      "options": [
+        "For SEO",
+        "Major bumps for schema/script changes that require migrations; minor for additions; patch for doc-only; the target repo records which version it was installed against",
+        "To track agent IQ",
+        "To advertise on Hacker News"
+      ],
+      "correct": 1,
+      "explanation": "Same shape as npm, Cargo, pyproject.toml; VERSION is the contract, not the marketing."
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What does cross-tool distribution look like in this pack?",
+      "options": [
+        "Hard-code each tool's path",
+        "One source file with symlinks (ln -s AGENTS.md CLAUDE.md, .cursor/rules/, .github/copilot-instructions.md) so the same source fans out to every coding agent",
+        "Manual copy per tool",
+        "A vendor lock per tool"
+      ],
+      "correct": 1,
+      "explanation": "Nx's nx ai-setup is the reference; the pack's installer does the same with symlinks."
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "How does the lesson recommend the uninstaller behave?",
+      "options": [
+        "Delete everything including state",
+        "Refuse on non-trivial state; never delete user agent_state.json, task_board.json, or outputs/; only remove schemas, scripts, docs, and AGENTS.md (with opt-out)",
+        "Delete only docs",
+        "Disable git"
+      ],
+      "correct": 1,
+      "explanation": "State belongs to the user; the pack does not own it."
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "What stays OUT of the pack?",
+      "options": [
+        "Schemas",
+        "Project-specific tasks, vendor SDK calls, team onboarding prose — the pack is framework-agnostic and lives next to onboarding, not inside it",
+        "Scripts",
+        "The installer"
+      ],
+      "correct": 1,
+      "explanation": "Tasks belong on the target repo's board, not the pack; vendor SDK calls would lock the pack to one framework."
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Through what channel does the pack ship to many coding agents at once?",
+      "options": [
+        "Hand-copy",
+        "SkillKit-style distribution (skillkit install agent-workbench-pack) lays it down across 32 AI agents from a single source",
+        "Email attachment",
+        "GitHub release notes only"
+      ],
+      "correct": 1,
+      "explanation": "Pack repo is the source of truth; SkillKit is the distribution channel; vendor lock-in collapses."
+    }
+  ],
+  "resources": [
+    {
+      "label": "SkillKit",
+      "href": "https://github.com/rohitg00/skillkit",
+      "kind": "Reading"
+    },
+    {
+      "label": "Nx Blog, Teach Your AI Agent How to Work in a Monorepo",
+      "href": "https://nx.dev/blog/nx-ai-agent-skills",
+      "kind": "Reading"
+    },
+    {
+      "label": "agents.md — the open spec",
+      "href": "https://agents.md/",
+      "kind": "Reading"
+    },
+    {
+      "label": "HKUDS/OpenHarness",
+      "href": "https://github.com/HKUDS/OpenHarness",
+      "kind": "Reading"
+    },
+    {
+      "label": "andrewgarst/agentic_harness",
+      "href": "https://github.com/andrewgarst/agentic_harness",
+      "kind": "Reading"
+    },
+    {
+      "label": "Augment Code, A good AGENTS.md is a model upgrade",
+      "href": "https://www.augmentcode.com/blog/how-to-write-good-agents-dot-md-files",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Effective harnesses for long-running agents",
+      "href": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+      "kind": "Reading"
+    },
+    {
+      "label": "Anthropic, Harness design for long-running application development",
+      "href": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+      "kind": "Reading"
+    },
+    {
+      "label": "AGENTS",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/AGENTS.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "README",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/README.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "VERSION",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/VERSION",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Install",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/bin/install.sh",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Rules",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/docs/agent-rules.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Handoff Protocol",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/docs/handoff-protocol.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Reliability Policy",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/docs/reliability-policy.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Reviewer Rubric",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/docs/reviewer-rubric.md",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Agent_state.schema",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/schemas/agent_state.schema.json",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Scope_contract.schema",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/schemas/scope_contract.schema.json",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Task_board.schema",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/schemas/task_board.schema.json",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Generate_handoff",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/scripts/generate_handoff.py",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Init_agent",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/scripts/init_agent.py",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Run_with_feedback",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/scripts/run_with_feedback.py",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Verify_agent",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/agent-workbench-pack/scripts/verify_agent.py",
+      "kind": "Artifact"
+    },
+    {
+      "label": "Workbench Pack",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/outputs/skill-workbench-pack.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/42-agent-workbench-capstone",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/14-agent-engineering/42-agent-workbench-capstone"
+}

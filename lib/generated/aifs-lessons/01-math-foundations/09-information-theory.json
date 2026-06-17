@@ -1,0 +1,192 @@
+{
+  "id": "ai-from-scratch/01-math-foundations/09-information-theory",
+  "slug": "09-information-theory",
+  "phaseSlug": "01-math-foundations",
+  "number": "09",
+  "title": "Information Theory",
+  "summary": "Information theory measures surprise. Loss functions are built on it.",
+  "motto": "Information theory measures surprise. Loss functions are built on it.",
+  "type": "Learn",
+  "languages": [],
+  "prerequisites": [
+    "Phase 1",
+    "Lesson 06 (Probability)"
+  ],
+  "duration": "~60 minutes",
+  "status": "Complete",
+  "objectives": [
+    "Compute entropy, cross-entropy, and KL divergence from scratch and explain their relationship",
+    "Derive why minimizing cross-entropy loss is equivalent to maximizing log-likelihood",
+    "Calculate mutual information between features and a target to rank feature importance",
+    "Explain perplexity as the effective vocabulary size a language model chooses from"
+  ],
+  "exercises": [
+    "Compute the entropy of the English alphabet assuming uniform distribution (26 letters). Then estimate it using actual letter frequencies. Which is higher and why?",
+    "A model outputs logits [5.0, 2.0, 0.5] for a sample with true class 1. Compute the cross-entropy loss by hand, then verify with your cross_entropy_loss function. What logits would give zero loss?",
+    "Show that KL divergence is not symmetric. Pick two distributions P and Q and compute D_KL(P || Q) and D_KL(Q || P). Explain why they differ.",
+    "Build a function that computes perplexity for a sequence of token predictions. Given a list of (true_token_index, predicted_logits) pairs, return the perplexity of the sequence."
+  ],
+  "topics": [
+    "Math Foundations",
+    "Learn",
+    "Information",
+    "Theory",
+    "Information content",
+    "Entropy",
+    "Cross-entropy",
+    "KL divergence",
+    "Mutual information",
+    "Softmax",
+    "Perplexity",
+    "Bits",
+    "Nats",
+    "Negative log-likelihood"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Information theory measures surprise. Loss functions are built on it."
+    },
+    {
+      "key": "objectives",
+      "title": "Learning Objectives",
+      "markdown": "- Compute entropy, cross-entropy, and KL divergence from scratch and explain their relationship\n- Derive why minimizing cross-entropy loss is equivalent to maximizing log-likelihood\n- Calculate mutual information between features and a target to rank feature importance\n- Explain perplexity as the effective vocabulary size a language model chooses from"
+    },
+    {
+      "key": "problem",
+      "title": "The Problem",
+      "markdown": "You call `CrossEntropyLoss()` in every classification model you train. You see \"perplexity\" in every language model paper. You read about KL divergence in VAEs, distillation, and RLHF. These are not disconnected concepts. They are all the same idea wearing different hats.\n\nInformation theory gives you the language to reason about uncertainty, compression, and prediction. Claude Shannon invented it in 1948 to solve communication problems. Turns out, training a neural network is a communication problem: the model is trying to transmit the correct label through a noisy channel of learned weights.\n\nThis lesson builds every formula from scratch so you see where they come from and why they work."
+    },
+    {
+      "key": "concept",
+      "title": "The Concept",
+      "markdown": "### Information Content (Surprise)\n\nWhen something unlikely happens, it carries more information. A coin landing heads? Not surprising. A lottery win? Very surprising.\n\nThe information content of an event with probability p is:\n\n```\nI(x) = -log(p(x))\n```\n\nUsing log base 2 gives you bits. Using natural log gives you nats. Same idea, different units.\n\n```\nEvent              Probability    Surprise (bits)\nFair coin heads    0.5            1.0\nRolling a 6        0.167          2.58\n1-in-1000 event    0.001          9.97\nCertain event      1.0            0.0\n```\n\nCertain events carry zero information. You already knew they would happen.\n\n### Entropy (Average Surprise)\n\nEntropy is the expected surprise across all possible outcomes of a distribution.\n\n```\nH(P) = -sum( p(x) * log(p(x)) )  for all x\n```\n\nA fair coin has maximum entropy for a binary variable: 1 bit. A biased coin (99% heads) has low entropy: 0.08 bits. You already know what will happen, so each flip tells you almost nothing.\n\n```\nFair coin:    H = -(0.5 * log2(0.5) + 0.5 * log2(0.5)) = 1.0 bit\nBiased coin:  H = -(0.99 * log2(0.99) + 0.01 * log2(0.01)) = 0.08 bits\n```\n\nEntropy measures the irreducible uncertainty in a distribution. You cannot compress below it.\n\n### Cross-Entropy (The Loss Function You Use Every Day)\n\nCross-entropy measures the average surprise when you use distribution Q to encode events that actually come from distribution P.\n\n```\nH(P, Q) = -sum( p(x) * log(q(x)) )  for all x\n```\n\nP is the true distribution (the labels). Q is your model's predictions. If Q matches P perfectly, cross-entropy equals entropy. Any mismatch makes it larger.\n\nIn classification, P is a one-hot vector (the true class has probability 1, everything else 0). This simplifies cross-entropy to:\n\n```\nH(P, Q) = -log(q(true_class))\n```\n\nThat is the entire cross-entropy loss formula for classification. Maximize the predicted probability of the correct class.\n\n### KL Divergence (Distance Between Distributions)\n\nKL divergence measures how much extra surprise you get from using Q instead of P.\n\n```\nD_KL(P || Q) = sum( p(x) * log(p(x) / q(x)) )  for all x\n             = H(P, Q) - H(P)\n```\n\nCross-entropy is entropy plus KL divergence. Since entropy of the true distribution is constant during training, minimizing cross-entropy is the same as minimizing KL divergence. You are pushing your model's distribution toward the true distribution.\n\nKL divergence is not symmetric: D_KL(P || Q) != D_KL(Q || P). It is not a true distance metric.\n\n### Mutual Information\n\nMutual information measures how much knowing one variable tells you about another.\n\n```\nI(X; Y) = H(X) - H(X|Y)\n        = H(X) + H(Y) - H(X, Y)\n```\n\nIf X and Y are independent, mutual information is zero. Knowing one tells you nothing about the other. If they are perfectly correlated, mutual information equals the entropy of either variable.\n\nIn feature selection, high mutual information between a feature and the target means the feature is useful. Low mutual information means it is noise.\n\n### Conditional Entropy\n\nH(Y|X) measures how much uncertainty remains about Y after you observe X.\n\n```\nH(Y|X) = H(X,Y) - H(X)\n```\n\nTwo extremes:\n- If X completely determines Y, then H(Y|X) = 0. Knowing X eliminates all uncertainty about Y. Example: X = temperature in Celsius, Y = temperature in Fahrenheit.\n- If X tells you nothing about Y, then H(Y|X) = H(Y). Knowing X does not reduce your uncertainty at all. Example: X = coin flip, Y = tomorrow's weather.\n\nConditional entropy is always non-negative and never exceeds H(Y):\n\n```\n0 <= H(Y|X) <= H(Y)\n```\n\nIn machine learning, conditional entropy appears in decision trees. At each split, the algorithm picks the feature X that minimizes H(Y|X) -- the feature that removes the most uncertainty about the label Y.\n\n### Joint Entropy\n\nH(X,Y) is the entropy of the joint distribution of X and Y together.\n\n```\nH(X,Y) = -sum sum p(x,y) * log(p(x,y))   for all x, y\n```\n\nKey property:\n\n```\nH(X,Y) <= H(X) + H(Y)\n```\n\nEquality holds when X and Y are independent. If they share information, the joint entropy is less than the sum of individual entropies. The \"missing\" entropy is exactly the mutual information.\n\n```mermaid\ngraph TD\n    subgraph \"Information Venn Diagram\"\n        direction LR\n        HX[\"H(X)\"]\n        HY[\"H(Y)\"]\n        MI[\"I(X;Y)<br/>Mutual<br/>Information\"]\n        HXgY[\"H(X|Y)<br/>= H(X) - I(X;Y)\"]\n        HYgX[\"H(Y|X)<br/>= H(Y) - I(X;Y)\"]\n        HXY[\"H(X,Y) = H(X) + H(Y) - I(X;Y)\"]\n    end\n\n    HXgY --- MI\n    MI --- HYgX\n    HX -.- HXgY\n    HX -.- MI\n    HY -.- MI\n    HY -.- HYgX\n    HXY -.- HXgY\n    HXY -.- MI\n    HXY -.- HYgX\n```\n\nThe relationships:\n- H(X,Y) = H(X) + H(Y|X) = H(Y) + H(X|Y)\n- I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X)\n- H(X,Y) = H(X) + H(Y) - I(X;Y)\n\n### Mutual Information (Deep Dive)\n\nMutual information I(X;Y) quantifies how much knowing one variable reduces uncertainty about the other.\n\n```\nI(X;Y) = H(X) - H(X|Y)\n       = H(Y) - H(Y|X)\n       = H(X) + H(Y) - H(X,Y)\n       = sum sum p(x,y) * log(p(x,y) / (p(x) * p(y)))\n```\n\nProperties:\n- I(X;Y) >= 0 always. You never lose information by observing something.\n- I(X;Y) = 0 if and only if X and Y are independent.\n- I(X;Y) = I(Y;X). It is symmetric, unlike KL divergence.\n- I(X;X) = H(X). A variable shares all its information with itself.\n\n**Mutual information for feature selection.** In ML, you want features that are informative about the target. Mutual information gives you a principled way to rank features:\n\n1. For each feature X_i, compute I(X_i; Y) where Y is the target variable.\n2. Rank features by MI score.\n3. Keep the top k features.\n\nThis works for any relationship between feature and target -- linear, nonlinear, monotonic, or not. Correlation only catches linear relationships. MI catches everything.\n\n| Method | Detects | Computational cost | Handles categorical? |\n|--------|---------|-------------------|---------------------|\n| Pearson correlation | Linear relationships | O(n) | No |\n| Spearman correlation | Monotonic relationships | O(n log n) | No |\n| Mutual information | Any statistical dependency | O(n log n) with binning | Yes |\n\n### Label Smoothing and Cross-Entropy\n\nStandard classification uses hard targets: [0, 0, 1, 0]. The true class gets probability 1, everything else gets 0. Label smoothing replaces these with soft targets:\n\n```\nsoft_target = (1 - epsilon) * hard_target + epsilon / num_classes\n```\n\nWith epsilon = 0.1 and 4 classes:\n- Hard target:  [0, 0, 1, 0]\n- Soft target:  [0.025, 0.025, 0.925, 0.025]\n\nFrom an information theory perspective, label smoothing increases the entropy of the target distribution. Hard one-hot targets have entropy 0 -- there is no uncertainty. Soft targets have positive entropy.\n\nWhy this helps:\n- Prevents the model from driving logits to extreme values (infinite logits would be needed to perfectly match a one-hot target under cross-entropy)\n- Acts as regularization: the model cannot be 100% confident\n- Improves calibration: predicted probabilities better reflect true uncertainty\n- Reduces the gap between training and inference behavior\n\nThe cross-entropy loss with label smoothing becomes:\n\n```\nL = (1 - epsilon) * CE(hard_target, prediction) + epsilon * H_uniform(prediction)\n```\n\nThe second term penalizes predictions that are far from uniform -- a direct regularization on confidence.\n\n### Why Cross-Entropy Is THE Classification Loss\n\nThree perspectives, same conclusion.\n\n**Information theory view.** Cross-entropy measures how many bits you waste by using your model's distribution instead of the true distribution. Minimizing it makes your model the most efficient encoder of reality.\n\n**Maximum likelihood view.** For N training samples with true classes y_i:\n\n```\nLikelihood     = product( q(y_i) )\nLog-likelihood = sum( log(q(y_i)) )\nNegative log-likelihood = -sum( log(q(y_i)) )\n```\n\nThat last line is cross-entropy loss. Minimizing cross-entropy = maximizing the likelihood of the training data under your model.\n\n**Gradient view.** The gradient of cross-entropy with respect to the logits is simply (predicted - true). Clean, stable, and fast to compute. This is why it pairs perfectly with softmax.\n\n### Bits vs Nats\n\nThe only difference is the log base.\n\n```\nlog base 2   -> bits      (information theory tradition)\nlog base e   -> nats      (machine learning convention)\nlog base 10  -> hartleys  (rarely used)\n```\n\n1 nat = 1/ln(2) bits = 1.4427 bits. PyTorch and TensorFlow use natural log (nats) by default.\n\n### Perplexity\n\nPerplexity is the exponential of cross-entropy. It tells you the effective number of equally likely choices the model is uncertain between.\n\n```\nPerplexity = 2^H(P,Q)   (if using bits)\nPerplexity = e^H(P,Q)   (if using nats)\n```\n\nA language model with perplexity 50 is, on average, as confused as if it had to pick uniformly from 50 possible next tokens. Lower is better.\n\nGPT-2 achieved perplexity ~30 on common benchmarks. Modern models are in the single digits for well-represented domains.\n\n```figure\nentropy-kl\n```"
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "### Step 1: Information content and entropy\n\n```python\nimport math\n\ndef information_content(p, base=2):\n    if p <= 0 or p > 1:\n        return float('inf') if p <= 0 else 0.0\n    return -math.log(p) / math.log(base)\n\ndef entropy(probs, base=2):\n    return sum(\n        p * information_content(p, base)\n        for p in probs if p > 0\n    )\n\nfair_coin = [0.5, 0.5]\nbiased_coin = [0.99, 0.01]\nfair_die = [1/6] * 6\n\nprint(f\"Fair coin entropy:   {entropy(fair_coin):.4f} bits\")\nprint(f\"Biased coin entropy: {entropy(biased_coin):.4f} bits\")\nprint(f\"Fair die entropy:    {entropy(fair_die):.4f} bits\")\n```\n\n### Step 2: Cross-entropy and KL divergence\n\n```python\ndef cross_entropy(p, q, base=2):\n    total = 0.0\n    for pi, qi in zip(p, q):\n        if pi > 0:\n            if qi <= 0:\n                return float('inf')\n            total += pi * (-math.log(qi) / math.log(base))\n    return total\n\ndef kl_divergence(p, q, base=2):\n    return cross_entropy(p, q, base) - entropy(p, base)\n\ntrue_dist = [0.7, 0.2, 0.1]\ngood_model = [0.6, 0.25, 0.15]\nbad_model = [0.1, 0.1, 0.8]\n\nprint(f\"Entropy of true dist:     {entropy(true_dist):.4f} bits\")\nprint(f\"CE (good model):          {cross_entropy(true_dist, good_model):.4f} bits\")\nprint(f\"CE (bad model):           {cross_entropy(true_dist, bad_model):.4f} bits\")\nprint(f\"KL divergence (good):     {kl_divergence(true_dist, good_model):.4f} bits\")\nprint(f\"KL divergence (bad):      {kl_divergence(true_dist, bad_model):.4f} bits\")\n```\n\n### Step 3: Cross-entropy as classification loss\n\n```python\ndef softmax(logits):\n    max_logit = max(logits)\n    exps = [math.exp(z - max_logit) for z in logits]\n    total = sum(exps)\n    return [e / total for e in exps]\n\ndef cross_entropy_loss(true_class, logits):\n    probs = softmax(logits)\n    return -math.log(probs[true_class])\n\nlogits = [2.0, 1.0, 0.1]\ntrue_class = 0\n\nprobs = softmax(logits)\nloss = cross_entropy_loss(true_class, logits)\n\nprint(f\"Logits:      {logits}\")\nprint(f\"Softmax:     {[f'{p:.4f}' for p in probs]}\")\nprint(f\"True class:  {true_class}\")\nprint(f\"Loss:        {loss:.4f} nats\")\nprint(f\"Perplexity:  {math.exp(loss):.2f}\")\n```\n\n### Step 4: Cross-entropy equals negative log-likelihood\n\n```python\nimport random\n\nrandom.seed(42)\n\nn_samples = 1000\nn_classes = 3\ntrue_labels = [random.randint(0, n_classes - 1) for _ in range(n_samples)]\nmodel_logits = [[random.gauss(0, 1) for _ in range(n_classes)] for _ in range(n_samples)]\n\nce_loss = sum(\n    cross_entropy_loss(label, logits)\n    for label, logits in zip(true_labels, model_logits)\n) / n_samples\n\nnll = -sum(\n    math.log(softmax(logits)[label])\n    for label, logits in zip(true_labels, model_logits)\n) / n_samples\n\nprint(f\"Cross-entropy loss:      {ce_loss:.6f}\")\nprint(f\"Negative log-likelihood: {nll:.6f}\")\nprint(f\"Difference:              {abs(ce_loss - nll):.2e}\")\n```\n\n### Step 5: Mutual information\n\n```python\ndef mutual_information(joint_probs, base=2):\n    rows = len(joint_probs)\n    cols = len(joint_probs[0])\n\n    margin_x = [sum(joint_probs[i][j] for j in range(cols)) for i in range(rows)]\n    margin_y = [sum(joint_probs[i][j] for i in range(rows)) for j in range(cols)]\n\n    mi = 0.0\n    for i in range(rows):\n        for j in range(cols):\n            pxy = joint_probs[i][j]\n            if pxy > 0:\n                mi += pxy * math.log(pxy / (margin_x[i] * margin_y[j])) / math.log(base)\n    return mi\n\nindependent = [[0.25, 0.25], [0.25, 0.25]]\ndependent = [[0.45, 0.05], [0.05, 0.45]]\n\nprint(f\"MI (independent): {mutual_information(independent):.4f} bits\")\nprint(f\"MI (dependent):   {mutual_information(dependent):.4f} bits\")\n```"
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "The same concepts using NumPy, the way you will use them in practice:\n\n```python\nimport numpy as np\n\ndef np_entropy(p):\n    p = np.asarray(p, dtype=float)\n    mask = p > 0\n    result = np.zeros_like(p)\n    result[mask] = p[mask] * np.log(p[mask])\n    return -result.sum()\n\ndef np_cross_entropy(p, q):\n    p, q = np.asarray(p, dtype=float), np.asarray(q, dtype=float)\n    mask = p > 0\n    return -(p[mask] * np.log(q[mask])).sum()\n\ndef np_kl_divergence(p, q):\n    return np_cross_entropy(p, q) - np_entropy(p)\n\ntrue = np.array([0.7, 0.2, 0.1])\npred = np.array([0.6, 0.25, 0.15])\nprint(f\"Entropy:    {np_entropy(true):.4f} nats\")\nprint(f\"Cross-ent:  {np_cross_entropy(true, pred):.4f} nats\")\nprint(f\"KL div:     {np_kl_divergence(true, pred):.4f} nats\")\n```\n\nYou built from scratch what `torch.nn.CrossEntropyLoss()` does internally. Now you know why the loss goes down during training: your model's predicted distribution is getting closer to the true distribution, measured in nats of wasted information."
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Compute the entropy of the English alphabet assuming uniform distribution (26 letters). Then estimate it using actual letter frequencies. Which is higher and why?\n\n2. A model outputs logits [5.0, 2.0, 0.5] for a sample with true class 1. Compute the cross-entropy loss by hand, then verify with your `cross_entropy_loss` function. What logits would give zero loss?\n\n3. Show that KL divergence is not symmetric. Pick two distributions P and Q and compute D_KL(P || Q) and D_KL(Q || P). Explain why they differ.\n\n4. Build a function that computes perplexity for a sequence of token predictions. Given a list of (true_token_index, predicted_logits) pairs, return the perplexity of the sequence."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|----------------|----------------------|\n| Information content | \"Surprise\" | The number of bits (or nats) needed to encode an event: -log(p) |\n| Entropy | \"Randomness\" | The average surprise across all outcomes of a distribution. Measures irreducible uncertainty. |\n| Cross-entropy | \"The loss function\" | Average surprise when using model distribution Q to encode events from true distribution P. |\n| KL divergence | \"Distance between distributions\" | Extra bits wasted by using Q instead of P. Equals cross-entropy minus entropy. Not symmetric. |\n| Mutual information | \"How related are X and Y\" | Reduction in uncertainty about X from knowing Y. Zero means independent. |\n| Softmax | \"Turn logits into probabilities\" | Exponentiate and normalize. Maps any real-valued vector to a valid probability distribution. |\n| Perplexity | \"How confused the model is\" | Exponential of cross-entropy. The effective vocabulary size the model is choosing from at each step. |\n| Bits | \"Shannon's unit\" | Information measured with log base 2. One bit resolves one fair coin flip. |\n| Nats | \"ML's unit\" | Information measured with natural log. Used by PyTorch and TensorFlow by default. |\n| Negative log-likelihood | \"NLL loss\" | Identical to cross-entropy loss for one-hot labels. Minimizing it maximizes the probability of correct predictions. |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Shannon 1948: A Mathematical Theory of Communication](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf) - the original paper, still readable\n- [Visual Information Theory (Chris Olah)](https://colah.github.io/posts/2015-09-Visual-Information/) - best visual explanation of entropy and KL divergence\n- [PyTorch CrossEntropyLoss docs](https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html) - how the framework implements what you just built"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does 'entropy' measure in information theory?",
+      "options": [
+        "The energy of a physical system",
+        "The average surprise or uncertainty in a probability distribution",
+        "The number of bits in a binary message",
+        "The error rate of a communication channel"
+      ],
+      "correct": 1,
+      "explanation": "Entropy H(P) = -sum(p(x) * log(p(x))) measures the average amount of surprise across all outcomes. High entropy means high uncertainty (uniform distribution). Low entropy means the outcome is predictable."
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "What is the cross-entropy loss commonly used for in neural networks?",
+      "options": [
+        "Regression tasks with continuous outputs",
+        "Classification tasks, measuring how far predicted probabilities are from true labels",
+        "Generating new data samples",
+        "Regularizing model weights to prevent overfitting"
+      ],
+      "correct": 1,
+      "explanation": "Cross-entropy loss H(P,Q) = -sum(p(x)*log(q(x))) measures the difference between the true distribution (labels) and the model's predicted distribution. It is THE standard loss for classification."
+    },
+    {
+      "id": "post-3",
+      "stage": "post",
+      "question": "Why is minimizing cross-entropy equivalent to minimizing KL divergence during training?",
+      "options": [
+        "Because KL divergence is always zero during training",
+        "Because cross-entropy = entropy + KL divergence, and the entropy of the true labels is constant, so minimizing cross-entropy minimizes KL divergence",
+        "Because cross-entropy and KL divergence are the same formula",
+        "Because the model's entropy equals zero at convergence"
+      ],
+      "correct": 1,
+      "explanation": "H(P,Q) = H(P) + D_KL(P||Q). Since the true distribution P doesn't change during training, H(P) is constant. Minimizing H(P,Q) is the same as minimizing D_KL(P||Q) -- pushing the model toward the true distribution."
+    },
+    {
+      "id": "post-4",
+      "stage": "post",
+      "question": "A language model has perplexity 50 on a test set. What does this mean?",
+      "options": [
+        "The model makes 50 errors per sentence",
+        "On average, the model is as uncertain as if it were choosing uniformly from 50 possible next tokens at each step",
+        "The model has 50 layers",
+        "The model was trained for 50 epochs"
+      ],
+      "correct": 1,
+      "explanation": "Perplexity = e^(cross-entropy). A perplexity of 50 means the model's uncertainty at each token is equivalent to picking randomly from 50 equally likely options. Lower perplexity means better predictions."
+    },
+    {
+      "id": "post-5",
+      "stage": "post",
+      "question": "How does mutual information differ from Pearson correlation for feature selection?",
+      "options": [
+        "Mutual information is faster to compute",
+        "Mutual information detects any statistical dependency (linear or nonlinear) while correlation only detects linear relationships",
+        "Pearson correlation works for any data type while mutual information only works for continuous data",
+        "They always give the same feature rankings"
+      ],
+      "correct": 1,
+      "explanation": "Mutual information I(X;Y) captures all statistical dependencies between variables, including nonlinear and non-monotonic ones. Pearson correlation only measures linear association, missing many important relationships."
+    }
+  ],
+  "resources": [
+    {
+      "label": "Shannon 1948: A Mathematical Theory of Communication",
+      "href": "https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf",
+      "kind": "Reading"
+    },
+    {
+      "label": "Visual Information Theory (Chris Olah)",
+      "href": "https://colah.github.io/posts/2015-09-Visual-Information/",
+      "kind": "Reading"
+    },
+    {
+      "label": "PyTorch CrossEntropyLoss docs",
+      "href": "https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+      "kind": "Reading"
+    },
+    {
+      "label": "Information Theory",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/09-information-theory/outputs/skill-information-theory.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "information_theory.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/09-information-theory/code/information_theory.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/09-information-theory",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/01-math-foundations/09-information-theory"
+}

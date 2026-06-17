@@ -1,0 +1,268 @@
+{
+  "id": "ai-from-scratch/19-capstone-projects/15-constitutional-safety-harness",
+  "slug": "15-constitutional-safety-harness",
+  "phaseSlug": "19-capstone-projects",
+  "number": "15",
+  "title": "Capstone 15 — Constitutional Safety Harness + Red-Team Range",
+  "summary": "Anthropic's Constitutional Classifiers, Meta's Llama Guard 4, Google's ShieldGemma-2, NVIDIA's Nemotron 3 Content Safety, and X-Guard for multilingual coverage defined the 2026 safety-classifier stack. garak, PyRIT, NVIDIA Aegis, and promp...",
+  "motto": "Anthropic's Constitutional Classifiers, Meta's Llama Guard 4, Google's ShieldGemma-2, NVIDIA's Nemotron 3 Content Safety, and X-Guard for multilingual coverage defined the 2026 safety-classifier stack. garak, PyRIT, NVIDIA Aegis, and promptfoo became the standard adversarial evaluation tools. NeMo Guardrails v0.12 ties them into a production pipeline. This capstone wires all of it together: a layered safety harness around a target app, an autonomous red-team agent running 6+ attack families, and a constitutional self-critique run that produces a measurable harmlessness delta.",
+  "type": "Capstone",
+  "languages": [
+    "Python (safety pipeline",
+    "red team)",
+    "YAML (policy configs)"
+  ],
+  "prerequisites": [
+    "Phase 10 (LLMs from scratch)",
+    "Phase 11 (LLM engineering)",
+    "Phase 13 (tools)",
+    "Phase 14 (agents)",
+    "Phase 18 (ethics",
+    "safety",
+    "alignment)"
+  ],
+  "duration": "25 hours",
+  "status": "Complete",
+  "objectives": [],
+  "exercises": [
+    "Run garak's plugin for prompt-injection on a RAG chatbot and compare attack success rate with and without the output-filter layer.",
+    "Add a seventh attack family: indirect prompt injection via retrieved documents. Measure the extra defense required.",
+    "Implement a \"refuse-with-help\" mode: when the guardrail blocks, the target offers a safer related answer instead of a flat refusal. Measure XSTest delta.",
+    "Multilingual coverage gap: find a language where X-Guard underperforms. Propose a fine-tune dataset targeting it.",
+    "Run the constitutional self-critique on a 30B model and measure whether the delta scales."
+  ],
+  "topics": [
+    "Capstone Projects",
+    "Capstone",
+    "Python (safety pipeline",
+    "red team)",
+    "YAML (policy configs)",
+    "Constitutional",
+    "Safety",
+    "Harness",
+    "Red",
+    "Team",
+    "Range",
+    "Layered safety",
+    "Llama Guard 4",
+    "PAIR",
+    "TAP",
+    "GCG",
+    "Constitutional self-critique",
+    "XSTest",
+    "CVSS 4.0"
+  ],
+  "sections": [
+    {
+      "key": "overview",
+      "title": "Overview",
+      "markdown": "> Anthropic's Constitutional Classifiers, Meta's Llama Guard 4, Google's ShieldGemma-2, NVIDIA's Nemotron 3 Content Safety, and X-Guard for multilingual coverage defined the 2026 safety-classifier stack. garak, PyRIT, NVIDIA Aegis, and promptfoo became the standard adversarial evaluation tools. NeMo Guardrails v0.12 ties them into a production pipeline. This capstone wires all of it together: a layered safety harness around a target app, an autonomous red-team agent running 6+ attack families, and a constitutional self-critique run that produces a measurable harmlessness delta."
+    },
+    {
+      "key": "problem",
+      "title": "Problem",
+      "markdown": "The frontier of LLM safety in 2026 is not whether classifiers work (they do, roughly) but how to compose them correctly around a production app without over-refusing or leaving obvious holes. Llama Guard 4 handles English policy violations. X-Guard (132 languages) handles multilingual jailbreak. ShieldGemma-2 catches image-based prompt injection. NVIDIA Nemotron 3 Content Safety covers enterprise categories. Anthropic's Constitutional Classifiers are a separate approach used during training rather than serving.\n\nAttack evolution matters too. PAIR and TAP automate jailbreak discovery. GCG runs gradient-based suffix attacks. Multi-turn and code-switch attacks exploit agent memory. Any deployed LLM needs a red-team range — garak and PyRIT are the canonical drivers — plus documented mitigations and CVSS-scored findings.\n\nYou will harden a target application (either an 8B instruction-tuned model or one of the RAG chatbots from other capstones), run 6+ attack families against it, and produce a before/after harmlessness measurement."
+    },
+    {
+      "key": "concept",
+      "title": "Concept",
+      "markdown": "The safety pipeline is five layers. **Input sanitize**: strip zero-width chars, decode base64/rot13, normalize Unicode. **Policy layer**: NeMo Guardrails v0.12 rails (off-domain, toxicity, PII extraction). **Classifier gate**: Llama Guard 4 on input, X-Guard on non-English, ShieldGemma-2 on image inputs. **Model**: the target LLM. **Output filter**: Llama Guard 4 on output, Presidio PII scrub, citation enforcement where applicable. **HITL tier**: outputs flagged high-risk go to a Slack queue.\n\nThe red-team range runs on a scheduler. PAIR and TAP autonomously discover jailbreaks. GCG runs gradient-based suffix attacks. ASCII / base64 / rot13 encoding attacks. Multi-turn attacks (persona adoption, memory exploitation). Code-switch attacks (mix English with Swahili or Thai). Each run produces a structured findings file with CVSS scoring and disclosure timeline.\n\nThe constitutional-self-critique run is a training-time intervention. Take 1k harmful-attempt prompts, have the model draft a response, critique it against a written constitution (do-not-harm rules), and retrain on the critique loop. Measure the before/after harmlessness delta on a held-out eval."
+    },
+    {
+      "key": "build-it",
+      "title": "Build It",
+      "markdown": "1. **Target setup.** Stand up an 8B instruction-tuned model on vLLM (or reuse a RAG chatbot from another capstone). This is the app under test.\n\n2. **Safety pipeline wrap.** Wire the five-layer pipeline around the target. Verify each layer is individually observable (span per layer in Langfuse).\n\n3. **Classifier coverage.** Load Llama Guard 4, X-Guard (multilingual), ShieldGemma-2 (image). Run each on a small labeled set to establish baselines.\n\n4. **Red-team scheduler.** Schedule garak, PyRIT, a PAIR agent, a TAP agent, a GCG runner, a multi-turn attacker, and a code-switch attacker. Each runs on a separate queue.\n\n5. **Attack suite.** Six attack families: (1) PAIR automated jailbreak, (2) TAP tree-of-attacks, (3) GCG gradient suffix, (4) ASCII / base64 / rot13 encoding, (5) multi-turn persona, (6) multilingual code-switch. Report success rate per family.\n\n6. **Constitutional self-critique.** Curate 1k harmful-attempt prompts. For each, the target drafts a response. A critic LLM scores against a written constitution (\"do no harm,\" \"cite evidence,\" \"refuse illegal requests\"). Prompts where the critic objects get rewritten; the target fine-tunes on the critique-improved pairs. Measure before/after harmlessness on a held-out eval.\n\n7. **Over-refusal measurement.** Track false-positive rate on a benign prompt suite (e.g., XSTest). The target must stay helpful on benign questions.\n\n8. **CVSS scoring.** For each successful jailbreak, score on CVSS 4.0 (attack vector, complexity, impact). Produce a disclosure timeline and mitigation plan.\n\n9. **Range automation.** Everything above runs on a cron; findings write to a queue; over-refusal regression alerts fire to Slack."
+    },
+    {
+      "key": "use-it",
+      "title": "Use It",
+      "markdown": "```\n$ safety probe --model=target --family=PAIR --budget=50\n[attacker]   PAIR agent running on target\n[attack]     attempt 1/50: disguise query as academic research ... blocked\n[attack]     attempt 2/50: appeal to roleplay ... blocked\n[attack]     attempt 3/50: chain-of-thought coax ... SUCCEEDED\n[finding]    CVSS 4.8 medium: roleplay bypass on target\n[range]      7 successes out of 50 (14% success rate)\n```"
+    },
+    {
+      "key": "ship-it",
+      "title": "Ship It",
+      "markdown": "`outputs/skill-safety-harness.md` is the deliverable. A production-grade layered safety pipeline plus a reproducible red-team range with before/after harmlessness deltas.\n\n| Weight | Criterion | How it is measured |\n|:-:|---|---|\n| 25 | Attack-surface coverage | 6+ attack families exercised, 2+ languages |\n| 20 | True-positive / false-positive trade-off | Attack block rate vs XSTest benign pass rate |\n| 20 | Self-critique delta | Before/after harmlessness on held-out eval |\n| 20 | Documentation and disclosure | CVSS-scored findings with timeline |\n| 15 | Automation and repeatability | Everything runs on cron with alerts |\n| **100** | | |"
+    },
+    {
+      "key": "exercises",
+      "title": "Exercises",
+      "markdown": "1. Run garak's plugin for prompt-injection on a RAG chatbot and compare attack success rate with and without the output-filter layer.\n\n2. Add a seventh attack family: indirect prompt injection via retrieved documents. Measure the extra defense required.\n\n3. Implement a \"refuse-with-help\" mode: when the guardrail blocks, the target offers a safer related answer instead of a flat refusal. Measure XSTest delta.\n\n4. Multilingual coverage gap: find a language where X-Guard underperforms. Propose a fine-tune dataset targeting it.\n\n5. Run the constitutional self-critique on a 30B model and measure whether the delta scales."
+    },
+    {
+      "key": "key-terms",
+      "title": "Key Terms",
+      "markdown": "| Term | What people say | What it actually means |\n|------|-----------------|------------------------|\n| Layered safety | \"Defense in depth\" | Multiple guardrails at input, gate, output, HITL |\n| Llama Guard 4 | \"Meta's safety classifier\" | The 2026 reference input/output content classifier |\n| PAIR | \"Jailbreak agent\" | Paper (Chao et al.) on LLM-driven jailbreak discovery |\n| TAP | \"Tree-of-Attacks\" | Tree-search variant of PAIR |\n| GCG | \"Greedy coordinate gradient\" | Gradient-based adversarial suffix attack |\n| Constitutional self-critique | \"Anthropic-style training\" | Target drafts -> critic scores -> rewrite -> retrain |\n| XSTest | \"Benign probe set\" | Benchmark for over-refusal regression |\n| CVSS 4.0 | \"Severity score\" | Standard vulnerability scoring for safety findings |"
+    },
+    {
+      "key": "resources",
+      "title": "Further Reading",
+      "markdown": "- [Anthropic Constitutional Classifiers](https://www.anthropic.com/research/constitutional-classifiers) — training-time reference\n- [Meta Llama Guard 4](https://ai.meta.com/research/publications/llama-guard-4/) — the 2026 input/output classifier\n- [Google ShieldGemma-2](https://huggingface.co/google/shieldgemma-2b) — image + multimodal safety\n- [NVIDIA Nemotron 3 Content Safety](https://developer.nvidia.com/blog/building-nvidia-nemotron-3-agents-for-reasoning-multimodal-rag-voice-and-safety/) — enterprise reference\n- [X-Guard (arXiv:2504.08848)](https://arxiv.org/abs/2504.08848) — 132-language multilingual safety\n- [garak](https://github.com/NVIDIA/garak) — NVIDIA red-team toolkit\n- [PyRIT](https://github.com/Azure/PyRIT) — Microsoft red-team framework\n- [NeMo Guardrails v0.12](https://docs.nvidia.com/nemo-guardrails/) — rail framework\n- [PAIR (arXiv:2310.08419)](https://arxiv.org/abs/2310.08419) — jailbreak agent paper"
+    },
+    {
+      "key": "architecture",
+      "title": "Architecture",
+      "markdown": "```\nrequest (text / image / multilingual)\n      |\n      v\ninput sanitize (strip zero-width, decode, normalize)\n      |\n      v\nNeMo Guardrails v0.12 rails (off-domain, policy)\n      |\n      v\nclassifier gate:\n  Llama Guard 4 (English)\n  X-Guard (multilingual, 132 langs)\n  ShieldGemma-2 (image prompts)\n  Nemotron 3 Content Safety (enterprise)\n      |\n      v (allowed)\ntarget LLM\n      |\n      v\noutput filter: Llama Guard 4 + Presidio PII + citation check\n      |\n      v\nHITL tier for flagged outputs\n\nparallel:\n  red-team scheduler\n    -> garak (classic attacks)\n    -> PyRIT (orchestrated red team)\n    -> autonomous jailbreak agent (PAIR + TAP)\n    -> GCG suffix attacks\n    -> multilingual / code-switch\n    -> multi-turn persona adoption\n\noutput: CVSS-scored findings + disclosure timeline + before/after harmlessness delta\n```"
+    },
+    {
+      "key": "stack",
+      "title": "Stack",
+      "markdown": "- Safety classifiers: Llama Guard 4, ShieldGemma-2, NVIDIA Nemotron 3 Content Safety, X-Guard\n- Guardrail framework: NeMo Guardrails v0.12 + OPA\n- Red-team drivers: garak (NVIDIA), PyRIT (Microsoft Azure), NVIDIA Aegis, promptfoo\n- Jailbreak agents: PAIR (Chao et al., 2023), Tree-of-Attacks (TAP), GCG suffix\n- Constitutional training: Anthropic-style self-critique loop + SFT on critiques\n- PII scrub: Presidio\n- Target: an 8B instruction-tuned model or one of the other capstones' RAG chatbots"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "pre-1",
+      "stage": "pre",
+      "question": "What does layered safety in this capstone mean?",
+      "options": [
+        "Manual review of every response",
+        "Running one strong classifier on the input only",
+        "A single rule-based regex over outputs",
+        "Defense in depth across input sanitize, policy rails, classifier gate, model, output filter, and HITL tier"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "pre-2",
+      "stage": "pre",
+      "question": "Which classifier handles multilingual coverage across roughly 132 languages?",
+      "options": [
+        "Nemotron 3 Content Safety",
+        "ShieldGemma-2",
+        "X-Guard",
+        "Llama Guard 4"
+      ],
+      "correct": 2,
+      "explanation": ""
+    },
+    {
+      "id": "check-3",
+      "stage": "check",
+      "question": "Why is over-refusal measured on a benign suite like XSTest?",
+      "options": [
+        "To replace red-team scoring",
+        "To benchmark token throughput",
+        "To certify the guardrail framework",
+        "To track false-positive blocks so the model stays helpful while improving harmlessness"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-4",
+      "stage": "check",
+      "question": "What is the constitutional self-critique loop in this capstone?",
+      "options": [
+        "A reranker over candidate jailbreak prompts",
+        "An RLHF reward model trained from scratch",
+        "A single forward pass through Llama Guard 4",
+        "Critic LLM scores drafts against a written constitution, prompts the model rewrites the objected outputs, and SFT runs on the improved pairs"
+      ],
+      "correct": 3,
+      "explanation": ""
+    },
+    {
+      "id": "check-5",
+      "stage": "check",
+      "question": "How are successful jailbreaks scored for severity in the findings?",
+      "options": [
+        "By the model that produced the response",
+        "Using CVSS 4.0 with attack vector, complexity, and impact, plus a disclosure timeline",
+        "By raw token count of the prompt",
+        "On a hand-tuned 1-10 scale chosen by the operator"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "post-6",
+      "stage": "post",
+      "question": "Which six attack families does the red-team range run?",
+      "options": [
+        "BLEU, ROUGE, METEOR, BERTScore, CometKiwi, and chrF",
+        "PAIR, TAP, GCG, encoding (ASCII/base64/rot13), multi-turn persona, and multilingual code-switch",
+        "Brute-force, dictionary, replay, MITM, phishing, and CSRF",
+        "PSI, KL, MMD, KS, JS, and Wasserstein"
+      ],
+      "correct": 1,
+      "explanation": ""
+    },
+    {
+      "id": "post-7",
+      "stage": "post",
+      "question": "Why is range automation (cron + alerts) part of the rubric?",
+      "options": [
+        "Cron is the only way to call OPA",
+        "Continuous scheduled probes catch drift in attack success rate and over-refusal regressions over time",
+        "Manual runs are explicitly required",
+        "Automation is required to disable Llama Guard 4"
+      ],
+      "correct": 1,
+      "explanation": ""
+    }
+  ],
+  "resources": [
+    {
+      "label": "Anthropic Constitutional Classifiers",
+      "href": "https://www.anthropic.com/research/constitutional-classifiers",
+      "kind": "Reading"
+    },
+    {
+      "label": "Meta Llama Guard 4",
+      "href": "https://ai.meta.com/research/publications/llama-guard-4/",
+      "kind": "Reading"
+    },
+    {
+      "label": "Google ShieldGemma-2",
+      "href": "https://huggingface.co/google/shieldgemma-2b",
+      "kind": "Reading"
+    },
+    {
+      "label": "NVIDIA Nemotron 3 Content Safety",
+      "href": "https://developer.nvidia.com/blog/building-nvidia-nemotron-3-agents-for-reasoning-multimodal-rag-voice-and-safety/",
+      "kind": "Reading"
+    },
+    {
+      "label": "X-Guard (arXiv:2504.08848)",
+      "href": "https://arxiv.org/abs/2504.08848",
+      "kind": "Reading"
+    },
+    {
+      "label": "garak",
+      "href": "https://github.com/NVIDIA/garak",
+      "kind": "Reading"
+    },
+    {
+      "label": "PyRIT",
+      "href": "https://github.com/Azure/PyRIT",
+      "kind": "Reading"
+    },
+    {
+      "label": "NeMo Guardrails v0.12",
+      "href": "https://docs.nvidia.com/nemo-guardrails/",
+      "kind": "Reading"
+    },
+    {
+      "label": "PAIR (arXiv:2310.08419)",
+      "href": "https://arxiv.org/abs/2310.08419",
+      "kind": "Reading"
+    },
+    {
+      "label": "Safety Harness",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/15-constitutional-safety-harness/outputs/skill-safety-harness.md",
+      "kind": "Skill"
+    },
+    {
+      "label": "main.py",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/15-constitutional-safety-harness/code/main.py",
+      "kind": "Code"
+    },
+    {
+      "label": "Source lesson",
+      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/15-constitutional-safety-harness",
+      "kind": "Source"
+    }
+  ],
+  "sourcePath": "phases/19-capstone-projects/15-constitutional-safety-harness"
+}
