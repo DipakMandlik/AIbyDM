@@ -1,8 +1,11 @@
 # build output
+.next/
+out/
 dist/
 
 # generated types
 .astro/
+tsconfig.tsbuildinfo
 
 # dependencies
 node_modules/
@@ -10,6 +13,8 @@ node_modules/
 # logs
 npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # environment variables
 .env

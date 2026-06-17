@@ -1,35 +1,32 @@
 # Deployment
 
-AIByDM deploys as a static site on GitHub Pages.
+AIByDM deploys as a static Next.js export on GitHub Pages.
 
-## Current Hosting Model
+## Hosting Model
 
 - Host: GitHub Pages
-- Source: GitHub Actions workflow
+- Source: GitHub Actions
 - Live URL: <https://dipakmandlik.github.io/AIByDM/>
+- Build output: `out/`
 
 ## Environment Variables
 
-| Variable    | Purpose                        | Default                          |
-| ----------- | ------------------------------ | -------------------------------- |
-| `SITE_URL`  | Canonical site host            | `https://dipakmandlik.github.io` |
-| `BASE_PATH` | Base path for Pages deployment | `/AIByDM`                        |
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `BASE_PATH` | GitHub Pages route base | `/AIByDM` |
 
-## Deployment Workflow
+## Workflow
 
 1. Push to `main`.
-2. `validate.yml` checks build quality.
-3. `deploy.yml` builds the site and publishes `dist/` to GitHub Pages.
-4. The Pages environment exposes the live URL.
+2. `validate.yml` runs `npm ci`, `npm run typecheck`, `npm run lint`, and `npm run build`.
+3. `deploy.yml` repeats the quality gates and uploads `out/` to GitHub Pages.
+4. GitHub Pages publishes the generated static files.
+
+## Manual Verification
+
+After deployment, verify the representative production routes listed in [README.md](../../README.md#smoke-routes). Also check mobile navigation, Command-K search, visible focus states, and reduced-motion behavior.
 
 ## Release Workflow
 
-- `release.yml` creates GitHub releases from semantic version tags.
+- `release.yml` publishes GitHub releases from semantic version tags.
 - `.github/release.yml` controls generated release note categories.
-
-## Verification Checklist
-
-- Confirm the live Pages URL responds.
-- Confirm screenshots in the README still match the product.
-- Confirm badges point to the correct repository workflows.
-- Confirm docs links resolve on GitHub.

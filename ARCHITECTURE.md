@@ -1,73 +1,89 @@
 # AIByDM Architecture
 
-AIByDM is a static-first open-source platform designed for learner clarity, contributor velocity,
-and low-friction deployment.
+AIByDM is a static-first Next.js App Router platform for AI learning, discovery, practice, exam preparation, newsletter reading, and community contribution.
 
-## Architecture Principles
+## Principles
 
-- Prefer static delivery for reliability and simplicity.
-- Use interactivity where it improves learning, not by default.
-- Keep content in-repo so contributors can improve it through normal Git workflows.
-- Treat documentation and community operations as part of the system architecture.
+- Keep the public product static-export compatible for GitHub Pages.
+- Put each major area behind a clear landing page and dedicated detail routes.
+- Model content with typed TypeScript objects and explicit slugs.
+- Keep learning progression simple: track, module, lesson, project.
+- Prefer shared navigation, footer, hero, card, button, and search patterns over page-specific templates.
+- Respect reduced motion, keyboard navigation, visible focus, and small-screen constraints.
 
-## System Overview
+## Runtime Model
 
 ```mermaid
 flowchart LR
-    Contributors[Contributors] --> GitHub[GitHub Repository]
-    GitHub --> Issues[Issues and Discussions]
-    GitHub --> PRs[Pull Requests]
-    GitHub --> Actions[GitHub Actions]
-    Content[MDX, YAML, JSON, TS Catalogs] --> Astro[Astro App]
-    React[React Islands] --> Astro
-    Astro --> Build[Static Build]
-    Actions --> Validate[Validate and Security Checks]
-    Actions --> Deploy[Pages Deployment]
-    Build --> Pages[GitHub Pages]
+    Content[lib/content.ts] --> Routes[Next App Router]
+    Routes --> StaticExport[next build output export]
+    StaticExport --> Pages[GitHub Pages]
+    SearchIndex[Search items] --> ClientSearch[Command-K and /search]
+    GitHub[GitHub Actions] --> Validate[typecheck lint build]
+    Validate --> Deploy[out artifact]
     Deploy --> Pages
 ```
 
-## Current Implementation Snapshot
+## Product Areas
 
-As of 2026-06-16, the Learn platform is the most mature module in the repo and is implemented as
-a hybrid Astro, React, and TypeScript catalog system.
+| Area | Route | Detail routes |
+| --- | --- | --- |
+| Learn | `/learn/` | `/learn/[slug]/`, `/learn/[slug]/[lessonSlug]/`, `/learn/[slug]/projects/[projectSlug]/` |
+| Tools | `/tools/` | `/tools/[slug]/` |
+| Games | `/games/` | `/games/[slug]/` |
+| Exams | `/exams/` | `/exams/[slug]/` |
+| Newsletter | `/newsletter/` | `/newsletter/[slug]/` |
+| Community | `/community/` | GitHub links for discussions, issues, security, and support |
+| Search | `/search/` | Client-side query and type filters |
 
-| Area           | Current repo state                                                                                                                                                                                                   |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Curriculum     | `src/data/learn/catalog.ts` defines 17 tracks across core, builder, systems, and enterprise stages.                                                                                                                  |
-| Routes         | Learn currently ships `/learn/`, `/learn/catalog/`, `/learn/roadmap/`, `/learn/resources/`, `/learn/glossary/`, `/learn/[track]/`, `/learn/[track]/[lesson]/`, `/learn/[track]/projects/[project]/`, and `/search/`. |
-| Learning UI    | `src/components/learn/` contains the dashboard, control center, roadmap, lesson rail, progress panel, and search experience.                                                                                         |
-| Progress state | `src/data/learn/progress.ts` stores lesson completion, module completion, streaks, recents, and last-visited state in local storage.                                                                                 |
-| Scale          | The current Learn catalog generates 136 lesson routes and 68 project routes inside a 234-page static build.                                                                                                          |
+## Content Model
 
-Authored MDX content in `src/content/learn/` is still supported, but it now acts as an enrichment
-layer for selected lessons rather than the only Learn source of truth.
+`lib/content.ts` defines the public content contracts:
 
-## Core Layers
+- `Track`, `Module`, `Lesson`, `Project`
+- `ToolCategory`, `Tool`
+- `Game`
+- `Exam`
+- `Issue`
+- `SearchItem`
 
-| Layer               | Responsibility                                                    |
-| ------------------- | ----------------------------------------------------------------- |
-| Astro routes        | Static shell, page composition, metadata, and route generation    |
-| React islands       | Search, progress tracking, and interactive product surfaces       |
-| Content collections | Learning lessons, tools, exams, games, and newsletter entries     |
-| TypeScript catalogs | Structured learning roadmaps, stage metadata, and search indexes  |
-| GitHub workflows    | Validation, deployment, security scanning, and release automation |
-| Community docs      | Contribution flow, support, governance, and roadmap communication |
+Every route uses explicit slugs. Production URLs are not derived from mutable titles.
 
-## Repository Map
+Route helpers live alongside the data:
 
-| Path              | Role                                                  |
-| ----------------- | ----------------------------------------------------- |
-| `src/pages/`      | User-facing routes                                    |
-| `src/components/` | Astro and React UI building blocks                    |
-| `src/content/`    | Authored platform content                             |
-| `src/data/`       | Structured catalog and search data                    |
-| `src/styles/`     | Global tokens and styling primitives                  |
-| `.github/`        | Automation, templates, and repository operations      |
-| `docs/`           | Public documentation for contributors and maintainers |
+- `getTrackHref`
+- `getLessonHref`
+- `getProjectHref`
+- `getToolHref`
+- `getGameHref`
+- `getExamHref`
+- `getIssueHref`
 
-## Detailed Architecture Docs
+## Static Export
 
-The long-form architecture pack lives in [docs/architecture/README.md](./docs/architecture/README.md).
-It includes product requirements, information architecture, design system notes, deployment, search,
-content architecture, and implementation planning.
+`next.config.mjs` keeps the site GitHub Pages-ready:
+
+```js
+const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
+  basePath: process.env.BASE_PATH ?? '/AIByDM',
+  images: {
+    unoptimized: true,
+  },
+};
+```
+
+Avoid features that require a Next server, including server actions, dynamic server routes, image optimization, and database-backed search.
+
+## Quality Gates
+
+Local and CI validation use the same commands:
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+The GitHub Pages workflow uploads the generated `out/` directory.

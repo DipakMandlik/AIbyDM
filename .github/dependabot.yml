@@ -13,10 +13,10 @@ updates:
       - dependencies
       - status:needs-triage
     groups:
-      astro:
+      next:
         patterns:
-          - astro
-          - '@astrojs/*'
+          - next
+          - '@next/*'
       react:
         patterns:
           - react

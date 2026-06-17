@@ -1,8 +1,8 @@
 {
   "name": "aibydm",
-  "type": "module",
   "version": "0.1.0",
-  "description": "Open-source AI learning platform featuring structured learning paths, projects, roadmaps, AI tools, challenges, exams, and community-driven learning.",
+  "private": true,
+  "description": "AIByDM is a free, open-source AI learning platform with structured tracks, tools, games, exams, newsletters, and community paths.",
   "homepage": "https://dipakmandlik.github.io/AIByDM/",
   "repository": {
     "type": "git",
@@ -13,70 +13,44 @@
   },
   "author": "Dipak Mandlik (https://github.com/DipakMandlik)",
   "license": "MIT",
-  "keywords": [
-    "ai",
-    "artificial-intelligence",
-    "machine-learning",
-    "deep-learning",
-    "llm",
-    "rag",
-    "agents",
-    "learning-platform",
-    "education",
-    "open-source",
-    "developer-tools",
-    "genai",
-    "ai-engineering",
-    "transformers",
-    "prompt-engineering",
-    "mlops",
-    "roadmap",
-    "career-development",
-    "opensource-community",
-    "github-pages"
-  ],
-  "packageManager": "pnpm@10.33.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "build": "next build"
+  },
   "engines": {
     "node": ">=22.12.0"
   },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "check": "astro check",
-    "lint": "eslint . && prettier --check .",
-    "lint:fix": "eslint --fix . && prettier --write .",
-    "lint:content": "markdownlint-cli2 \"src/content/**/*.md\" \"src/content/**/*.mdx\"",
-    "format": "prettier --write .",
-    "validate": "pnpm check && pnpm lint && pnpm lint:content && pnpm build",
-    "astro": "astro",
-    "typecheck": "astro check"
+  "overrides": {
+    "postcss": "$postcss"
   },
   "dependencies": {
-    "@astrojs/mdx": "^6.0.3",
-    "@astrojs/react": "^5.0.7",
-    "@astrojs/sitemap": "^3.7.3",
-    "@tailwindcss/vite": "^4.3.1",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "astro": "^6.4.7",
-    "framer-motion": "^12.40.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tailwindcss": "^4.3.1"
+    "@radix-ui/react-slot": "1.1.1",
+    "@vercel/analytics": "1.3.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.454.0",
+    "next": "16.2.9",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.9",
+    "tw-animate-css": "1.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
     "@eslint/js": "^10.0.1",
+    "@next/eslint-plugin-next": "^16.2.9",
+    "@tailwindcss/postcss": "^4.1.9",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "eslint": "^10.5.0",
-    "eslint-plugin-astro": "^1.7.0",
-    "lucide-react": "^1.18.0",
-    "markdownlint-cli2": "^0.22.1",
-    "prettier": "^3.8.4",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.61.0",
-    "vite": "7.3.5"
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^16.5.0",
+    "postcss": "^8.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.61.0"
   }
 }

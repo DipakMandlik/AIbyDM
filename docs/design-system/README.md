@@ -1,29 +1,43 @@
 # Design System
 
-AIByDM aims to feel sharp, trustworthy, and developer-native.
+AIByDM uses a restrained editorial product system: neutral surfaces, thin borders, low-radius cards, strong type hierarchy, and focused actions.
 
-## Design Principles
+## Foundations
 
-- Make the product feel intentional and product-grade.
-- Favor clarity over visual noise.
-- Use strong hierarchy, readable spacing, and clear states.
-- Preserve accessibility and mobile resilience.
+- Typography: system sans for UI, serif display for hero and section titles, monospace for metadata.
+- Color: warm neutral background, near-black foreground, subtle muted surfaces, semantic green/amber/red only where status matters.
+- Shape: low-radius primitives; avoid oversized pill/card decoration except for clear buttons and badges.
+- Layout: wide editorial sections, thin dividers, dense but readable grids, and simple detail-page sidebars.
+- Motion: subtle reveal, marquee, and canvas motion with `prefers-reduced-motion` support.
 
-## Current UI Foundations
+## Shared Components
 
-- Astro layouts for page structure.
-- React islands for interactive panels.
-- Tailwind CSS tokens defined in `src/styles/global.css`.
-- Consistent module accents for Learn, Tools, Games, Exams, Newsletter, and Community.
+- `SiteNav` owns primary navigation, mobile menu, Command-K search, and the primary `Start learning` CTA.
+- `SiteFooter` owns platform, resource, open-source, and legal links.
+- `PageHero` standardizes platform landing headers.
+- `Button` is the shared low-level action primitive.
+- `SearchExperience` and `CommandSearch` share the static search index from `lib/content.ts`.
 
-## What to Preserve
+## Product Area Pattern
 
-- Static-first rendering.
-- Strong contrast in dark mode.
-- Clear action buttons and readable cards.
-- Consistent navigation, footer, and command surface patterns.
+Every major area should have:
+
+- Dedicated landing page.
+- Dedicated detail pages where relevant.
+- Clear primary action.
+- Consistent metadata and discovery affordances.
+- Mobile-first layout with no horizontal scroll.
+
+## Accessibility Rules
+
+- Keep one `h1` per route.
+- Preserve the skip link and semantic page landmarks.
+- Label icon-only buttons.
+- Keep visible focus rings.
+- Ensure Escape closes overlays.
+- Respect reduced motion for decorative motion and canvas effects.
 
 ## Related Docs
 
-- [docs/architecture/04-Design-System.md](../architecture/04-Design-System.md)
 - [ARCHITECTURE.md](../../ARCHITECTURE.md)
+- [docs/development/README.md](../development/README.md)

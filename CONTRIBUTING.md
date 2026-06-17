@@ -14,8 +14,8 @@ ship new workflows, or review pull requests, there is a clear path to help.
 
 ### Product and Code
 
-- Improve Astro and React experiences.
-- Build search, progress, and future lab workflows.
+- Improve Next, React, and static-export experiences.
+- Build search, progression, and future lab workflows.
 - Refine responsive layout, accessibility, and interactions.
 - Strengthen CI, release, and deployment workflows.
 
@@ -31,14 +31,16 @@ ship new workflows, or review pull requests, there is a clear path to help.
 ```bash
 git clone https://github.com/DipakMandlik/AIByDM.git
 cd AIByDM
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Before you open a pull request, run:
 
 ```bash
-pnpm validate
+npm run typecheck
+npm run lint
+npm run build
 ```
 
 ## Repository Workflow
@@ -84,7 +86,7 @@ content: add python foundations lesson
 ### For Code
 
 - Preserve the static-first architecture unless interactivity is necessary.
-- Use React only for interactive islands.
+- Keep all routes compatible with Next static export and GitHub Pages.
 - Follow the existing design tokens and layout language.
 - Keep accessibility and mobile behavior in scope.
 
@@ -100,7 +102,7 @@ If you are contributing platform content, start here:
 
 - [docs/content-system/README.md](./docs/content-system/README.md)
 - [docs/design-system/README.md](./docs/design-system/README.md)
-- [docs/architecture/08-Content-Architecture.md](./docs/architecture/08-Content-Architecture.md)
+- [ARCHITECTURE.md](./ARCHITECTURE.md)
 
 ## Pull Request Checklist
 
@@ -109,7 +111,7 @@ Before requesting review, make sure your change:
 - Solves one clear problem or completes one clear slice of work.
 - Includes screenshots for UI or README updates.
 - Updates docs if behavior or workflow changed.
-- Passes `pnpm validate`.
+- Passes `npm run typecheck`, `npm run lint`, and `npm run build`.
 - Does not include secrets, local build output, or unrelated edits.
 
 ## Good First Issues

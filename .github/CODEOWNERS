@@ -5,12 +5,11 @@
 
 /.github/ @DipakMandlik
 /docs/ @DipakMandlik
-/src/content/learn/ @DipakMandlik
-/src/content/tools/ @DipakMandlik
-/src/content/exams/ @DipakMandlik
-/src/content/games/ @DipakMandlik
-/src/content/newsletter/ @DipakMandlik
-/src/components/ @DipakMandlik
-/src/layouts/ @DipakMandlik
-/src/pages/ @DipakMandlik
-/src/styles/ @DipakMandlik
+/app/ @DipakMandlik
+/components/ @DipakMandlik
+/hooks/ @DipakMandlik
+/lib/content.ts @DipakMandlik
+/styles/ @DipakMandlik
+/next.config.mjs @DipakMandlik
+/package.json @DipakMandlik
+/package-lock.json @DipakMandlik

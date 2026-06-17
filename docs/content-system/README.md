@@ -1,31 +1,51 @@
 # Content System
 
-AIByDM content is meant to be contributor-friendly and version-controlled.
+AIByDM content is stored as typed TypeScript data in `lib/content.ts` so routes, search, and discovery stay static-export compatible.
 
 ## Content Areas
 
-| Area             | Location                  | Format     |
-| ---------------- | ------------------------- | ---------- |
-| Learn lessons    | `src/content/learn/`      | MDX        |
-| Tools            | `src/content/tools/`      | YAML       |
-| Exams            | `src/content/exams/`      | JSON       |
-| Games            | `src/content/games/`      | YAML       |
-| Newsletter       | `src/content/newsletter/` | MDX        |
-| Learning catalog | `src/data/learn/`         | TypeScript |
+| Area | Types | Routes |
+| --- | --- | --- |
+| Learn | `Track`, `Module`, `Lesson`, `Project` | `/learn/`, lesson pages, project pages |
+| Tools | `ToolCategory`, `Tool` | `/tools/`, `/tools/[slug]/` |
+| Games | `Game` | `/games/`, `/games/[slug]/` |
+| Exams | `Exam` | `/exams/`, `/exams/[slug]/` |
+| Newsletter | `Issue` | `/newsletter/`, `/newsletter/[slug]/` |
+| Search | `SearchItem` | `/search/`, Command-K |
 
 ## Authoring Rules
 
-- Keep entries factual, specific, and reviewable.
-- Include enough metadata for categorization and future search.
-- Prefer small, composable content additions over giant drops.
-- Link concepts back to practical AI workflows when possible.
+- Use explicit `slug` values for every routable object.
+- Do not derive production URLs from display titles.
+- Keep lessons small enough to support clear next actions.
+- Give projects milestones, deliverables, and related lesson slugs.
+- Keep search keywords useful and specific.
+- Prefer practical AI workflows over abstract summaries.
 
-## When to Edit Catalog Data
+## Route Helpers
 
-Use `src/data/learn/` when you are changing track structure, roadmap metadata, or search behavior.
-Use `src/content/` when you are authoring learner-facing content.
+Use the existing route helpers instead of hand-building URLs:
+
+- `getTrackHref`
+- `getLessonHref`
+- `getProjectHref`
+- `getToolHref`
+- `getGameHref`
+- `getExamHref`
+- `getIssueHref`
+
+## Learn V1 Scope
+
+The primary Learn catalog intentionally stays focused on four reference-led tracks:
+
+- AI Foundations
+- Prompt Engineering
+- Building With LLMs
+- AI Product Design
+
+Additional tracks can be added later, but new content should preserve the track, module, lesson, and project hierarchy.
 
 ## Related Docs
 
+- [ARCHITECTURE.md](../../ARCHITECTURE.md)
 - [CONTRIBUTING.md](../../CONTRIBUTING.md)
-- [docs/architecture/08-Content-Architecture.md](../architecture/08-Content-Architecture.md)

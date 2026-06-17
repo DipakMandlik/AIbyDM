@@ -26,12 +26,11 @@ Fixes #
 
 ## Verification
 
-- [ ] `pnpm check`
-- [ ] `pnpm lint`
-- [ ] `pnpm lint:content`
-- [ ] `pnpm build`
+- [ ] `npm run typecheck`
+- [ ] `npm run lint`
+- [ ] `npm run build`
 - [ ] Screenshots attached for visual UI changes
-- [ ] Content follows the relevant template and schema
+- [ ] Content uses explicit slugs and follows `lib/content.ts` types
 
 ## Reviewer Notes
 

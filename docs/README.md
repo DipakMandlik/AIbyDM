@@ -13,11 +13,11 @@ project as an open-source platform.
 | [contributing/README.md](./contributing/README.md)       | Contributor journey and review expectations                 |
 | [design-system/README.md](./design-system/README.md)     | Visual system, tokens, and UI guidance                      |
 | [content-system/README.md](./content-system/README.md)   | Learn, tools, exams, games, and newsletter authoring system |
-| [architecture/README.md](./architecture/README.md)       | Long-form architecture documentation index                  |
+| [../ARCHITECTURE.md](../ARCHITECTURE.md)                 | Current Next/static-export architecture                     |
 | [community/GITHUB_SETUP.md](./community/GITHUB_SETUP.md) | GitHub repository settings and operations checklist         |
 
 ## Fast Paths
 
 - First-time contributor: [getting-started/README.md](./getting-started/README.md)
 - Maintainer or reviewer: [development/README.md](./development/README.md)
-- Open-source repo evaluator: [architecture/README.md](./architecture/README.md)
+- Open-source repo evaluator: [ARCHITECTURE.md](../ARCHITECTURE.md)
