@@ -185,6 +185,20 @@
     filter: blur(40px);
     transform: translateY(100%);
   }
+
+  .brand-wordmark-text {
+    background: linear-gradient(110deg, var(--foreground) 0%, var(--foreground) 38%, #0891b2 48%, var(--foreground) 58%, var(--foreground) 100%);
+    background-size: 240% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: brand-shimmer 7s ease-in-out infinite;
+  }
+
+  @keyframes brand-shimmer {
+    0%, 72%, 100% { background-position: 120% 0; }
+    86% { background-position: -40% 0; }
+  }
   
   @keyframes char-in {
     0% {
