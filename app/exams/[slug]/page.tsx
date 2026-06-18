@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, FileQuestion } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, FileQuestion } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SiteNav } from "@/components/site/site-nav";
 import { SiteFooter } from "@/components/site/site-footer";
-import { exams, getExam } from "@/lib/content";
+import { exams, getExam, getExamTakeHref } from "@/lib/content";
 
 export function generateStaticParams() {
   return exams.map((exam) => ({ slug: exam.slug }));
@@ -37,9 +38,26 @@ export default async function ExamPage({ params }: { params: Promise<{ slug: str
           <h1 className="mt-5 font-display text-[clamp(3rem,8vw,6rem)] leading-[0.95] tracking-tight">
             {exam.title}
           </h1>
-          <p className="mt-8 max-w-2xl text-xl leading-relaxed text-muted-foreground">
-            {exam.description}
-          </p>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
+            <p className="max-w-2xl text-xl leading-relaxed text-muted-foreground">
+              {exam.description}
+            </p>
+            <div className="border border-foreground/10 bg-background p-5">
+              <div className="grid grid-cols-2 gap-px border border-foreground/10 bg-foreground/10">
+                <div className="bg-background p-4">
+                  <div className="font-display text-3xl">{exam.sampleExamQuestions.length}</div>
+                  <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">V1 questions</div>
+                </div>
+                <div className="bg-background p-4">
+                  <div className="font-display text-3xl">{exam.stages.length}</div>
+                  <div className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Stages</div>
+                </div>
+              </div>
+              <Button asChild size="lg" className="mt-5 min-h-12 w-full rounded-full">
+                <Link href={getExamTakeHref(exam.slug)}>Start exam <ArrowRight className="h-4 w-4" /></Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
       <section className="py-16 lg:py-24">
@@ -66,12 +84,16 @@ export default async function ExamPage({ params }: { params: Promise<{ slug: str
               <h2 className="font-medium">Sample questions</h2>
             </div>
             <div className="space-y-3">
-              {exam.sampleQuestions.map((question) => (
-                <div key={question} className="border border-foreground/10 p-4 text-sm text-muted-foreground">
-                  {question}
+              {exam.sampleExamQuestions.map((question, index) => (
+                <div key={question.id} className="border border-foreground/10 p-4 text-sm text-muted-foreground">
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground">Question {index + 1} / {question.stage}</p>
+                  <p className="mt-2 text-foreground">{question.prompt}</p>
                 </div>
               ))}
             </div>
+            <Button asChild className="mt-5 w-full rounded-full">
+              <Link href={getExamTakeHref(exam.slug)}>Open test runner <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
           </aside>
         </div>
       </section>

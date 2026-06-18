@@ -121,6 +121,17 @@ export type Exam = {
   description: string;
   stages: string[];
   sampleQuestions: string[];
+  sampleExamQuestions: ExamQuestion[];
+};
+
+export type ExamQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correctOptionIndex: number;
+  explanation: string;
+  stage: string;
+  topic?: string;
 };
 
 export type Issue = {
@@ -165,6 +176,10 @@ export function getGameHref(gameSlug: string) {
 
 export function getExamHref(examSlug: string) {
   return `/exams/${examSlug}`;
+}
+
+export function getExamTakeHref(examSlug: string) {
+  return `/exams/${examSlug}/take`;
 }
 
 export function getIssueHref(issueSlug: string) {
@@ -797,6 +812,50 @@ export const exams: Exam[] = [
     description: 'A progressive interview path around LLMs, RAG, agents, evaluations, and production readiness.',
     stages: ['LLM fundamentals', 'RAG and retrieval', 'Agents and tools', 'Evaluation and safety', 'Live system design'],
     sampleQuestions: ['How would you evaluate a RAG answer?', 'Where should tool-call validation happen?', 'What metrics matter after launch?'],
+    sampleExamQuestions: [
+      {
+        id: 'ai-engineer-q1',
+        prompt: 'How would you evaluate whether a RAG answer is production-ready?',
+        options: [
+          'Check whether the answer is long enough and uses confident language.',
+          'Measure groundedness against retrieved sources, answer completeness, citation quality, and failure handling on a held-out set.',
+          'Ask the model to grade its own response after every answer.',
+          'Track only thumbs-up and thumbs-down feedback after launch.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'A production RAG eval needs source-grounded checks, completeness, citation quality, and edge cases. User feedback helps later, but it is not a release gate by itself.',
+        stage: 'RAG and retrieval',
+        topic: 'RAG evaluation',
+      },
+      {
+        id: 'ai-engineer-q2',
+        prompt: 'Where should tool-call validation happen in an LLM application?',
+        options: [
+          'Inside the model prompt, because the model understands the user intent best.',
+          'Only in the frontend, before the request reaches the model.',
+          'In application code before execution, using schemas, permissions, and business rules.',
+          'After the tool executes, by asking the model whether the result looks safe.',
+        ],
+        correctOptionIndex: 2,
+        explanation: 'The application owns validation and side effects. The model may request a tool call, but code must validate arguments, permissions, and policy before execution.',
+        stage: 'Agents and tools',
+        topic: 'Tool safety',
+      },
+      {
+        id: 'ai-engineer-q3',
+        prompt: 'Which metrics matter most after launching an AI feature?',
+        options: [
+          'Only model accuracy, because product metrics are downstream effects.',
+          'Latency, cost per task, fallback rate, quality/eval score, error rate, and user success signals.',
+          'The number of generated tokens, because longer answers are usually better.',
+          'Daily active users only, because adoption summarizes every technical concern.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'AI launch monitoring needs both model and product signals: quality, speed, cost, failures, fallbacks, and whether users actually complete the job.',
+        stage: 'Evaluation and safety',
+        topic: 'Production monitoring',
+      },
+    ],
   },
   {
     slug: 'ml-engineer',
@@ -807,6 +866,50 @@ export const exams: Exam[] = [
     description: 'Fundamentals through ML system design, with practical checks for model quality and deployment tradeoffs.',
     stages: ['Math and statistics', 'Classic ML', 'Deep learning', 'ML system design', 'Behavioral'],
     sampleQuestions: ['How do you handle data leakage?', 'When does a simpler model win?', 'What monitoring catches drift?'],
+    sampleExamQuestions: [
+      {
+        id: 'ml-engineer-q1',
+        prompt: 'How should you handle suspected data leakage in a training pipeline?',
+        options: [
+          'Keep the model if offline accuracy is high enough.',
+          'Remove features created after the prediction point, rebuild splits by time/entity, and rerun validation.',
+          'Reduce model complexity until validation accuracy drops to a realistic number.',
+          'Add regularization so the model cannot memorize leaked signals.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'Leakage is a data and split problem. The fix is to remove future/invalid signals and validate using splits that match production reality.',
+        stage: 'Classic ML',
+        topic: 'Data leakage',
+      },
+      {
+        id: 'ml-engineer-q2',
+        prompt: 'When does a simpler model win over a more complex model?',
+        options: [
+          'When it is easier to explain, cheaper to serve, robust on validation data, and meets the product quality bar.',
+          'Never; complex models always learn more signal.',
+          'Only when the dataset has fewer than one thousand rows.',
+          'When stakeholders do not care about accuracy.',
+        ],
+        correctOptionIndex: 0,
+        explanation: 'A simpler model often wins when it meets the required quality with better reliability, latency, cost, debuggability, or interpretability.',
+        stage: 'ML system design',
+        topic: 'Model selection',
+      },
+      {
+        id: 'ml-engineer-q3',
+        prompt: 'What monitoring best catches model drift after deployment?',
+        options: [
+          'CPU utilization only, because drift usually appears as slower inference.',
+          'Input distribution shifts, prediction distribution shifts, segment-level quality, calibration, and delayed ground-truth metrics.',
+          'Training loss from the original experiment.',
+          'The number of model versions deployed per month.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'Drift shows up in data, predictions, calibration, and real-world outcome quality. Infrastructure metrics are useful but do not prove model behavior is stable.',
+        stage: 'ML system design',
+        topic: 'Drift monitoring',
+      },
+    ],
   },
   {
     slug: 'data-scientist',
@@ -817,6 +920,50 @@ export const exams: Exam[] = [
     description: 'Statistics, experimentation, modeling, and narrative thinking for data science loops.',
     stages: ['Probability', 'Experimentation', 'Modeling', 'SQL and analytics', 'Case studies'],
     sampleQuestions: ['How would you design an experiment?', 'What makes an A/B test invalid?', 'How do you explain model uncertainty?'],
+    sampleExamQuestions: [
+      {
+        id: 'data-scientist-q1',
+        prompt: 'What is the strongest first step when designing an experiment?',
+        options: [
+          'Pick the dashboard chart before defining the metric.',
+          'Define the hypothesis, primary metric, unit of randomization, guardrails, and decision rule before launch.',
+          'Run the test to everyone so the sample size is as large as possible.',
+          'Choose the winning variant after the first day of data.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'Good experiments start with a predeclared hypothesis, metric, randomization unit, guardrails, sample plan, and decision rule.',
+        stage: 'Experimentation',
+        topic: 'Experiment design',
+      },
+      {
+        id: 'data-scientist-q2',
+        prompt: 'What can make an A/B test invalid?',
+        options: [
+          'Using a control group.',
+          'Random assignment at the user level.',
+          'Peeking repeatedly without correction, sample-ratio mismatch, interference between groups, or changing the metric mid-test.',
+          'Running the test for more than one day.',
+        ],
+        correctOptionIndex: 2,
+        explanation: 'Invalid tests usually fail through design or analysis problems: broken randomization, interference, unplanned peeking, metric changes, or sample-ratio mismatch.',
+        stage: 'Experimentation',
+        topic: 'A/B testing',
+      },
+      {
+        id: 'data-scientist-q3',
+        prompt: 'How should you explain model uncertainty to a non-technical stakeholder?',
+        options: [
+          'Avoid uncertainty because it reduces confidence in the model.',
+          'Use probability ranges, examples of likely errors, confidence intervals where appropriate, and the decision impact of being wrong.',
+          'Show the full training notebook so they can inspect every assumption.',
+          'Report only the single best estimate and hide edge cases.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'Useful uncertainty communication ties ranges and error modes to decisions. It makes risk actionable without burying stakeholders in implementation details.',
+        stage: 'Modeling',
+        topic: 'Uncertainty',
+      },
+    ],
   },
   {
     slug: 'ai-pm',
@@ -827,6 +974,50 @@ export const exams: Exam[] = [
     description: 'Strategy, metrics, user trust, prioritization, and responsible AI launch decisions.',
     stages: ['AI strategy', 'Metrics and evals', 'Prioritization', 'Trust and ethics', 'Execution'],
     sampleQuestions: ['What quality bar would you set before launch?', 'How do you measure AI feature success?', 'When should a human approve an AI action?'],
+    sampleExamQuestions: [
+      {
+        id: 'ai-pm-q1',
+        prompt: 'What quality bar should an AI PM set before launch?',
+        options: [
+          'The demo works on the happy path and the team is excited.',
+          'The feature passes representative evals, handles known failure modes, has rollback/fallback paths, and meets latency/cost constraints.',
+          'The model vendor publishes a high benchmark score.',
+          'The interface includes a disclaimer that the answer may be wrong.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'A launch quality bar combines representative evals, failure handling, operational constraints, and recovery paths. A disclaimer is not a substitute for product readiness.',
+        stage: 'Metrics and evals',
+        topic: 'Launch quality',
+      },
+      {
+        id: 'ai-pm-q2',
+        prompt: 'How should you measure AI feature success?',
+        options: [
+          'Only by model accuracy on a public benchmark.',
+          'By user task completion, quality/eval scores, trust signals, latency, cost, adoption, and support/escalation impact.',
+          'Only by how many users try the feature once.',
+          'By the number of AI-generated outputs per user.',
+        ],
+        correctOptionIndex: 1,
+        explanation: 'AI feature success is product success plus model quality. The key is whether users complete the task reliably, quickly, safely, and economically.',
+        stage: 'AI strategy',
+        topic: 'Success metrics',
+      },
+      {
+        id: 'ai-pm-q3',
+        prompt: 'When should a human approve an AI action?',
+        options: [
+          'When the action is high-stakes, hard to undo, legally sensitive, financially meaningful, or affects user trust.',
+          'Only when the model says it is uncertain.',
+          'Never, because approval slows down automation.',
+          'Only after a customer complains.',
+        ],
+        correctOptionIndex: 0,
+        explanation: 'Human approval belongs where risk, reversibility, compliance, or trust stakes are high. Self-reported model uncertainty is not enough by itself.',
+        stage: 'Trust and ethics',
+        topic: 'Human approval',
+      },
+    ],
   },
 ];
 
