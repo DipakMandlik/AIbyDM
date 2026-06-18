@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteNav } from "@/components/site/site-nav";
 import { LessonReader } from "@/components/learn/aifs/lesson-reader";
 import { getAifsFullLesson } from "@/lib/learning";
@@ -32,7 +31,6 @@ export default async function AiFromScratchLessonPage({ params }: { params: Prom
     <main className="relative min-h-screen overflow-x-hidden noise-overlay">
       <SiteNav />
       <LessonReader phase={match.phase} lesson={match.lesson} />
-      <SiteFooter />
     </main>
   );
 }
