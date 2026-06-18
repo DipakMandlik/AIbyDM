@@ -15,15 +15,18 @@ export const productLinks = [
   { name: "Community", href: "/community", desc: "Open source" },
 ];
 
-export function SiteNav() {
+export function SiteNav({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const compact = variant === 'compact';
+  const condensed = compact || isScrolled;
 
   useEffect(() => {
+    if (compact) return;
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [compact]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -42,39 +45,41 @@ export function SiteNav() {
   return (
     <header
       className={`fixed z-50 transition-all duration-500 ${
-        isScrolled ? "top-4 left-4 right-4" : "top-0 left-0 right-0"
+        compact ? "left-0 right-0 top-0" : isScrolled ? "top-4 left-4 right-4" : "top-0 left-0 right-0"
       }`}
     >
       <nav
         className={`mx-auto transition-all duration-500 ${
-          isScrolled || isMobileMenuOpen
+          compact
+            ? "max-w-none border-b border-foreground/10 bg-background/95 shadow-sm backdrop-blur-xl"
+            : isScrolled || isMobileMenuOpen
             ? "bg-background/80 backdrop-blur-xl border border-foreground/10 rounded-2xl shadow-lg max-w-[1200px]"
             : "bg-transparent max-w-[1400px]"
         }`}
       >
         <div
           className={`flex items-center justify-between transition-all duration-500 px-6 lg:px-8 ${
-            isScrolled ? "h-14" : "h-20"
+            compact ? "h-14" : isScrolled ? "h-14" : "h-20"
           }`}
         >
           <Link href="/" className="flex items-center gap-2 group">
             <span
               className={`font-display tracking-tight transition-all duration-500 ${
-                isScrolled ? "text-xl" : "text-2xl"
+                condensed ? "text-xl" : "text-2xl"
               }`}
             >
               AIByDM
             </span>
             <span
               className={`text-muted-foreground font-mono transition-all duration-500 ${
-                isScrolled ? "text-[10px] mt-0.5" : "text-xs mt-1"
+                condensed ? "text-[10px] mt-0.5" : "text-xs mt-1"
               }`}
             >
               /ai
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-9">
+          <div className={`hidden md:flex items-center ${compact ? "gap-6" : "gap-9"}`}>
             {productLinks.map((link) => (
               <Link
                 key={link.name}
@@ -93,7 +98,7 @@ export function SiteNav() {
               asChild
               size="sm"
               className={`bg-foreground hover:bg-foreground/90 text-background rounded-full transition-all duration-500 ${
-                isScrolled ? "px-4 h-8 text-xs" : "px-6"
+                condensed ? "px-4 h-8 text-xs" : "px-6"
               }`}
             >
               <Link href="/learn">Start learning</Link>
@@ -120,7 +125,7 @@ export function SiteNav() {
         }`}
         style={{ top: 0 }}
       >
-        <div className="flex flex-col h-full px-8 pt-28 pb-8">
+        <div className={`flex h-full flex-col px-8 pb-8 ${compact ? "pt-24" : "pt-28"}`}>
           <div className="flex-1 flex flex-col justify-center gap-6">
             {productLinks.map((link, i) => (
               <Link

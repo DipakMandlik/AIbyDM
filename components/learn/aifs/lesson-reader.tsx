@@ -20,67 +20,85 @@ export function LessonReader({ phase, lesson }: { phase: AifsPhase; lesson: Aifs
   const next = getNextLesson(phase.slug, lesson.slug);
 
   return (
-    <section className="px-4 pb-6 pt-24 lg:h-screen lg:overflow-hidden lg:px-6 lg:pb-6 lg:pt-24">
-      <div className="mx-auto flex h-full max-w-[1380px] flex-col gap-4">
-        <header className="border border-foreground/10 bg-background/85 px-4 py-3 shadow-sm backdrop-blur lg:px-5">
-          <Link
-            href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)}
-            className="group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Phase {phase.number}: {phase.title}
-          </Link>
-          <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
+    <section className="px-3 pb-4 pt-16 lg:h-screen lg:overflow-hidden lg:px-4 lg:pb-4 lg:pt-[4.25rem]">
+      <div className="mx-auto flex h-full max-w-[1380px] flex-col gap-3">
+        <header className="shrink-0 border border-foreground/10 bg-background/90 px-3 py-3 shadow-sm backdrop-blur lg:px-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="min-w-0">
-              <div className="mb-2 flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
-                <span>{aifsLearningPath.title}</span>
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
+                <Link href="/learn/ai-from-scratch" className="transition-colors hover:text-foreground">
+                  {aifsLearningPath.title}
+                </Link>
+                <span>/</span>
+                <Link href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)} className="transition-colors hover:text-foreground">
+                  Phase {phase.number}
+                </Link>
                 <span>/</span>
                 <span>Lesson {lesson.number}</span>
                 <span>/</span>
                 <span>{lesson.duration}</span>
               </div>
-              <h1 className="font-display text-2xl leading-tight tracking-tight lg:text-3xl">{lesson.title}</h1>
-              <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-6 text-muted-foreground lg:line-clamp-1">{lesson.summary}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 font-mono text-xs text-muted-foreground lg:justify-end">
-              <span className="border border-foreground/10 px-3 py-1">{lesson.type}</span>
-              {lesson.languages.map((language) => (
-                <span key={language} className="border border-foreground/10 px-3 py-1">
-                  {language}
+
+              <div className="mt-2 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                <h1 className="min-w-0 font-display text-xl leading-tight tracking-tight lg:text-2xl">{lesson.title}</h1>
+                <span className="border border-foreground/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {lesson.type}
                 </span>
-              ))}
-              {lesson.prerequisites.length === 0 && <span className="border border-foreground/10 px-3 py-1">No prerequisites</span>}
+                {lesson.languages.slice(0, 3).map((language) => (
+                  <span key={language} className="border border-foreground/10 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+                    {language}
+                  </span>
+                ))}
+                {lesson.prerequisites.length === 0 && (
+                  <span className="border border-foreground/10 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">No prerequisites</span>
+                )}
+              </div>
+
+              <p className="mt-1 line-clamp-1 max-w-4xl text-sm leading-6 text-muted-foreground">{lesson.summary}</p>
             </div>
+
+            <nav className="grid shrink-0 gap-2 sm:grid-cols-2 xl:min-w-[420px]" aria-label="Lesson navigation">
+              <Link
+                href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)}
+                className="group flex min-h-11 min-w-0 items-center justify-between gap-3 border border-foreground/10 bg-background px-3 py-2 text-sm transition-colors hover:bg-foreground/[0.03]"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <ArrowLeft className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-x-1" />
+                  <span className="min-w-0">
+                    <span className="block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Back to phase</span>
+                    <span className="block truncate font-medium">{phase.title}</span>
+                  </span>
+                </span>
+              </Link>
+
+              {next ? (
+                <Link
+                  href={getAifsLessonHref(next.phase.slug, next.lesson.slug)}
+                  className="group flex min-h-11 min-w-0 items-center justify-between gap-3 border border-foreground/10 bg-background px-3 py-2 text-sm transition-colors hover:bg-foreground/[0.03]"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Next lesson</span>
+                    <span className="block truncate font-medium">{next.lesson.title}</span>
+                  </span>
+                  <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
+                </Link>
+              ) : (
+                <div
+                  className="flex min-h-11 min-w-0 items-center border border-foreground/10 bg-foreground/[0.02] px-3 py-2 text-sm text-muted-foreground"
+                  aria-disabled="true"
+                >
+                  <span className="min-w-0">
+                    <span className="block font-mono text-[10px] uppercase tracking-wider">End of path</span>
+                    <span className="block truncate font-medium text-foreground">{aifsLearningPath.title}</span>
+                  </span>
+                </div>
+              )}
+            </nav>
           </div>
         </header>
-
-        <nav className="grid shrink-0 gap-px border border-foreground/10 bg-foreground/10 lg:grid-cols-2" aria-label="Lesson navigation">
-          <Link href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)} className="group bg-background p-4 transition-colors hover:bg-foreground/[0.03]">
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              Back to phase
-            </span>
-            <span className="mt-2 block font-medium">{phase.title}</span>
-          </Link>
-          {next ? (
-            <Link href={getAifsLessonHref(next.phase.slug, next.lesson.slug)} className="group bg-background p-4 text-left transition-colors hover:bg-foreground/[0.03] lg:text-right">
-              <span className="flex items-center gap-2 text-sm text-muted-foreground lg:justify-end">
-                Next lesson
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </span>
-              <span className="mt-2 block font-medium">{next.lesson.title}</span>
-            </Link>
-          ) : (
-            <div className="bg-background p-4 text-sm text-muted-foreground lg:text-right">
-              <span className="block">End of path</span>
-              <span className="mt-2 block font-medium text-foreground">{aifsLearningPath.title}</span>
-            </div>
-          )}
-        </nav>
-
-        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)_320px]">
+        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[260px_minmax(0,1fr)_320px]">
           <aside className="hidden min-h-0 lg:block">
-            <div className="sticky top-28 max-h-[calc(100vh-9rem)] overflow-y-auto">
+            <div className="sticky top-[4.75rem] max-h-[calc(100vh-5.5rem)] overflow-y-auto">
               <LearningSidebar phase={phase} currentLessonSlug={lesson.slug} />
             </div>
           </aside>
@@ -89,7 +107,7 @@ export function LessonReader({ phase, lesson }: { phase: AifsPhase; lesson: Aifs
             <LessonBody sections={lesson.sections} quiz={lesson.quiz} sourcePath={lesson.sourcePath} />
           </article>
 
-          <aside className="min-h-0 space-y-5 lg:sticky lg:top-28 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto">
+          <aside className="min-h-0 space-y-3 lg:sticky lg:top-[4.75rem] lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto">
             <LessonProgressControls lessonId={lesson.id} phaseSlug={phase.slug} />
 
             <div className="lg:hidden">

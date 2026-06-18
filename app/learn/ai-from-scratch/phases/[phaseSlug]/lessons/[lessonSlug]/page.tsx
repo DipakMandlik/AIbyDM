@@ -29,7 +29,7 @@ export default async function AiFromScratchLessonPage({ params }: { params: Prom
 
   return (
     <main className="relative min-h-screen overflow-x-hidden noise-overlay">
-      <SiteNav />
+      <SiteNav variant='compact' />
       <LessonReader phase={match.phase} lesson={match.lesson} />
     </main>
   );
