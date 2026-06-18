@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { AnimatedWave } from "@/components/landing/animated-wave";
@@ -36,6 +37,9 @@ const socialLinks = [
   { name: "Issues", href: "https://github.com/DipakMandlik/AIByDM/issues" },
 ];
 
+const assetBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/AIByDM";
+const logoSrc = `${assetBasePath}/brand/aibydm-logo.png`;
+
 export function SiteFooter() {
   return (
     <footer className="relative border-t border-foreground/10">
@@ -47,9 +51,8 @@ export function SiteFooter() {
         <div className="py-16 lg:py-24">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             <div className="col-span-2">
-              <Link href="/" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display">AIByDM</span>
-                <span className="text-xs text-muted-foreground font-mono">/ai</span>
+              <Link href="/" className="mb-6 inline-flex items-center">
+                <Image src={logoSrc} alt="AIByDM" width={330} height={257} className="h-14 w-auto" />
               </Link>
 
               <p className="text-muted-foreground leading-relaxed mb-8 max-w-xs">

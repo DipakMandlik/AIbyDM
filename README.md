@@ -1,4 +1,4 @@
-![AIByDM logo](./assets/brand/aibydm-logo.svg)
+![AIByDM logo](./assets/brand/logo.png)
 
 # AIByDM
 
@@ -24,7 +24,7 @@ An open-source AI learning platform for structured courses, hands-on projects, c
 [![Stars](https://img.shields.io/github/stars/DipakMandlik/AIByDM?style=social)](https://github.com/DipakMandlik/AIByDM/stargazers)
 [![Forks](https://img.shields.io/github/forks/DipakMandlik/AIByDM?style=social)](https://github.com/DipakMandlik/AIByDM/forks)
 
-![AIByDM hero banner](./assets/brand/hero-banner.svg)
+![AIByDM hero banner](./assets/brand/hero-banner.png)
 
 ## Mission
 

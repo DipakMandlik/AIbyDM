@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CommandSearch } from "@/components/site/command-search";
@@ -14,6 +15,9 @@ export const productLinks = [
   { name: "Newsletter", href: "/newsletter", desc: "Weekly editions" },
   { name: "Community", href: "/community", desc: "Open source" },
 ];
+
+const assetBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/AIByDM";
+const logoSrc = `${assetBasePath}/brand/aibydm-logo.png`;
 
 export function SiteNav({ variant = 'default' }: { variant?: 'default' | 'compact' }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -63,20 +67,14 @@ export function SiteNav({ variant = 'default' }: { variant?: 'default' | 'compac
           }`}
         >
           <Link href="/" className="flex items-center gap-2 group">
-            <span
-              className={`font-display tracking-tight transition-all duration-500 ${
-                condensed ? "text-xl" : "text-2xl"
-              }`}
-            >
-              AIByDM
-            </span>
-            <span
-              className={`text-muted-foreground font-mono transition-all duration-500 ${
-                condensed ? "text-[10px] mt-0.5" : "text-xs mt-1"
-              }`}
-            >
-              /ai
-            </span>
+            <Image
+              src={logoSrc}
+              alt="AIByDM"
+              width={330}
+              height={257}
+              priority
+              className={`w-auto transition-all duration-500 ${condensed ? "h-11" : "h-12"}`}
+            />
           </Link>
 
           <div className={`hidden md:flex items-center ${compact ? "gap-6" : "gap-9"}`}>
