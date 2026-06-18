@@ -79,16 +79,19 @@ Additional visual QA assets: [Mobile Learn](./assets/screenshots/mobile-learn.pn
 
 ## Watch Demo
 
-The repository is prepared for product demo assets under [assets/demo](./assets/demo/).
+The repository now includes a current platform walkthrough under [assets/demo](./assets/demo/).
+
+[![Watch the AIByDM platform walkthrough](./assets/demo/youtube-thumbnail.png)](./assets/demo/aibydm-platform-walkthrough.mp4)
+
+This demo gives new learners and contributors a quick tour of the homepage, learning paths, tools directory, games, exams, newsletter, and responsive platform experience before they clone the project.
 
 | Demo asset | Status | Path |
 | --- | --- | --- |
-| Product Demo | Placeholder ready | [assets/demo/README.md](./assets/demo/README.md) |
-| Feature Walkthrough | Script and shot list ready | [docs/marketing/LAUNCH_VIDEO_KIT.md](./docs/marketing/LAUNCH_VIDEO_KIT.md) |
-| Learning Experience Demo | Capture path defined | [docs/marketing/launch-video-shotlist.json](./docs/marketing/launch-video-shotlist.json) |
-| Preview GIF | Add when recorded | `assets/demo/aibydm-demo-preview.gif` |
-| YouTube Link | Add when published | README demo section |
-| Downloadable Version | Add when exported | `assets/demo/aibydm-platform-walkthrough.mp4` |
+| Platform Walkthrough | Available now | [Download MP4](./assets/demo/aibydm-platform-walkthrough.mp4) |
+| Preview Image | Available now | [youtube-thumbnail.png](./assets/demo/youtube-thumbnail.png) |
+| Feature Walkthrough | Planned polished cut | [docs/marketing/LAUNCH_VIDEO_KIT.md](./docs/marketing/LAUNCH_VIDEO_KIT.md) |
+| Learning Experience Demo | Planned focused cut | [docs/marketing/launch-video-shotlist.json](./docs/marketing/launch-video-shotlist.json) |
+| YouTube Link | Publish later | Add to this section when the edited showcase is ready |
 
 ## Architecture
 
