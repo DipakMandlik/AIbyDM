@@ -153,17 +153,17 @@
   "resources": [
     {
       "label": "vscode/extensions.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/extensions.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/extensions.json",
       "kind": "Code"
     },
     {
       "label": "vscode/settings.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/settings.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/08-editor-setup/code/vscode/settings.json",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/08-editor-setup",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/08-editor-setup",
       "kind": "Source"
     }
   ],

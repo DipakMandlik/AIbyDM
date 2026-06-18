@@ -181,17 +181,17 @@
     },
     {
       "label": "Stategraph Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/16-langgraph-state-machines/outputs/skill-stategraph-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/16-langgraph-state-machines/outputs/skill-stategraph-designer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/16-langgraph-state-machines/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/16-langgraph-state-machines/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/16-langgraph-state-machines",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/16-langgraph-state-machines",
       "kind": "Source"
     }
   ],

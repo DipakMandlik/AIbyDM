@@ -216,17 +216,17 @@
     },
     {
       "label": "Claude Agent Scaffold",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/17-claude-agent-sdk/outputs/skill-claude-agent-scaffold.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/17-claude-agent-sdk/outputs/skill-claude-agent-scaffold.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/17-claude-agent-sdk/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/17-claude-agent-sdk/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/17-claude-agent-sdk",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/17-claude-agent-sdk",
       "kind": "Source"
     }
   ],

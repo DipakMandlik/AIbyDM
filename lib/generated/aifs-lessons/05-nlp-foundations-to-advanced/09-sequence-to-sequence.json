@@ -211,22 +211,22 @@
     },
     {
       "label": "",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/outputs/.gitkeep",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/outputs/.gitkeep",
       "kind": "Artifact"
     },
     {
       "label": "Seq2seq Design",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/outputs/prompt-seq2seq-design.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/outputs/prompt-seq2seq-design.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/09-sequence-to-sequence",
       "kind": "Source"
     }
   ],

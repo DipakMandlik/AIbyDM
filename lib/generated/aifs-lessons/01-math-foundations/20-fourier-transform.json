@@ -194,17 +194,17 @@
     },
     {
       "label": "Spectral Analyzer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/20-fourier-transform/outputs/prompt-spectral-analyzer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/20-fourier-transform/outputs/prompt-spectral-analyzer.md",
       "kind": "Prompt"
     },
     {
       "label": "fourier.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/20-fourier-transform/code/fourier.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/20-fourier-transform/code/fourier.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/20-fourier-transform",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/20-fourier-transform",
       "kind": "Source"
     }
   ],

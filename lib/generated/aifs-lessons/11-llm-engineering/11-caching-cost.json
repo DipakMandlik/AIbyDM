@@ -154,22 +154,22 @@
     },
     {
       "label": "Cost Optimizer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/11-caching-cost/outputs/prompt-cost-optimizer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/11-caching-cost/outputs/prompt-cost-optimizer.md",
       "kind": "Prompt"
     },
     {
       "label": "Cost Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/11-caching-cost/outputs/skill-cost-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/11-caching-cost/outputs/skill-cost-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "caching_cost.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/11-caching-cost/code/caching_cost.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/11-caching-cost/code/caching_cost.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/11-caching-cost",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/11-caching-cost",
       "kind": "Source"
     }
   ],

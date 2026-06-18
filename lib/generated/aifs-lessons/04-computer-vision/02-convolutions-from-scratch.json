@@ -184,22 +184,22 @@
     },
     {
       "label": "CNN Architect",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/outputs/prompt-cnn-architect.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/outputs/prompt-cnn-architect.md",
       "kind": "Prompt"
     },
     {
       "label": "Conv Shape Calculator",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/outputs/skill-conv-shape-calculator.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/outputs/skill-conv-shape-calculator.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/02-convolutions-from-scratch/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/02-convolutions-from-scratch",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/02-convolutions-from-scratch",
       "kind": "Source"
     }
   ],

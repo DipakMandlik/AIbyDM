@@ -186,22 +186,22 @@
     },
     {
       "label": "Backbone Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/outputs/prompt-backbone-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/outputs/prompt-backbone-selector.md",
       "kind": "Prompt"
     },
     {
       "label": "Residual Block Reviewer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/outputs/skill-residual-block-reviewer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/outputs/skill-residual-block-reviewer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/03-cnns-lenet-to-resnet",
       "kind": "Source"
     }
   ],

@@ -115,27 +115,27 @@
     },
     {
       "label": "Embedding Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/04-embeddings/outputs/prompt-embedding-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/04-embeddings/outputs/prompt-embedding-advisor.md",
       "kind": "Prompt"
     },
     {
       "label": "Embedding Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/04-embeddings/outputs/skill-embedding-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/04-embeddings/outputs/skill-embedding-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "embeddings.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/04-embeddings/code/embeddings.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/04-embeddings/code/embeddings.py",
       "kind": "Code"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/04-embeddings/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/04-embeddings/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/04-embeddings",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/04-embeddings",
       "kind": "Source"
     }
   ],

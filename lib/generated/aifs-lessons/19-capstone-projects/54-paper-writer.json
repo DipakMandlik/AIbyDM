@@ -168,17 +168,17 @@
   "resources": [
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/54-paper-writer/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/54-paper-writer/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests/test_paper_writer.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/54-paper-writer/code/tests/test_paper_writer.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/54-paper-writer/code/tests/test_paper_writer.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/54-paper-writer",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/54-paper-writer",
       "kind": "Source"
     }
   ],

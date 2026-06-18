@@ -126,17 +126,17 @@
     },
     {
       "label": "Dualpipe Planner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism/outputs/skill-dualpipe-planner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism/outputs/skill-dualpipe-planner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/19-dualpipe-parallelism",
       "kind": "Source"
     }
   ],

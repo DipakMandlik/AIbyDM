@@ -173,17 +173,17 @@
   "resources": [
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/32-token-positional-embeddings/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/32-token-positional-embeddings/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests/test_embeddings.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/32-token-positional-embeddings/code/tests/test_embeddings.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/32-token-positional-embeddings/code/tests/test_embeddings.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/32-token-positional-embeddings",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/32-token-positional-embeddings",
       "kind": "Source"
     }
   ],

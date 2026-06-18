@@ -168,17 +168,17 @@
   "resources": [
     {
       "label": "Graph Analysis",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/21-graph-theory/outputs/skill-graph-analysis.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/21-graph-theory/outputs/skill-graph-analysis.md",
       "kind": "Skill"
     },
     {
       "label": "graph_theory.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/21-graph-theory/code/graph_theory.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/21-graph-theory/code/graph_theory.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/21-graph-theory",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/21-graph-theory",
       "kind": "Source"
     }
   ],

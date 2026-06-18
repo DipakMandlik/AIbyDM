@@ -187,22 +187,22 @@
     },
     {
       "label": "Detection Metric Reader",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/06-object-detection-yolo/outputs/prompt-detection-metric-reader.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/06-object-detection-yolo/outputs/prompt-detection-metric-reader.md",
       "kind": "Prompt"
     },
     {
       "label": "Anchor Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/06-object-detection-yolo/outputs/skill-anchor-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/06-object-detection-yolo/outputs/skill-anchor-designer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/06-object-detection-yolo/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/06-object-detection-yolo/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/06-object-detection-yolo",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/06-object-detection-yolo",
       "kind": "Source"
     }
   ],

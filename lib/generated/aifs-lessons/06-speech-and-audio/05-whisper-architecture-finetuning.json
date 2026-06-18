@@ -120,17 +120,17 @@
     },
     {
       "label": "Whisper Tuner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning/outputs/skill-whisper-tuner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning/outputs/skill-whisper-tuner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/05-whisper-architecture-finetuning",
       "kind": "Source"
     }
   ],

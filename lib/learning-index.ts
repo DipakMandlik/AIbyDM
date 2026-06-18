@@ -50,6 +50,13 @@ export type AifsLearningPathIndex = {
     ref: string;
     license: string;
     importedAt: string;
+    upstream?: {
+      name: string;
+      repository: string;
+      ref: string;
+      commit: string;
+      license: string;
+    };
   };
   totalPhases: number;
   totalLessons: number;

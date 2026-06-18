@@ -168,22 +168,22 @@
     },
     {
       "label": "Gradient Computation",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/04-calculus-for-ml/outputs/skill-gradient-computation.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/04-calculus-for-ml/outputs/skill-gradient-computation.md",
       "kind": "Skill"
     },
     {
       "label": "derivatives.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/04-calculus-for-ml/code/derivatives.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/04-calculus-for-ml/code/derivatives.py",
       "kind": "Code"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/04-calculus-for-ml/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/04-calculus-for-ml/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/04-calculus-for-ml",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/04-calculus-for-ml",
       "kind": "Source"
     }
   ],

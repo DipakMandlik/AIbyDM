@@ -172,17 +172,17 @@
   "resources": [
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests/test_bpe.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/code/tests/test_bpe.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch/code/tests/test_bpe.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/30-bpe-tokenizer-from-scratch",
       "kind": "Source"
     }
   ],

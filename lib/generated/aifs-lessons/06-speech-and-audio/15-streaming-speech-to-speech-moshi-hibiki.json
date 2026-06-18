@@ -123,17 +123,17 @@
     },
     {
       "label": "Duplex Pipeline",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki/outputs/skill-duplex-pipeline.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki/outputs/skill-duplex-pipeline.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/15-streaming-speech-to-speech-moshi-hibiki",
       "kind": "Source"
     }
   ],

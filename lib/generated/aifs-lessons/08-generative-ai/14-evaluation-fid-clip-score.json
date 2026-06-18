@@ -141,17 +141,17 @@
     },
     {
       "label": "Eval Report",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score/outputs/skill-eval-report.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score/outputs/skill-eval-report.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/14-evaluation-fid-clip-score",
       "kind": "Source"
     }
   ],

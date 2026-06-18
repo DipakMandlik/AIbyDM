@@ -126,17 +126,17 @@
     },
     {
       "label": "Reward Model Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/07-rlhf/outputs/prompt-reward-model-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/07-rlhf/outputs/prompt-reward-model-designer.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/07-rlhf/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/07-rlhf/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/07-rlhf",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/07-rlhf",
       "kind": "Source"
     }
   ],

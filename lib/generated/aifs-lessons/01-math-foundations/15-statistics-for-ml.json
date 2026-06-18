@@ -143,17 +143,17 @@
   "resources": [
     {
       "label": "Statistical Testing",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml/outputs/skill-statistical-testing.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/15-statistics-for-ml/outputs/skill-statistical-testing.md",
       "kind": "Skill"
     },
     {
       "label": "statistics.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml/code/statistics.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/15-statistics-for-ml/code/statistics.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/15-statistics-for-ml",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/15-statistics-for-ml",
       "kind": "Source"
     }
   ],

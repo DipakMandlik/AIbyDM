@@ -116,17 +116,17 @@
     },
     {
       "label": "Seq2seq Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/outputs/skill-seq2seq-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/outputs/skill-seq2seq-picker.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/08-t5-bart-encoder-decoder",
       "kind": "Source"
     }
   ],

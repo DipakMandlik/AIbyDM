@@ -115,27 +115,27 @@
     },
     {
       "label": "RAG Architect",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/06-rag/outputs/prompt-rag-architect.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/06-rag/outputs/prompt-rag-architect.md",
       "kind": "Prompt"
     },
     {
       "label": "RAG Pipeline",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/06-rag/outputs/skill-rag-pipeline.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/06-rag/outputs/skill-rag-pipeline.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/06-rag/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/06-rag/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/06-rag/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/06-rag/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/06-rag",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/06-rag",
       "kind": "Source"
     }
   ],

@@ -182,17 +182,17 @@
   "resources": [
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests/test_load.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/tests/test_load.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights/code/tests/test_load.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/37-loading-pretrained-weights",
       "kind": "Source"
     }
   ],

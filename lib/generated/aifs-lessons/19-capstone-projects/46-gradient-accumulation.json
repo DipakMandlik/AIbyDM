@@ -175,27 +175,27 @@
   "resources": [
     {
       "label": "Accum Curve",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/46-gradient-accumulation/outputs/accum-curve.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/46-gradient-accumulation/outputs/accum-curve.json",
       "kind": "Artifact"
     },
     {
       "label": "Gradient Accumulation",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/46-gradient-accumulation/outputs/skill-gradient-accumulation.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/46-gradient-accumulation/outputs/skill-gradient-accumulation.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/46-gradient-accumulation/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/46-gradient-accumulation/code/main.py",
       "kind": "Code"
     },
     {
       "label": "test_main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/46-gradient-accumulation/code/test_main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/46-gradient-accumulation/code/test_main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/46-gradient-accumulation",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/46-gradient-accumulation",
       "kind": "Source"
     }
   ],

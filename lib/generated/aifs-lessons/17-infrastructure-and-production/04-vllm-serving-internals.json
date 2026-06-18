@@ -207,17 +207,17 @@
     },
     {
       "label": "Vllm Scheduler Reader",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals/outputs/skill-vllm-scheduler-reader.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals/outputs/skill-vllm-scheduler-reader.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/04-vllm-serving-internals",
       "kind": "Source"
     }
   ],

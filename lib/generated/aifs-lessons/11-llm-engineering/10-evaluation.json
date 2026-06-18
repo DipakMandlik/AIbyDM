@@ -154,22 +154,22 @@
     },
     {
       "label": "Eval Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/10-evaluation/outputs/prompt-eval-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/10-evaluation/outputs/prompt-eval-designer.md",
       "kind": "Prompt"
     },
     {
       "label": "Eval Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/10-evaluation/outputs/skill-eval-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/10-evaluation/outputs/skill-eval-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "eval_framework.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/10-evaluation/code/eval_framework.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/10-evaluation/code/eval_framework.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/10-evaluation",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/10-evaluation",
       "kind": "Source"
     }
   ],

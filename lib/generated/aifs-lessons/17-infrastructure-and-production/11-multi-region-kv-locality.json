@@ -201,17 +201,17 @@
     },
     {
       "label": "Multi Region Router",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality/outputs/skill-multi-region-router.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality/outputs/skill-multi-region-router.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/11-multi-region-kv-locality",
       "kind": "Source"
     }
   ],

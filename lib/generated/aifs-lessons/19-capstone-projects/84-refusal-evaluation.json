@@ -162,37 +162,37 @@
   "resources": [
     {
       "label": "Refusal_eval_report",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/outputs/refusal_eval_report.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/outputs/refusal_eval_report.json",
       "kind": "Artifact"
     },
     {
       "label": "Refusal Evaluation",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/outputs/skill-refusal-evaluation.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/outputs/skill-refusal-evaluation.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/main.py",
       "kind": "Code"
     },
     {
       "label": "mock_llm.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/mock_llm.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/mock_llm.py",
       "kind": "Code"
     },
     {
       "label": "prompts.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/prompts.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/prompts.py",
       "kind": "Code"
     },
     {
       "label": "tests.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/tests.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation/code/tests.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/84-refusal-evaluation",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/84-refusal-evaluation",
       "kind": "Source"
     }
   ],

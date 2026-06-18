@@ -149,12 +149,12 @@
   "resources": [
     {
       "label": "shell_aliases.sh",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/10-terminal-and-shell/code/shell_aliases.sh",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/10-terminal-and-shell/code/shell_aliases.sh",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/10-terminal-and-shell",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/10-terminal-and-shell",
       "kind": "Source"
     }
   ],

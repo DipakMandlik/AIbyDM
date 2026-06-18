@@ -188,22 +188,22 @@
     },
     {
       "label": "Vision Preprocessing Audit",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/01-image-fundamentals/outputs/prompt-vision-preprocessing-audit.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/01-image-fundamentals/outputs/prompt-vision-preprocessing-audit.md",
       "kind": "Prompt"
     },
     {
       "label": "Image Tensor Inspector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/01-image-fundamentals/outputs/skill-image-tensor-inspector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/01-image-fundamentals/outputs/skill-image-tensor-inspector.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/01-image-fundamentals/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/01-image-fundamentals/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/01-image-fundamentals",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/01-image-fundamentals",
       "kind": "Source"
     }
   ],

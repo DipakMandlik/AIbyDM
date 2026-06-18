@@ -146,17 +146,17 @@
     },
     {
       "label": "Diffusion Trainer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch/outputs/skill-diffusion-trainer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch/outputs/skill-diffusion-trainer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/06-diffusion-ddpm-from-scratch",
       "kind": "Source"
     }
   ],

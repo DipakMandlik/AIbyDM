@@ -59,7 +59,7 @@
     {
       "key": "build-it",
       "title": "Build It",
-      "markdown": "### Step 1: Configure git\n\n```bash\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"you@example.com\"\n```\n\n### Step 2: The daily workflow\n\n```bash\ngit status\ngit add file.py\ngit commit -m \"Add perceptron implementation\"\ngit push origin main\n```\n\n### Step 3: Branching for experiments\n\n```bash\ngit checkout -b experiment/new-optimizer\n\n# ... make changes, commit ...\n\ngit checkout main\ngit merge experiment/new-optimizer\n```\n\n### Step 4: Working with this course repo\n\n```bash\ngit clone https://github.com/rohitg00/ai-engineering-from-scratch.git\ncd ai-engineering-from-scratch\n\ngit checkout -b my-progress\n# work through lessons, commit your code\ngit push origin my-progress\n```"
+      "markdown": "### Step 1: Configure git\n\n```bash\ngit config --global user.name \"Your Name\"\ngit config --global user.email \"you@example.com\"\n```\n\n### Step 2: The daily workflow\n\n```bash\ngit status\ngit add file.py\ngit commit -m \"Add perceptron implementation\"\ngit push origin main\n```\n\n### Step 3: Branching for experiments\n\n```bash\ngit checkout -b experiment/new-optimizer\n\n# ... make changes, commit ...\n\ngit checkout main\ngit merge experiment/new-optimizer\n```\n\n### Step 4: Working with this course repo\n\n```bash\ngit clone https://github.com/DipakMandlik/AIByDM.git\ncd ai-engineering-from-scratch\n\ngit checkout -b my-progress\n# work through lessons, commit your code\ngit push origin my-progress\n```"
     },
     {
       "key": "use-it",
@@ -147,7 +147,7 @@
   "resources": [
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/02-git-and-collaboration",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/02-git-and-collaboration",
       "kind": "Source"
     }
   ],

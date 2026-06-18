@@ -108,17 +108,17 @@
     },
     {
       "label": "Browser Agent Trust Boundary",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/11-browser-agents/outputs/skill-browser-agent-trust-boundary.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/11-browser-agents/outputs/skill-browser-agent-trust-boundary.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/11-browser-agents/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/11-browser-agents/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/11-browser-agents",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/11-browser-agents",
       "kind": "Source"
     }
   ],

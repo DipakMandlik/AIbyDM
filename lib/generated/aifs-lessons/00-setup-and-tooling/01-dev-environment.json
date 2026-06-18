@@ -147,27 +147,27 @@
   "resources": [
     {
       "label": "Env Check",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/01-dev-environment/outputs/prompt-env-check.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/01-dev-environment/outputs/prompt-env-check.md",
       "kind": "Prompt"
     },
     {
       "label": "main.rs",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/main.rs",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/main.rs",
       "kind": "Code"
     },
     {
       "label": "verify.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/verify.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/verify.py",
       "kind": "Code"
     },
     {
       "label": "verify.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/verify.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/01-dev-environment/code/verify.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/01-dev-environment",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/01-dev-environment",
       "kind": "Source"
     }
   ],

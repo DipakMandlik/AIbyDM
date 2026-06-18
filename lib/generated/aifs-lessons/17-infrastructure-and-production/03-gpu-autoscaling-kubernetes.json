@@ -208,17 +208,17 @@
     },
     {
       "label": "GPU Autoscaler Plan",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes/outputs/skill-gpu-autoscaler-plan.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes/outputs/skill-gpu-autoscaler-plan.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/03-gpu-autoscaling-kubernetes",
       "kind": "Source"
     }
   ],

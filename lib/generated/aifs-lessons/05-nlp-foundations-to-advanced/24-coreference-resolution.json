@@ -222,17 +222,17 @@
     },
     {
       "label": "Coref Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution/outputs/skill-coref-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution/outputs/skill-coref-picker.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/24-coreference-resolution",
       "kind": "Source"
     }
   ],

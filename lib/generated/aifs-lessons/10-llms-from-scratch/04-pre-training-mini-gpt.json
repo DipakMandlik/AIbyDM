@@ -123,22 +123,22 @@
     },
     {
       "label": "GPT Architecture Analyzer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/outputs/prompt-gpt-architecture-analyzer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/outputs/prompt-gpt-architecture-analyzer.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.rs",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/code/main.rs",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt/code/main.rs",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/04-pre-training-mini-gpt",
       "kind": "Source"
     }
   ],

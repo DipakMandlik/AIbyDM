@@ -138,17 +138,17 @@
     },
     {
       "label": "Eagle3 Tuner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3/outputs/skill-eagle3-tuner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3/outputs/skill-eagle3-tuner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/15-speculative-decoding-eagle3",
       "kind": "Source"
     }
   ],

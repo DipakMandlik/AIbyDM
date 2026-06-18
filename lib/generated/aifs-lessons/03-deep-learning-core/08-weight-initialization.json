@@ -104,17 +104,17 @@
   "resources": [
     {
       "label": "Init Strategy",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/08-weight-initialization/outputs/prompt-init-strategy.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/08-weight-initialization/outputs/prompt-init-strategy.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/08-weight-initialization/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/08-weight-initialization/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/08-weight-initialization",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/08-weight-initialization",
       "kind": "Source"
     }
   ],

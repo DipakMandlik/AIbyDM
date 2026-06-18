@@ -208,17 +208,17 @@
     },
     {
       "label": "Load Test Plan",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis/outputs/skill-load-test-plan.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis/outputs/skill-load-test-plan.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/22-load-testing-llm-apis",
       "kind": "Source"
     }
   ],

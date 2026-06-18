@@ -183,22 +183,22 @@
     },
     {
       "label": "Matrix Operations",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/outputs/prompt-matrix-operations.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/outputs/prompt-matrix-operations.md",
       "kind": "Prompt"
     },
     {
       "label": "matrices.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/code/matrices.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/code/matrices.jl",
       "kind": "Code"
     },
     {
       "label": "matrices.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/code/matrices.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/02-vectors-matrices-operations/code/matrices.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/02-vectors-matrices-operations",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/02-vectors-matrices-operations",
       "kind": "Source"
     }
   ],

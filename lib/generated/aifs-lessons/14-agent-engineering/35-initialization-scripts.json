@@ -220,17 +220,17 @@
     },
     {
       "label": "Init Script",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/35-initialization-scripts/outputs/skill-init-script.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/35-initialization-scripts/outputs/skill-init-script.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/35-initialization-scripts/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/35-initialization-scripts/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/35-initialization-scripts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/35-initialization-scripts",
       "kind": "Source"
     }
   ],

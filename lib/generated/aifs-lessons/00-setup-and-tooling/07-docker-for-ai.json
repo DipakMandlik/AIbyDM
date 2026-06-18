@@ -150,17 +150,17 @@
   "resources": [
     {
       "label": "Dockerfile",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/Dockerfile",
       "kind": "Code"
     },
     {
       "label": "docker-compose.yml",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/docker-compose.yml",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/07-docker-for-ai/code/docker-compose.yml",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/07-docker-for-ai",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/07-docker-for-ai",
       "kind": "Source"
     }
   ],

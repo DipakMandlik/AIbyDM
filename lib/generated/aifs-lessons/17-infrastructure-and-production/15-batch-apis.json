@@ -198,22 +198,22 @@
     },
     {
       "label": "Batch Triager",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/15-batch-apis/outputs/skill-batch-triager.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/15-batch-apis/outputs/skill-batch-triager.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/15-batch-apis/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/15-batch-apis/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/15-batch-apis/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/15-batch-apis/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/17-infrastructure-and-production/15-batch-apis",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/17-infrastructure-and-production/15-batch-apis",
       "kind": "Source"
     }
   ],

@@ -100,17 +100,17 @@
   "resources": [
     {
       "label": "Optimizer Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/06-optimizers/outputs/prompt-optimizer-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/06-optimizers/outputs/prompt-optimizer-selector.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/06-optimizers/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/06-optimizers/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/06-optimizers",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/06-optimizers",
       "kind": "Source"
     }
   ],

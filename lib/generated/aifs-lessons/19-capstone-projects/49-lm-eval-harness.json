@@ -177,52 +177,52 @@
   "resources": [
     {
       "label": "Leaderboard",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/leaderboard.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/leaderboard.json",
       "kind": "Artifact"
     },
     {
       "label": "Lm Eval Harness",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/skill-lm-eval-harness.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/skill-lm-eval-harness.md",
       "kind": "Skill"
     },
     {
       "label": "Arithmetic",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/arithmetic.jsonl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/arithmetic.jsonl",
       "kind": "Artifact"
     },
     {
       "label": "Code Exec",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/code-exec.jsonl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/code-exec.jsonl",
       "kind": "Artifact"
     },
     {
       "label": "Generation",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/generation.jsonl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/generation.jsonl",
       "kind": "Artifact"
     },
     {
       "label": "Multiple Choice",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/multiple-choice.jsonl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/multiple-choice.jsonl",
       "kind": "Artifact"
     },
     {
       "label": "Summary",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/summary.jsonl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/outputs/tasks/summary.jsonl",
       "kind": "Artifact"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/code/main.py",
       "kind": "Code"
     },
     {
       "label": "test_main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness/code/test_main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness/code/test_main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/49-lm-eval-harness",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/49-lm-eval-harness",
       "kind": "Source"
     }
   ],

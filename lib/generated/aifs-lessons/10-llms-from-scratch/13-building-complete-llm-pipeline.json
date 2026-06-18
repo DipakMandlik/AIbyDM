@@ -131,17 +131,17 @@
     },
     {
       "label": "LLM Pipeline Reviewer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline/outputs/skill-llm-pipeline-reviewer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline/outputs/skill-llm-pipeline-reviewer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/10-llms-from-scratch/13-building-complete-llm-pipeline",
       "kind": "Source"
     }
   ],

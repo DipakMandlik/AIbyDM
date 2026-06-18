@@ -101,27 +101,27 @@
   "resources": [
     {
       "label": "Loss Debugger",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/05-loss-functions/outputs/prompt-loss-debugger.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/05-loss-functions/outputs/prompt-loss-debugger.md",
       "kind": "Prompt"
     },
     {
       "label": "Loss Function Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/05-loss-functions/outputs/prompt-loss-function-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/05-loss-functions/outputs/prompt-loss-function-selector.md",
       "kind": "Prompt"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/05-loss-functions/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/05-loss-functions/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/05-loss-functions/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/05-loss-functions/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/05-loss-functions",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/05-loss-functions",
       "kind": "Source"
     }
   ],

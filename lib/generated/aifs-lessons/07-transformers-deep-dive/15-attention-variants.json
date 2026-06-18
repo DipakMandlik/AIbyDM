@@ -130,17 +130,17 @@
     },
     {
       "label": "Attention Variant Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/15-attention-variants/outputs/skill-attention-variant-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/15-attention-variants/outputs/skill-attention-variant-picker.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/15-attention-variants/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/15-attention-variants/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/15-attention-variants",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/15-attention-variants",
       "kind": "Source"
     }
   ],

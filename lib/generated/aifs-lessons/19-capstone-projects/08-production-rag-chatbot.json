@@ -245,52 +245,52 @@
     },
     {
       "label": "Production RAG",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/outputs/skill-production-rag.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/outputs/skill-production-rag.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/main.py",
       "kind": "Code"
     },
     {
       "label": "ts/README.md",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/README.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/README.md",
       "kind": "Code"
     },
     {
       "label": "ts/package.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/package.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/package.json",
       "kind": "Code"
     },
     {
       "label": "ts/src/index.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/index.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/index.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/server.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/server.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/server.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/session.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/session.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/session.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/stream.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/stream.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/stream.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/types.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/types.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot/code/ts/src/types.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/08-production-rag-chatbot",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/08-production-rag-chatbot",
       "kind": "Source"
     }
   ],

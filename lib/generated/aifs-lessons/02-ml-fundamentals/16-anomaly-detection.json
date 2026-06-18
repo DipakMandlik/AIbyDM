@@ -120,17 +120,17 @@
     },
     {
       "label": "Anomaly Detector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/16-anomaly-detection/outputs/skill-anomaly-detector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/16-anomaly-detection/outputs/skill-anomaly-detector.md",
       "kind": "Skill"
     },
     {
       "label": "anomaly_detection.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/16-anomaly-detection/code/anomaly_detection.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/16-anomaly-detection/code/anomaly_detection.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/16-anomaly-detection",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/16-anomaly-detection",
       "kind": "Source"
     }
   ],

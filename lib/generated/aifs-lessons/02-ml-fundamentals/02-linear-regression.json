@@ -124,22 +124,22 @@
     },
     {
       "label": "Regression",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/02-linear-regression/outputs/skill-regression.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/02-linear-regression/outputs/skill-regression.md",
       "kind": "Skill"
     },
     {
       "label": "linear_regression.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/02-linear-regression/code/linear_regression.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/02-linear-regression/code/linear_regression.py",
       "kind": "Code"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/02-linear-regression/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/02-linear-regression/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/02-linear-regression",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/02-linear-regression",
       "kind": "Source"
     }
   ],

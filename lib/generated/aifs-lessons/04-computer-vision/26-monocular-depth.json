@@ -188,22 +188,22 @@
     },
     {
       "label": "Depth Model Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/26-monocular-depth/outputs/prompt-depth-model-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/26-monocular-depth/outputs/prompt-depth-model-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Depth To Pointcloud",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/26-monocular-depth/outputs/skill-depth-to-pointcloud.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/26-monocular-depth/outputs/skill-depth-to-pointcloud.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/26-monocular-depth/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/26-monocular-depth/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/26-monocular-depth",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/26-monocular-depth",
       "kind": "Source"
     }
   ],

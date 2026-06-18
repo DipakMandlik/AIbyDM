@@ -138,17 +138,17 @@
     },
     {
       "label": "Gan Debugger",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/03-gans-generator-discriminator/outputs/skill-gan-debugger.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/03-gans-generator-discriminator/outputs/skill-gan-debugger.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/03-gans-generator-discriminator/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/03-gans-generator-discriminator/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/03-gans-generator-discriminator",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/03-gans-generator-discriminator",
       "kind": "Source"
     }
   ],

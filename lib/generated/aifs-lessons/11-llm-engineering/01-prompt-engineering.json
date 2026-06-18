@@ -141,27 +141,27 @@
     },
     {
       "label": "Prompt Optimizer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/01-prompt-engineering/outputs/prompt-prompt-optimizer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/01-prompt-engineering/outputs/prompt-prompt-optimizer.md",
       "kind": "Prompt"
     },
     {
       "label": "Prompt Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/01-prompt-engineering/outputs/skill-prompt-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/01-prompt-engineering/outputs/skill-prompt-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/01-prompt-engineering/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/01-prompt-engineering/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "prompt_engineering.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/01-prompt-engineering/code/prompt_engineering.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/01-prompt-engineering/code/prompt_engineering.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/01-prompt-engineering",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/01-prompt-engineering",
       "kind": "Source"
     }
   ],

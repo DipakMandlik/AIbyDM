@@ -131,17 +131,17 @@
     },
     {
       "label": "Patch Geometry Reader",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/outputs/skill-patch-geometry-reader.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/outputs/skill-patch-geometry-reader.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/01-vision-transformer-patch-tokens",
       "kind": "Source"
     }
   ],

@@ -214,22 +214,22 @@
     },
     {
       "label": "Tool Registry",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/outputs/skill-tool-registry.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/outputs/skill-tool-registry.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/06-tool-use-and-function-calling",
       "kind": "Source"
     }
   ],

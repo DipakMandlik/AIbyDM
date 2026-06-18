@@ -183,22 +183,22 @@
     },
     {
       "label": "Instance Vs Semantic Router",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/outputs/prompt-instance-vs-semantic-router.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/outputs/prompt-instance-vs-semantic-router.md",
       "kind": "Prompt"
     },
     {
       "label": "Mask Rcnn Head Swapper",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/outputs/skill-mask-rcnn-head-swapper.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/outputs/skill-mask-rcnn-head-swapper.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/08-instance-segmentation-mask-rcnn",
       "kind": "Source"
     }
   ],

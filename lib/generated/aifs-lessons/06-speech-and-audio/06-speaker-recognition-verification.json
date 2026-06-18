@@ -118,17 +118,17 @@
     },
     {
       "label": "Speaker Verifier",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification/outputs/skill-speaker-verifier.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification/outputs/skill-speaker-verifier.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/06-speaker-recognition-verification",
       "kind": "Source"
     }
   ],

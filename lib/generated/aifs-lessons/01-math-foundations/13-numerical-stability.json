@@ -189,17 +189,17 @@
     },
     {
       "label": "Numerical Debugger",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/13-numerical-stability/outputs/prompt-numerical-debugger.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/13-numerical-stability/outputs/prompt-numerical-debugger.md",
       "kind": "Prompt"
     },
     {
       "label": "numerical.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/13-numerical-stability/code/numerical.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/13-numerical-stability/code/numerical.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/13-numerical-stability",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/13-numerical-stability",
       "kind": "Source"
     }
   ],

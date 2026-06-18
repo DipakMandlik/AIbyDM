@@ -127,17 +127,17 @@
     },
     {
       "label": "ASR Configurator",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper/outputs/skill-asr-configurator.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper/outputs/skill-asr-configurator.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/10-audio-transformers-whisper",
       "kind": "Source"
     }
   ],

@@ -205,22 +205,22 @@
     },
     {
       "label": "",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/outputs/.gitkeep",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/outputs/.gitkeep",
       "kind": "Artifact"
     },
     {
       "label": "Embedding Probe",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/outputs/skill-embedding-probe.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/outputs/skill-embedding-probe.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/03-word-embeddings-word2vec",
       "kind": "Source"
     }
   ],

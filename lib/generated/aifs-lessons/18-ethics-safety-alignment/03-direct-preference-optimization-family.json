@@ -210,17 +210,17 @@
     },
     {
       "label": "Preference Loss Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/outputs/skill-preference-loss-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/outputs/skill-preference-loss-selector.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/18-ethics-safety-alignment/03-direct-preference-optimization-family",
       "kind": "Source"
     }
   ],

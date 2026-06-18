@@ -133,17 +133,17 @@
     },
     {
       "label": "Inference Optimizer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention/outputs/skill-inference-optimizer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention/outputs/skill-inference-optimizer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/12-kv-cache-flash-attention",
       "kind": "Source"
     }
   ],

@@ -120,22 +120,22 @@
     },
     {
       "label": "Ensemble Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/outputs/prompt-ensemble-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/outputs/prompt-ensemble-selector.md",
       "kind": "Prompt"
     },
     {
       "label": "Ensemble Builder",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/outputs/skill-ensemble-builder.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/outputs/skill-ensemble-builder.md",
       "kind": "Skill"
     },
     {
       "label": "ensembles.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/code/ensembles.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/11-ensemble-methods/code/ensembles.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/11-ensemble-methods",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/11-ensemble-methods",
       "kind": "Source"
     }
   ],

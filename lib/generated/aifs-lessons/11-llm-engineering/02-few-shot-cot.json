@@ -166,22 +166,22 @@
     },
     {
       "label": "Reasoning Chain",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/02-few-shot-cot/outputs/prompt-reasoning-chain.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/02-few-shot-cot/outputs/prompt-reasoning-chain.md",
       "kind": "Prompt"
     },
     {
       "label": "Cot Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/02-few-shot-cot/outputs/skill-cot-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/02-few-shot-cot/outputs/skill-cot-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "advanced_prompting.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/02-few-shot-cot/code/advanced_prompting.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/02-few-shot-cot/code/advanced_prompting.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/02-few-shot-cot",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/02-few-shot-cot",
       "kind": "Source"
     }
   ],

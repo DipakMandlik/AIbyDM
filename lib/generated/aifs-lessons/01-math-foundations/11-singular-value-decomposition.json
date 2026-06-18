@@ -205,22 +205,22 @@
     },
     {
       "label": "Svd",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/11-singular-value-decomposition/outputs/skill-svd.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/11-singular-value-decomposition/outputs/skill-svd.md",
       "kind": "Skill"
     },
     {
       "label": "svd.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/11-singular-value-decomposition/code/svd.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/11-singular-value-decomposition/code/svd.jl",
       "kind": "Code"
     },
     {
       "label": "svd.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/11-singular-value-decomposition/code/svd.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/11-singular-value-decomposition/code/svd.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/11-singular-value-decomposition",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/11-singular-value-decomposition",
       "kind": "Source"
     }
   ],

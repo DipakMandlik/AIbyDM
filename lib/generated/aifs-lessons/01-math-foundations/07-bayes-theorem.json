@@ -184,17 +184,17 @@
     },
     {
       "label": "Bayesian Reasoning",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem/outputs/prompt-bayesian-reasoning.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/07-bayes-theorem/outputs/prompt-bayesian-reasoning.md",
       "kind": "Prompt"
     },
     {
       "label": "bayes.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem/code/bayes.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/07-bayes-theorem/code/bayes.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/07-bayes-theorem",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/07-bayes-theorem",
       "kind": "Source"
     }
   ],

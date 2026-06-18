@@ -116,17 +116,17 @@
     },
     {
       "label": "Qwen Vl Pipeline Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/outputs/skill-qwen-vl-pipeline-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/outputs/skill-qwen-vl-pipeline-designer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/09-qwen-vl-family-dynamic-fps",
       "kind": "Source"
     }
   ],

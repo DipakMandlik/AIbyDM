@@ -183,22 +183,22 @@
     },
     {
       "label": "Diffusion Sampler Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/10-image-generation-diffusion/outputs/prompt-diffusion-sampler-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/10-image-generation-diffusion/outputs/prompt-diffusion-sampler-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Noise Schedule Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/10-image-generation-diffusion/outputs/skill-noise-schedule-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/10-image-generation-diffusion/outputs/skill-noise-schedule-designer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/10-image-generation-diffusion/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/10-image-generation-diffusion/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/10-image-generation-diffusion",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/10-image-generation-diffusion",
       "kind": "Source"
     }
   ],

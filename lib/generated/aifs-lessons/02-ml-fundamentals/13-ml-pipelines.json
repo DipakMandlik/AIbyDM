@@ -117,17 +117,17 @@
     },
     {
       "label": "ML Pipeline",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/13-ml-pipelines/outputs/prompt-ml-pipeline.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/13-ml-pipelines/outputs/prompt-ml-pipeline.md",
       "kind": "Prompt"
     },
     {
       "label": "pipeline.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/13-ml-pipelines/code/pipeline.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/13-ml-pipelines",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/13-ml-pipelines",
       "kind": "Source"
     }
   ],

@@ -186,22 +186,22 @@
     },
     {
       "label": "Gan Training Triage",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/09-image-generation-gans/outputs/prompt-gan-training-triage.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/09-image-generation-gans/outputs/prompt-gan-training-triage.md",
       "kind": "Prompt"
     },
     {
       "label": "Dcgan Scaffold",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/09-image-generation-gans/outputs/skill-dcgan-scaffold.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/09-image-generation-gans/outputs/skill-dcgan-scaffold.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/09-image-generation-gans/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/09-image-generation-gans/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/09-image-generation-gans",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/09-image-generation-gans",
       "kind": "Source"
     }
   ],

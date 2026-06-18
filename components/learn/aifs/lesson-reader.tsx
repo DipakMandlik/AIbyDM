@@ -14,11 +14,9 @@ import {
   getAifsLessonHref,
   getNextLesson,
   getPhaseHref,
-  getPreviousLesson,
 } from "@/lib/learning-index";
 
 export function LessonReader({ phase, lesson }: { phase: AifsPhase; lesson: AifsLesson }) {
-  const previous = getPreviousLesson(phase.slug, lesson.slug);
   const next = getNextLesson(phase.slug, lesson.slug);
 
   return (
@@ -55,6 +53,30 @@ export function LessonReader({ phase, lesson }: { phase: AifsPhase; lesson: Aifs
             </div>
           </div>
         </header>
+
+        <nav className="grid shrink-0 gap-px border border-foreground/10 bg-foreground/10 lg:grid-cols-2" aria-label="Lesson navigation">
+          <Link href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)} className="group bg-background p-4 transition-colors hover:bg-foreground/[0.03]">
+            <span className="flex items-center gap-2 text-sm text-muted-foreground">
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              Back to phase
+            </span>
+            <span className="mt-2 block font-medium">{phase.title}</span>
+          </Link>
+          {next ? (
+            <Link href={getAifsLessonHref(next.phase.slug, next.lesson.slug)} className="group bg-background p-4 text-left transition-colors hover:bg-foreground/[0.03] lg:text-right">
+              <span className="flex items-center gap-2 text-sm text-muted-foreground lg:justify-end">
+                Next lesson
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+              <span className="mt-2 block font-medium">{next.lesson.title}</span>
+            </Link>
+          ) : (
+            <div className="bg-background p-4 text-sm text-muted-foreground lg:text-right">
+              <span className="block">End of path</span>
+              <span className="mt-2 block font-medium text-foreground">{aifsLearningPath.title}</span>
+            </div>
+          )}
+        </nav>
 
         <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[260px_minmax(0,1fr)_320px]">
           <aside className="hidden min-h-0 lg:block">
@@ -107,33 +129,6 @@ export function LessonReader({ phase, lesson }: { phase: AifsPhase; lesson: Aifs
           </aside>
         </div>
 
-        <nav className="grid shrink-0 gap-px border border-foreground/10 bg-foreground/10 lg:grid-cols-2" aria-label="Adjacent lessons">
-          {previous ? (
-            <Link href={getAifsLessonHref(previous.phase.slug, previous.lesson.slug)} className="group bg-background p-4 transition-colors hover:bg-foreground/[0.03]">
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Previous lesson
-              </span>
-              <span className="mt-2 block font-medium">{previous.lesson.title}</span>
-            </Link>
-          ) : (
-            <Link href={getPhaseHref(AIFS_PATH_SLUG, phase.slug)} className="bg-background p-4 transition-colors hover:bg-foreground/[0.03]">
-              <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                <ArrowLeft className="h-4 w-4" /> Back to phase
-              </span>
-              <span className="mt-2 block font-medium">{phase.title}</span>
-            </Link>
-          )}
-          {next && (
-            <Link href={getAifsLessonHref(next.phase.slug, next.lesson.slug)} className="group bg-background p-4 text-right transition-colors hover:bg-foreground/[0.03]">
-              <span className="flex items-center justify-end gap-2 text-sm text-muted-foreground">
-                Next lesson
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </span>
-              <span className="mt-2 block font-medium">{next.lesson.title}</span>
-            </Link>
-          )}
-        </nav>
       </div>
     </section>
   );

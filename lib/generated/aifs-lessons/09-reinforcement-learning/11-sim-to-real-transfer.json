@@ -134,17 +134,17 @@
     },
     {
       "label": "Sim2real Planner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer/outputs/skill-sim2real-planner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer/outputs/skill-sim2real-planner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/11-sim-to-real-transfer",
       "kind": "Source"
     }
   ],

@@ -119,17 +119,17 @@
     },
     {
       "label": "Feature Extractor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features/outputs/skill-feature-extractor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features/outputs/skill-feature-extractor.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/02-spectrograms-mel-features",
       "kind": "Source"
     }
   ],

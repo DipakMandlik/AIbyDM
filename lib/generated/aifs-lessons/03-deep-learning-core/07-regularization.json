@@ -99,17 +99,17 @@
   "resources": [
     {
       "label": "Regularization Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/07-regularization/outputs/prompt-regularization-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/07-regularization/outputs/prompt-regularization-advisor.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/07-regularization/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/07-regularization/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/07-regularization",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/07-regularization",
       "kind": "Source"
     }
   ],

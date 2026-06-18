@@ -180,22 +180,22 @@
     },
     {
       "label": "Transformation Visualizer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/03-matrix-transformations/outputs/prompt-transformation-visualizer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/03-matrix-transformations/outputs/prompt-transformation-visualizer.md",
       "kind": "Prompt"
     },
     {
       "label": "transformations.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/03-matrix-transformations/code/transformations.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/03-matrix-transformations/code/transformations.jl",
       "kind": "Code"
     },
     {
       "label": "transformations.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/03-matrix-transformations/code/transformations.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/03-matrix-transformations/code/transformations.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/03-matrix-transformations",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/03-matrix-transformations",
       "kind": "Source"
     }
   ],

@@ -125,17 +125,17 @@
     },
     {
       "label": "Td Agent",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa/outputs/skill-td-agent.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa/outputs/skill-td-agent.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/04-q-learning-sarsa",
       "kind": "Source"
     }
   ],

@@ -235,22 +235,22 @@
     },
     {
       "label": "Rule Set Builder",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/outputs/skill-rule-set-builder.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/outputs/skill-rule-set-builder.md",
       "kind": "Skill"
     },
     {
       "label": "agent-rules.md",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/code/agent-rules.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/code/agent-rules.md",
       "kind": "Code"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/33-instructions-as-executable-constraints",
       "kind": "Source"
     }
   ],

@@ -185,22 +185,22 @@
     },
     {
       "label": "Classifier Pipeline Auditor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/04-image-classification/outputs/prompt-classifier-pipeline-auditor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/04-image-classification/outputs/prompt-classifier-pipeline-auditor.md",
       "kind": "Prompt"
     },
     {
       "label": "Classification Diagnostics",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/04-image-classification/outputs/skill-classification-diagnostics.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/04-image-classification/outputs/skill-classification-diagnostics.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/04-image-classification/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/04-image-classification/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/04-image-classification",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/04-image-classification",
       "kind": "Source"
     }
   ],

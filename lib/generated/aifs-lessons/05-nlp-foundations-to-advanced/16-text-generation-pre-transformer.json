@@ -216,22 +216,22 @@
     },
     {
       "label": "",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/outputs/.gitkeep",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/outputs/.gitkeep",
       "kind": "Artifact"
     },
     {
       "label": "Lm Baseline",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/outputs/prompt-lm-baseline.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/outputs/prompt-lm-baseline.md",
       "kind": "Prompt"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/16-text-generation-pre-transformer",
       "kind": "Source"
     }
   ],

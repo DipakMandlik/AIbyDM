@@ -214,17 +214,17 @@
     },
     {
       "label": "Otel Genai",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/23-otel-genai-conventions/outputs/skill-otel-genai.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/23-otel-genai-conventions/outputs/skill-otel-genai.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/23-otel-genai-conventions/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/23-otel-genai-conventions/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/14-agent-engineering/23-otel-genai-conventions",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/14-agent-engineering/23-otel-genai-conventions",
       "kind": "Source"
     }
   ],

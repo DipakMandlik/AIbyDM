@@ -133,17 +133,17 @@
     },
     {
       "label": "Stylegan Inversion",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/05-stylegan/outputs/skill-stylegan-inversion.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/05-stylegan/outputs/skill-stylegan-inversion.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/05-stylegan/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/05-stylegan/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/05-stylegan",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/05-stylegan",
       "kind": "Source"
     }
   ],

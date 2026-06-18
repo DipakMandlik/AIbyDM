@@ -181,22 +181,22 @@
     },
     {
       "label": "Pose Stack Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/21-keypoint-pose/outputs/prompt-pose-stack-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/21-keypoint-pose/outputs/prompt-pose-stack-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Heatmap To Coords",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/21-keypoint-pose/outputs/skill-heatmap-to-coords.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/21-keypoint-pose/outputs/skill-heatmap-to-coords.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/21-keypoint-pose/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/21-keypoint-pose/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/21-keypoint-pose",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/21-keypoint-pose",
       "kind": "Source"
     }
   ],

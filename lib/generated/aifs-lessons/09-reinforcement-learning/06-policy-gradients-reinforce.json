@@ -120,17 +120,17 @@
     },
     {
       "label": "Policy Gradient Trainer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce/outputs/skill-policy-gradient-trainer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce/outputs/skill-policy-gradient-trainer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/06-policy-gradients-reinforce",
       "kind": "Source"
     }
   ],

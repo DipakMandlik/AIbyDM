@@ -129,17 +129,17 @@
     },
     {
       "label": "Vae Trainer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/02-autoencoders-vae/outputs/skill-vae-trainer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/02-autoencoders-vae/outputs/skill-vae-trainer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/02-autoencoders-vae/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/02-autoencoders-vae/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/08-generative-ai/02-autoencoders-vae",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/08-generative-ai/02-autoencoders-vae",
       "kind": "Source"
     }
   ],

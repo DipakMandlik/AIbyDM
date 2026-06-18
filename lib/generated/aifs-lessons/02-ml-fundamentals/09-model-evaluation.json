@@ -111,22 +111,22 @@
     },
     {
       "label": "Evaluation",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/09-model-evaluation/outputs/skill-evaluation.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/09-model-evaluation/outputs/skill-evaluation.md",
       "kind": "Skill"
     },
     {
       "label": "evaluation.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/09-model-evaluation/code/evaluation.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/09-model-evaluation/code/evaluation.py",
       "kind": "Code"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/09-model-evaluation/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/09-model-evaluation/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/09-model-evaluation",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/09-model-evaluation",
       "kind": "Source"
     }
   ],

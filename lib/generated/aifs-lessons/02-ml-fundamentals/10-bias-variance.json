@@ -113,17 +113,17 @@
     },
     {
       "label": "Model Diagnostics",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/10-bias-variance/outputs/prompt-model-diagnostics.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/10-bias-variance/outputs/prompt-model-diagnostics.md",
       "kind": "Prompt"
     },
     {
       "label": "bias_variance.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/10-bias-variance/code/bias_variance.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/10-bias-variance/code/bias_variance.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/10-bias-variance",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/10-bias-variance",
       "kind": "Source"
     }
   ],

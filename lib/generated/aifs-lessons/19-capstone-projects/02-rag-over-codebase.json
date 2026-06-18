@@ -241,52 +241,52 @@
     },
     {
       "label": "Codebase RAG",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/outputs/skill-codebase-rag.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/outputs/skill-codebase-rag.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/main.py",
       "kind": "Code"
     },
     {
       "label": "ts/README.md",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/README.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/README.md",
       "kind": "Code"
     },
     {
       "label": "ts/package.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/package.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/package.json",
       "kind": "Code"
     },
     {
       "label": "ts/src/corpus.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/corpus.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/corpus.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/index.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/index_store.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index_store.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/index_store.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/retrieval.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/retrieval.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/retrieval.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/server.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/server.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase/code/ts/src/server.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/02-rag-over-codebase",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/02-rag-over-codebase",
       "kind": "Source"
     }
   ],

@@ -123,22 +123,22 @@
     },
     {
       "label": "Svm Kernel Chooser",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/outputs/skill-svm-kernel-chooser.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/outputs/skill-svm-kernel-chooser.md",
       "kind": "Skill"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "svm.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/code/svm.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/05-support-vector-machines/code/svm.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/05-support-vector-machines",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/05-support-vector-machines",
       "kind": "Source"
     }
   ],

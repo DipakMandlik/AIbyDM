@@ -117,17 +117,17 @@
     },
     {
       "label": "Tuning Strategy",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning/outputs/prompt-tuning-strategy.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning/outputs/prompt-tuning-strategy.md",
       "kind": "Prompt"
     },
     {
       "label": "tuning.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning/code/tuning.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning/code/tuning.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/12-hyperparameter-tuning",
       "kind": "Source"
     }
   ],

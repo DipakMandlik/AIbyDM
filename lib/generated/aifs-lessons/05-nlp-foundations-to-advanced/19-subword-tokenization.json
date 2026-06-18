@@ -223,22 +223,22 @@
     },
     {
       "label": "Bpe Vs Wordpiece",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/outputs/skill-bpe-vs-wordpiece.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/outputs/skill-bpe-vs-wordpiece.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/05-nlp-foundations-to-advanced/19-subword-tokenization",
       "kind": "Source"
     }
   ],

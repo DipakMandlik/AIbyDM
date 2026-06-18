@@ -177,17 +177,17 @@
     },
     {
       "label": "Multi Agent Decision",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/outputs/prompt-multi-agent-decision.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/outputs/prompt-multi-agent-decision.md",
       "kind": "Prompt"
     },
     {
       "label": "single_vs_multi.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/code/single_vs_multi.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent/code/single_vs_multi.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/01-why-multi-agent",
       "kind": "Source"
     }
   ],

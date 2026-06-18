@@ -163,32 +163,32 @@
   "resources": [
     {
       "label": "Classifier_report",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration/outputs/classifier_report.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration/outputs/classifier_report.json",
       "kind": "Artifact"
     },
     {
       "label": "Content Classifier Integration",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration/outputs/skill-content-classifier-integration.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration/outputs/skill-content-classifier-integration.md",
       "kind": "Skill"
     },
     {
       "label": "classifiers.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/classifiers.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/classifiers.py",
       "kind": "Code"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/tests.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration/code/tests.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/85-content-classifier-integration",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/85-content-classifier-integration",
       "kind": "Source"
     }
   ],

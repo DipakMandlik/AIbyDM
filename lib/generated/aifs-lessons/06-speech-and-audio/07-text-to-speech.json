@@ -121,17 +121,17 @@
     },
     {
       "label": "TTS Designer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/07-text-to-speech/outputs/skill-tts-designer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/07-text-to-speech/outputs/skill-tts-designer.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/07-text-to-speech/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/07-text-to-speech/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/06-speech-and-audio/07-text-to-speech",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/06-speech-and-audio/07-text-to-speech",
       "kind": "Source"
     }
   ],

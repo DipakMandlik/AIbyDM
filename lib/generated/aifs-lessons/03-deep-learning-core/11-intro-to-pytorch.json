@@ -101,22 +101,22 @@
   "resources": [
     {
       "label": "PyTorch Debugger",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/outputs/prompt-pytorch-debugger.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/outputs/prompt-pytorch-debugger.md",
       "kind": "Prompt"
     },
     {
       "label": "PyTorch Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/outputs/skill-pytorch-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/outputs/skill-pytorch-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "pytorch_intro.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/code/pytorch_intro.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch/code/pytorch_intro.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/11-intro-to-pytorch",
       "kind": "Source"
     }
   ],

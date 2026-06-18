@@ -128,17 +128,17 @@
     },
     {
       "label": "Provider Portability Audit",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive/outputs/skill-provider-portability-audit.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive/outputs/skill-provider-portability-audit.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/13-tools-and-protocols/02-function-calling-deep-dive",
       "kind": "Source"
     }
   ],

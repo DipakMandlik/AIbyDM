@@ -118,17 +118,17 @@
     },
     {
       "label": "Memory Auditor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/outputs/skill-memory-auditor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/outputs/skill-memory-auditor.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/13-shared-memory-blackboard",
       "kind": "Source"
     }
   ],

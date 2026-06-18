@@ -190,22 +190,22 @@
     },
     {
       "label": "Tensor Debugger",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/12-tensor-operations/outputs/prompt-tensor-debugger.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/12-tensor-operations/outputs/prompt-tensor-debugger.md",
       "kind": "Prompt"
     },
     {
       "label": "Tensor Shapes",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/12-tensor-operations/outputs/prompt-tensor-shapes.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/12-tensor-operations/outputs/prompt-tensor-shapes.md",
       "kind": "Prompt"
     },
     {
       "label": "tensors.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/12-tensor-operations/code/tensors.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/12-tensor-operations/code/tensors.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/12-tensor-operations",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/12-tensor-operations",
       "kind": "Source"
     }
   ],

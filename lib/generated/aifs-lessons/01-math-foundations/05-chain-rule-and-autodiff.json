@@ -183,22 +183,22 @@
     },
     {
       "label": "Autodiff",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/outputs/skill-autodiff.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/outputs/skill-autodiff.md",
       "kind": "Skill"
     },
     {
       "label": "autodiff.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/code/autodiff.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/code/autodiff.py",
       "kind": "Code"
     },
     {
       "label": "main.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/code/main.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff/code/main.jl",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/05-chain-rule-and-autodiff",
       "kind": "Source"
     }
   ],

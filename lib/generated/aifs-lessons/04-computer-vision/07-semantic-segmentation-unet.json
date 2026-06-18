@@ -185,22 +185,22 @@
     },
     {
       "label": "Segmentation Task Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/outputs/prompt-segmentation-task-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/outputs/prompt-segmentation-task-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Segmentation Mask Inspector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/outputs/skill-segmentation-mask-inspector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/outputs/skill-segmentation-mask-inspector.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/07-semantic-segmentation-unet",
       "kind": "Source"
     }
   ],

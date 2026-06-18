@@ -156,22 +156,22 @@
     },
     {
       "label": "Architecture Reviewer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/13-production-app/outputs/prompt-architecture-reviewer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/13-production-app/outputs/prompt-architecture-reviewer.md",
       "kind": "Prompt"
     },
     {
       "label": "Production Checklist",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/13-production-app/outputs/skill-production-checklist.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/13-production-app/outputs/skill-production-checklist.md",
       "kind": "Skill"
     },
     {
       "label": "production_app.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/13-production-app/code/production_app.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/13-production-app/code/production_app.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/13-production-app",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/13-production-app",
       "kind": "Source"
     }
   ],

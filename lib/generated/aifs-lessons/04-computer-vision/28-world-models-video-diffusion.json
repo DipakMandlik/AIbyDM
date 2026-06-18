@@ -202,22 +202,22 @@
     },
     {
       "label": "Video Model Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/outputs/prompt-video-model-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/outputs/prompt-video-model-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Physical Plausibility Checks",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/outputs/skill-physical-plausibility-checks.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/outputs/skill-physical-plausibility-checks.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/28-world-models-video-diffusion/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/28-world-models-video-diffusion",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/28-world-models-video-diffusion",
       "kind": "Source"
     }
   ],

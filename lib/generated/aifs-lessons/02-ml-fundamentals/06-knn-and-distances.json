@@ -121,17 +121,17 @@
     },
     {
       "label": "Distance Metric Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/06-knn-and-distances/outputs/prompt-distance-metric-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/06-knn-and-distances/outputs/prompt-distance-metric-advisor.md",
       "kind": "Prompt"
     },
     {
       "label": "knn.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/06-knn-and-distances/code/knn.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/06-knn-and-distances/code/knn.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/02-ml-fundamentals/06-knn-and-distances",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/02-ml-fundamentals/06-knn-and-distances",
       "kind": "Source"
     }
   ],

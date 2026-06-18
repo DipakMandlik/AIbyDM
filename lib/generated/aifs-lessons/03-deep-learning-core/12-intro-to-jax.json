@@ -99,22 +99,22 @@
   "resources": [
     {
       "label": "JAX Optimizer",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/12-intro-to-jax/outputs/prompt-jax-optimizer.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/12-intro-to-jax/outputs/prompt-jax-optimizer.md",
       "kind": "Prompt"
     },
     {
       "label": "JAX Patterns",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/12-intro-to-jax/outputs/skill-jax-patterns.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/12-intro-to-jax/outputs/skill-jax-patterns.md",
       "kind": "Skill"
     },
     {
       "label": "jax_intro.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/12-intro-to-jax/code/jax_intro.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/12-intro-to-jax/code/jax_intro.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/03-deep-learning-core/12-intro-to-jax",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/03-deep-learning-core/12-intro-to-jax",
       "kind": "Source"
     }
   ],

@@ -186,22 +186,22 @@
     },
     {
       "label": "3d Task Router",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/13-3d-vision-nerf/outputs/prompt-3d-task-router.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/13-3d-vision-nerf/outputs/prompt-3d-task-router.md",
       "kind": "Prompt"
     },
     {
       "label": "Point Cloud Loader",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/13-3d-vision-nerf/outputs/skill-point-cloud-loader.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/13-3d-vision-nerf/outputs/skill-point-cloud-loader.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/13-3d-vision-nerf/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/13-3d-vision-nerf/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/13-3d-vision-nerf",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/13-3d-vision-nerf",
       "kind": "Source"
     }
   ],

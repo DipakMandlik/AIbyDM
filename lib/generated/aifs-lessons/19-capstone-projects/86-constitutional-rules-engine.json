@@ -165,37 +165,37 @@
   "resources": [
     {
       "label": "Rules_report",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/outputs/rules_report.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/outputs/rules_report.json",
       "kind": "Artifact"
     },
     {
       "label": "Constitutional Rules Engine",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/outputs/skill-constitutional-rules-engine.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/outputs/skill-constitutional-rules-engine.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/main.py",
       "kind": "Code"
     },
     {
       "label": "rules.yml",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/rules.yml",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/rules.yml",
       "kind": "Code"
     },
     {
       "label": "tests.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/tests.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/tests.py",
       "kind": "Code"
     },
     {
       "label": "yaml_subset.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/yaml_subset.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine/code/yaml_subset.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/86-constitutional-rules-engine",
       "kind": "Source"
     }
   ],

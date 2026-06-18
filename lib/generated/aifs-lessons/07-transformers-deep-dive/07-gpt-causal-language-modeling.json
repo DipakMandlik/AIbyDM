@@ -113,17 +113,17 @@
     },
     {
       "label": "Sampling Tuner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/outputs/skill-sampling-tuner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/outputs/skill-sampling-tuner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/07-transformers-deep-dive/07-gpt-causal-language-modeling",
       "kind": "Source"
     }
   ],

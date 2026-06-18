@@ -183,17 +183,17 @@
     },
     {
       "label": "Sampling Strategy",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/16-sampling-methods/outputs/skill-sampling-strategy.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/16-sampling-methods/outputs/skill-sampling-strategy.md",
       "kind": "Skill"
     },
     {
       "label": "sampling.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/16-sampling-methods/code/sampling.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/16-sampling-methods/code/sampling.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/16-sampling-methods",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/16-sampling-methods",
       "kind": "Source"
     }
   ],

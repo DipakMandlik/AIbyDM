@@ -163,37 +163,37 @@
   "resources": [
     {
       "label": "Detector_report",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/outputs/detector_report.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/outputs/detector_report.json",
       "kind": "Artifact"
     },
     {
       "label": "Prompt Injection Detector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/outputs/skill-prompt-injection-detector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/outputs/skill-prompt-injection-detector.md",
       "kind": "Skill"
     },
     {
       "label": "benign.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/benign.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/benign.py",
       "kind": "Code"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/main.py",
       "kind": "Code"
     },
     {
       "label": "rules.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/rules.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/rules.py",
       "kind": "Code"
     },
     {
       "label": "tests.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/tests.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector/code/tests.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/83-prompt-injection-detector",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/83-prompt-injection-detector",
       "kind": "Source"
     }
   ],

@@ -122,22 +122,22 @@
     },
     {
       "label": "LoRA Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/outputs/prompt-lora-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/outputs/prompt-lora-advisor.md",
       "kind": "Prompt"
     },
     {
       "label": "Fine Tuning Guide",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/outputs/skill-fine-tuning-guide.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/outputs/skill-fine-tuning-guide.md",
       "kind": "Skill"
     },
     {
       "label": "lora.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/code/lora.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/08-fine-tuning-lora/code/lora.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/11-llm-engineering/08-fine-tuning-lora",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/11-llm-engineering/08-fine-tuning-lora",
       "kind": "Source"
     }
   ],

@@ -167,17 +167,17 @@
   "resources": [
     {
       "label": "Stochastic Process Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/22-stochastic-processes/outputs/prompt-stochastic-process-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/22-stochastic-processes/outputs/prompt-stochastic-process-advisor.md",
       "kind": "Prompt"
     },
     {
       "label": "stochastic.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/22-stochastic-processes/code/stochastic.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/22-stochastic-processes/code/stochastic.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/22-stochastic-processes",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/22-stochastic-processes",
       "kind": "Source"
     }
   ],

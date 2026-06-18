@@ -186,22 +186,22 @@
     },
     {
       "label": "Retrieval Loss Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/20-image-retrieval-metric/outputs/prompt-retrieval-loss-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/20-image-retrieval-metric/outputs/prompt-retrieval-loss-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Recall At K Runner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/20-image-retrieval-metric/outputs/skill-recall-at-k-runner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/20-image-retrieval-metric/outputs/skill-recall-at-k-runner.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/20-image-retrieval-metric/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/20-image-retrieval-metric/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/20-image-retrieval-metric",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/20-image-retrieval-metric",
       "kind": "Source"
     }
   ],

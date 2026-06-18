@@ -157,22 +157,22 @@
   "resources": [
     {
       "label": "API Troubleshooter",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/outputs/prompt-api-troubleshooter.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/outputs/prompt-api-troubleshooter.md",
       "kind": "Prompt"
     },
     {
       "label": "first_api_call.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.py",
       "kind": "Code"
     },
     {
       "label": "first_api_call.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/04-apis-and-keys/code/first_api_call.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/04-apis-and-keys",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/04-apis-and-keys",
       "kind": "Source"
     }
   ],

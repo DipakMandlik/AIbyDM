@@ -186,22 +186,22 @@
     },
     {
       "label": "Fine Tune Planner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/05-transfer-learning/outputs/prompt-fine-tune-planner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/05-transfer-learning/outputs/prompt-fine-tune-planner.md",
       "kind": "Prompt"
     },
     {
       "label": "Freeze Inspector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/05-transfer-learning/outputs/skill-freeze-inspector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/05-transfer-learning/outputs/skill-freeze-inspector.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/05-transfer-learning/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/05-transfer-learning/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/05-transfer-learning",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/05-transfer-learning",
       "kind": "Source"
     }
   ],

@@ -241,52 +241,52 @@
     },
     {
       "label": "MCP Server",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/outputs/skill-mcp-server.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/outputs/skill-mcp-server.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/main.py",
       "kind": "Code"
     },
     {
       "label": "ts/README.md",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/README.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/README.md",
       "kind": "Code"
     },
     {
       "label": "ts/package.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/package.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/package.json",
       "kind": "Code"
     },
     {
       "label": "ts/src/index.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/index.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/index.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/protocol.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/protocol.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/protocol.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/tools.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/tools.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/tools.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/transport.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/transport.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/transport.ts",
       "kind": "Code"
     },
     {
       "label": "ts/src/types.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/types.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry/code/ts/src/types.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/13-mcp-server-with-registry",
       "kind": "Source"
     }
   ],

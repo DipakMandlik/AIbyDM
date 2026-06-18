@@ -162,47 +162,47 @@
   "resources": [
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tasks/task_001_fizzbuzz_offbyone/buggy/fizzbuzz.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/buggy/fizzbuzz.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/buggy/fizzbuzz.py",
       "kind": "Code"
     },
     {
       "label": "tasks/task_001_fizzbuzz_offbyone/expected/fizzbuzz.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/expected/fizzbuzz.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/expected/fizzbuzz.py",
       "kind": "Code"
     },
     {
       "label": "tasks/task_001_fizzbuzz_offbyone/task.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/task.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_001_fizzbuzz_offbyone/task.json",
       "kind": "Code"
     },
     {
       "label": "tasks/task_002_factorial_missing_return/buggy/factorial.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/buggy/factorial.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/buggy/factorial.py",
       "kind": "Code"
     },
     {
       "label": "tasks/task_002_factorial_missing_return/expected/factorial.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/expected/factorial.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/expected/factorial.py",
       "kind": "Code"
     },
     {
       "label": "tasks/task_002_factorial_missing_return/task.json",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/task.json",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_002_factorial_missing_return/task.json",
       "kind": "Code"
     },
     {
       "label": "tasks/task_003_error_message_typo/buggy/errors.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_003_error_message_typo/buggy/errors.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks/code/tasks/task_003_error_message_typo/buggy/errors.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/27-eval-harness-fixture-tasks",
       "kind": "Source"
     }
   ],

@@ -186,22 +186,22 @@
     },
     {
       "label": "Video Architecture Picker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/12-video-understanding/outputs/prompt-video-architecture-picker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/12-video-understanding/outputs/prompt-video-architecture-picker.md",
       "kind": "Prompt"
     },
     {
       "label": "Frame Sampler Auditor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/12-video-understanding/outputs/skill-frame-sampler-auditor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/12-video-understanding/outputs/skill-frame-sampler-auditor.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/12-video-understanding/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/12-video-understanding/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/12-video-understanding",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/12-video-understanding",
       "kind": "Source"
     }
   ],

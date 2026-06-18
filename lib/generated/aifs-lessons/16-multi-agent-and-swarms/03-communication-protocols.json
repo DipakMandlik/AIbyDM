@@ -204,17 +204,17 @@
     },
     {
       "label": "Protocol Selector",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/outputs/prompt-protocol-selector.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/outputs/prompt-protocol-selector.md",
       "kind": "Prompt"
     },
     {
       "label": "main.ts",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/code/main.ts",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols/code/main.ts",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/03-communication-protocols",
       "kind": "Source"
     }
   ],

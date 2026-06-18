@@ -110,17 +110,17 @@
     },
     {
       "label": "Classifier Stack Audit",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/18-llama-guard/outputs/skill-classifier-stack-audit.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/18-llama-guard/outputs/skill-classifier-stack-audit.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/18-llama-guard/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/18-llama-guard/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/18-llama-guard",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/18-llama-guard",
       "kind": "Source"
     }
   ],

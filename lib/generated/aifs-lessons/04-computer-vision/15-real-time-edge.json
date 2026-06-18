@@ -187,27 +187,27 @@
     },
     {
       "label": "Edge Deployment Planner",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/15-real-time-edge/outputs/prompt-edge-deployment-planner.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/15-real-time-edge/outputs/prompt-edge-deployment-planner.md",
       "kind": "Prompt"
     },
     {
       "label": "Latency Profiler",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/15-real-time-edge/outputs/skill-latency-profiler.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/15-real-time-edge/outputs/skill-latency-profiler.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/15-real-time-edge/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/15-real-time-edge/code/main.py",
       "kind": "Code"
     },
     {
       "label": "main.rs",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/15-real-time-edge/code/main.rs",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/15-real-time-edge/code/main.rs",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/04-computer-vision/15-real-time-edge",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/04-computer-vision/15-real-time-edge",
       "kind": "Source"
     }
   ],

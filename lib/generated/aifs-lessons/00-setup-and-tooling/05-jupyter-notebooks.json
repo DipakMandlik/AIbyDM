@@ -175,17 +175,17 @@
     },
     {
       "label": "Notebook Helper",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks/outputs/prompt-notebook-helper.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks/outputs/prompt-notebook-helper.md",
       "kind": "Prompt"
     },
     {
       "label": "notebook_tips.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks/code/notebook_tips.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks/code/notebook_tips.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/00-setup-and-tooling/05-jupyter-notebooks",
       "kind": "Source"
     }
   ],

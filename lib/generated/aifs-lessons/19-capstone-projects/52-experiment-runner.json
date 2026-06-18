@@ -178,27 +178,27 @@
   "resources": [
     {
       "label": "experiments/crashing_experiment.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/52-experiment-runner/code/experiments/crashing_experiment.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/52-experiment-runner/code/experiments/crashing_experiment.py",
       "kind": "Code"
     },
     {
       "label": "experiments/sparsity_experiment.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/52-experiment-runner/code/experiments/sparsity_experiment.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/52-experiment-runner/code/experiments/sparsity_experiment.py",
       "kind": "Code"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/52-experiment-runner/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/52-experiment-runner/code/main.py",
       "kind": "Code"
     },
     {
       "label": "tests/test_runner.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/52-experiment-runner/code/tests/test_runner.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/52-experiment-runner/code/tests/test_runner.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/19-capstone-projects/52-experiment-runner",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/19-capstone-projects/52-experiment-runner",
       "kind": "Source"
     }
   ],

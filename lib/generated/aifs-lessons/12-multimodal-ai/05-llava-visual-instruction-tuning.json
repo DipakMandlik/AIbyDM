@@ -118,17 +118,17 @@
     },
     {
       "label": "Llava Vibes Eval",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/outputs/skill-llava-vibes-eval.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/outputs/skill-llava-vibes-eval.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/12-multimodal-ai/05-llava-visual-instruction-tuning",
       "kind": "Source"
     }
   ],

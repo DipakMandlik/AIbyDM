@@ -111,17 +111,17 @@
     },
     {
       "label": "Tripwire Design",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries/outputs/skill-tripwire-design.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries/outputs/skill-tripwire-design.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/15-autonomous-systems/14-kill-switches-canaries",
       "kind": "Source"
     }
   ],

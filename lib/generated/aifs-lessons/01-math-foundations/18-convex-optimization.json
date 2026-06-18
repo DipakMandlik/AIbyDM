@@ -183,17 +183,17 @@
     },
     {
       "label": "Convexity Checker",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/18-convex-optimization/outputs/skill-convexity-checker.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/18-convex-optimization/outputs/skill-convexity-checker.md",
       "kind": "Skill"
     },
     {
       "label": "convex.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/18-convex-optimization/code/convex.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/18-convex-optimization/code/convex.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/18-convex-optimization",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/18-convex-optimization",
       "kind": "Source"
     }
   ],

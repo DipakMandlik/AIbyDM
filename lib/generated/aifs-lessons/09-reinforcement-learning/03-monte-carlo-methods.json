@@ -122,17 +122,17 @@
     },
     {
       "label": "Mc Evaluator",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods/outputs/skill-mc-evaluator.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods/outputs/skill-mc-evaluator.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/09-reinforcement-learning/03-monte-carlo-methods",
       "kind": "Source"
     }
   ],

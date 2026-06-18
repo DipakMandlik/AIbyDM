@@ -123,17 +123,17 @@
     },
     {
       "label": "Scaling Advisor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/outputs/skill-scaling-advisor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/outputs/skill-scaling-advisor.md",
       "kind": "Skill"
     },
     {
       "label": "main.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/code/main.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints/code/main.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/16-multi-agent-and-swarms/22-production-scaling-queues-checkpoints",
       "kind": "Source"
     }
   ],

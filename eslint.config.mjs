@@ -12,6 +12,7 @@ export default [
       'node_modules/**',
       'coverage/**',
       'public/**',
+      'phases/**',
       '*.config.js',
       '*.config.cjs',
       '*.config.mjs',

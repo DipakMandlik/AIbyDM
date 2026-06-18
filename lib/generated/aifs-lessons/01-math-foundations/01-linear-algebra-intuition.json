@@ -170,22 +170,22 @@
   "resources": [
     {
       "label": "Linear Algebra Tutor",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/outputs/prompt-linear-algebra-tutor.md",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/outputs/prompt-linear-algebra-tutor.md",
       "kind": "Prompt"
     },
     {
       "label": "vectors.jl",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.jl",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.jl",
       "kind": "Code"
     },
     {
       "label": "vectors.py",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py",
       "kind": "Code"
     },
     {
       "label": "Source lesson",
-      "href": "https://github.com/rohitg00/ai-engineering-from-scratch/tree/main/phases/01-math-foundations/01-linear-algebra-intuition",
+      "href": "https://github.com/DipakMandlik/AIByDM/tree/main/phases/01-math-foundations/01-linear-algebra-intuition",
       "kind": "Source"
     }
   ],
