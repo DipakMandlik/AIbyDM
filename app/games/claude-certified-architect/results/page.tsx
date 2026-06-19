@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteNav } from "@/components/site/site-nav";
 import { ClaudeChallengeResults } from "@/components/games/claude-certified-architect";
 
@@ -10,10 +9,9 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <main className="relative min-h-screen overflow-x-hidden noise-overlay">
-      <SiteNav />
+    <main className="min-h-dvh overflow-x-hidden bg-slate-950 text-white">
+      <SiteNav variant="compact" />
       <ClaudeChallengeResults />
-      <SiteFooter />
     </main>
   );
 }
