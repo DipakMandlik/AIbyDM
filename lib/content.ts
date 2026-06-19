@@ -8,6 +8,7 @@ import {
   getLearningPathHref,
   getPhaseHref,
 } from "@/lib/learning-index";
+import { issues, newsletterTopics } from "@/lib/newsletter-data";
 
 export type Level = 'Beginner' | 'Intermediate' | 'Advanced';
 export type Pricing = 'Free' | 'Freemium' | 'Paid' | 'Open Source';
@@ -140,10 +141,29 @@ export type Issue = {
   title: string;
   date: string;
   topic: string;
+  category: NewsletterCategory;
   excerpt: string;
+  sourceTitle: string;
+  sourceUrl: string;
+  sourceDomain: string;
+  publishedAt: string;
+  summary: string;
   sections: string[];
+  citations?: { label: string; href: string }[];
   featured?: boolean;
 };
+
+export type NewsletterCategory =
+  | 'Models'
+  | 'Agents'
+  | 'Tools'
+  | 'Research'
+  | 'Product'
+  | 'Safety'
+  | 'Engineering'
+  | 'Open Source'
+  | 'Business'
+  | 'Learning';
 
 export type SearchItem = {
   kind: SearchKind;
@@ -1021,47 +1041,7 @@ export const exams: Exam[] = [
   },
 ];
 
-export const issues: Issue[] = [
-  {
-    slug: 'agents-mainstream',
-    number: 47,
-    title: 'The year agents went mainstream',
-    date: 'Jun 12, 2026',
-    topic: 'Agents',
-    excerpt: 'Tool-using agents moved from demos to production. We break down the patterns that actually shipped.',
-    sections: ['Agent workflows that held up', 'What teams monitored', 'Patterns to learn next'],
-    featured: true,
-  },
-  {
-    slug: 'small-models-big-impact',
-    number: 46,
-    title: 'Small models, big impact',
-    date: 'Jun 5, 2026',
-    topic: 'Models',
-    excerpt: 'Why the most interesting work this month happened on models you can run on a laptop.',
-    sections: ['Local experimentation', 'Latency wins', 'Where small models fail'],
-  },
-  {
-    slug: 'evaluations-are-tests',
-    number: 45,
-    title: 'Evaluations are the new tests',
-    date: 'May 29, 2026',
-    topic: 'Engineering',
-    excerpt: 'A practical guide to building eval suites your team will actually maintain.',
-    sections: ['Useful rubrics', 'Regression examples', 'Review cadence'],
-  },
-  {
-    slug: 'designing-for-the-pause',
-    number: 44,
-    title: 'Designing for the pause',
-    date: 'May 22, 2026',
-    topic: 'Design',
-    excerpt: 'What great products do during the second an AI is thinking.',
-    sections: ['Streaming states', 'Trust cues', 'Retry and cancel'],
-  },
-];
-
-export const newsletterTopics = ['Agents', 'Models', 'Engineering', 'Design', 'Retrieval', 'Open Source'];
+export { issues, newsletterTopics };
 
 export function getTrack(slug: string) {
   return tracks.find((track) => track.slug === slug);
@@ -1267,8 +1247,8 @@ export function getSearchItems(): SearchItem[] {
     title: issue.title,
     href: getIssueHref(issue.slug),
     excerpt: issue.excerpt,
-    meta: `Issue ${issue.number} / ${issue.topic}`,
-    keywords: [issue.title, issue.topic, ...issue.sections],
+    meta: `Issue ${issue.number} / ${issue.category}`,
+    keywords: [issue.title, issue.topic, issue.category, issue.sourceDomain, issue.sourceTitle, ...issue.sections],
   }));
 
   return [

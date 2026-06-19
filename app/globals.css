@@ -187,17 +187,47 @@
   }
 
   .brand-wordmark-text {
-    background: linear-gradient(110deg, var(--foreground) 0%, var(--foreground) 38%, #0891b2 48%, var(--foreground) 58%, var(--foreground) 100%);
+    background: linear-gradient(110deg, var(--foreground) 0%, var(--foreground) 30%, #06b6d4 42%, #f97316 50%, #67e8f9 58%, var(--foreground) 70%, var(--foreground) 100%);
     background-size: 240% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     animation: brand-shimmer 7s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.16));
+  }
+
+  .brand-hero-wordmark {
+    background: linear-gradient(105deg, #ffffff 0%, #dffbff 28%, #22d3ee 44%, #fb923c 52%, #ffffff 66%, #ffffff 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: brand-hero-shimmer 5.8s ease-in-out infinite;
+    text-shadow: 0 0 32px rgba(34, 211, 238, 0.35);
+  }
+
+  .brand-logo-tubes {
+    background:
+      radial-gradient(circle at 30% 28%, rgba(34, 211, 238, 0.8), transparent 18%),
+      radial-gradient(circle at 72% 76%, rgba(251, 146, 60, 0.72), transparent 20%),
+      conic-gradient(from 140deg, rgba(34, 211, 238, 0), rgba(34, 211, 238, 0.55), rgba(251, 146, 60, 0.5), rgba(34, 211, 238, 0));
+    opacity: 0.78;
+    animation: brand-tubes-drift 6s ease-in-out infinite;
   }
 
   @keyframes brand-shimmer {
     0%, 72%, 100% { background-position: 120% 0; }
     86% { background-position: -40% 0; }
+  }
+
+  @keyframes brand-hero-shimmer {
+    0%, 68%, 100% { background-position: 120% 0; }
+    84% { background-position: -40% 0; }
+  }
+
+  @keyframes brand-tubes-drift {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(18deg) scale(1.08); }
   }
   
   @keyframes char-in {
