@@ -16,6 +16,8 @@ export type Skill = {
   projects: number;
   certifications: number;
   category: SkillCategory;
+  stars: number;
+  updatedAt: string;
   trending?: boolean;
   featured?: boolean;
   relatedTrackSlugs?: string[];
@@ -72,6 +74,8 @@ export const skills: Skill[] = [
     projects: 6,
     certifications: 2,
     category: 'Engineering',
+    stars: 24000,
+    updatedAt: '2026-06-19',
     featured: true,
     trending: true,
     relatedTrackSlugs: ['llm-foundations', 'ai-engineering'],
@@ -90,6 +94,8 @@ export const skills: Skill[] = [
     projects: 8,
     certifications: 2,
     category: 'Engineering',
+    stars: 19500,
+    updatedAt: '2026-06-15',
     featured: true,
     trending: true,
     relatedTrackSlugs: ['llm-foundations'],
@@ -107,6 +113,8 @@ export const skills: Skill[] = [
     projects: 7,
     certifications: 2,
     category: 'Engineering',
+    stars: 18500,
+    updatedAt: '2026-06-18',
     featured: true,
     trending: true,
     relatedTrackSlugs: ['llm-foundations'],
@@ -125,6 +133,8 @@ export const skills: Skill[] = [
     projects: 5,
     certifications: 1,
     category: 'Engineering',
+    stars: 14200,
+    updatedAt: '2026-06-10',
     featured: true,
     trending: true,
     relatedTrackSlugs: ['llm-foundations'],
@@ -141,6 +151,8 @@ export const skills: Skill[] = [
     projects: 10,
     certifications: 3,
     category: 'Architecture',
+    stars: 31000,
+    updatedAt: '2026-06-17',
     featured: true,
     relatedGameSlugs: ['claude-certified-architect'],
     relatedExamSlugs: ['ai-engineer'],
@@ -157,6 +169,8 @@ export const skills: Skill[] = [
     projects: 6,
     certifications: 2,
     category: 'Operations',
+    stars: 11800,
+    updatedAt: '2026-06-05',
     featured: true,
     relatedExamSlugs: ['ml-engineer'],
   },
@@ -172,6 +186,8 @@ export const skills: Skill[] = [
     projects: 4,
     certifications: 1,
     category: 'Product',
+    stars: 9400,
+    updatedAt: '2026-06-12',
     featured: true,
     relatedExamSlugs: ['ai-product-manager'],
   },
@@ -187,6 +203,8 @@ export const skills: Skill[] = [
     projects: 3,
     certifications: 1,
     category: 'Engineering',
+    stars: 16700,
+    updatedAt: '2026-06-19',
     featured: true,
     trending: true,
   },
@@ -202,6 +220,8 @@ export const skills: Skill[] = [
     projects: 5,
     certifications: 1,
     category: 'Security',
+    stars: 8900,
+    updatedAt: '2026-06-08',
     featured: true,
   },
 ];
