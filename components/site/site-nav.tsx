@@ -9,6 +9,7 @@ import { Menu, X } from "lucide-react";
 
 export const productLinks = [
   { name: "Learn", href: "/learn", desc: "Structured AI tracks" },
+  { name: "Skills", href: "/skills", desc: "Career paths & certs" },
   { name: "Tools", href: "/tools", desc: "Discover AI tools" },
   { name: "Games", href: "/games", desc: "Play to learn" },
   { name: "Exams", href: "/exams", desc: "Interview prep" },
