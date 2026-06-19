@@ -186,6 +186,19 @@
     transform: translateY(100%);
   }
 
+  .typewriter-char {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(0.16em);
+    animation: typewriter-char 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform, filter;
+  }
+
+  .typewriter-caret {
+    animation: typewriter-caret 900ms steps(2, end) infinite;
+    transform: translateY(0.08em);
+  }
+
   .brand-wordmark-text {
     background: linear-gradient(110deg, var(--foreground) 0%, var(--foreground) 30%, #06b6d4 42%, #f97316 50%, #67e8f9 58%, var(--foreground) 70%, var(--foreground) 100%);
     background-size: 240% 100%;
@@ -241,6 +254,24 @@
       filter: blur(0);
       transform: translateY(0);
     }
+  }
+
+  @keyframes typewriter-char {
+    0% {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(0.16em);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes typewriter-caret {
+    0%, 45% { opacity: 1; }
+    46%, 100% { opacity: 0; }
   }
 
   .noise-overlay {

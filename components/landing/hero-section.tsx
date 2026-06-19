@@ -5,15 +5,39 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { TubesBackground } from "./tubes-background";
-import { AnimatedSphere } from "./animated-sphere";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 const words = ["learn", "build", "practice", "ship"];
+
+function TypedText({
+  text,
+  delayOffset = 0,
+  characterClassName = "",
+}: {
+  text: string;
+  delayOffset?: number;
+  characterClassName?: string;
+}) {
+  return (
+    <span aria-hidden="true">
+      {text.split("").map((char, index) => (
+        <span
+          key={`${text}-${index}`}
+          className={`typewriter-char inline-block ${characterClassName}`}
+          style={{ animationDelay: `${delayOffset + index * 50}ms` }}
+        >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 export function HeroSection() {
   const isVisible = true;
   const [wordIndex, setWordIndex] = useState(0);
   const prefersReducedMotion = useReducedMotion();
+  const activeWord = words[wordIndex];
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -26,16 +50,12 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-background text-foreground">
-      <div className="absolute right-[-12%] top-1/2 hidden h-[620px] w-[620px] -translate-y-1/2 pointer-events-none md:block lg:h-[820px] lg:w-[820px]">
+      <div className="absolute right-[-6%] top-1/2 hidden h-[620px] w-[620px] -translate-y-1/2 opacity-50 pointer-events-none mix-blend-multiply md:block lg:h-[820px] lg:w-[820px]">
         <TubesBackground
           tone="light"
           enableClickInteraction={false}
-          className="h-full min-h-full rounded-full border border-cyan-500/10 shadow-[0_30px_120px_rgba(6,182,212,0.16)]"
+          className="h-full min-h-full"
         />
-      </div>
-
-      <div className="absolute right-0 top-1/2 hidden h-[600px] w-[600px] -translate-y-1/2 opacity-25 pointer-events-none md:block lg:h-[800px] lg:w-[800px]">
-        <AnimatedSphere />
       </div>
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
@@ -69,27 +89,29 @@ export function HeroSection() {
 
         <div className="mb-12">
           <h1
-            className={`text-[clamp(3rem,12vw,10rem)] font-display leading-[0.9] tracking-tight transition-all duration-1000 ${
+            aria-label={`The place to ${activeWord} AI`}
+            className={`max-w-6xl text-[clamp(3rem,12vw,10rem)] font-display leading-[0.92] tracking-normal transition-all duration-1000 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <span className="block">The place to</span>
-            <span className="block">
-              <span className="relative inline-block brand-wordmark-text">
-                <span key={wordIndex} className="inline-flex">
-                  {words[wordIndex].split("").map((char, i) => (
-                    <span
-                      key={`${wordIndex}-${i}`}
-                      className={prefersReducedMotion ? "inline-block" : "inline-block animate-char-in"}
-                      style={prefersReducedMotion ? undefined : { animationDelay: `${i * 50}ms` }}
-                    >
-                      {char}
-                    </span>
-                  ))}
+            <span className="block" aria-hidden="true">The place to</span>
+            <span className="mt-2 block md:mt-3" aria-hidden="true">
+              <span className="inline-flex items-baseline gap-[0.16em]">
+                <span className="relative inline-flex min-w-[7.1ch] items-baseline md:min-w-[7.6ch]">
+                  <span key={wordIndex} className="inline-flex">
+                    {prefersReducedMotion ? (
+                      <span className="brand-wordmark-text">{activeWord}</span>
+                    ) : (
+                      <TypedText text={activeWord} characterClassName="brand-wordmark-text" />
+                    )}
+                  </span>
+                  {prefersReducedMotion ? (
+                    null
+                  ) : <span className="typewriter-caret ml-2 h-[0.72em] w-[0.06em] bg-cyan-600" />}
+                  <span className="absolute -bottom-2 left-0 h-2 w-full origin-left rounded-full bg-cyan-400/15 shadow-[0_0_28px_rgba(6,182,212,0.22)]" />
                 </span>
-                <span className="absolute -bottom-2 left-0 right-0 h-3 bg-cyan-400/15 shadow-[0_0_28px_rgba(6,182,212,0.22)]" />
-              </span>{" "}
-              AI
+                <span>AI</span>
+              </span>
             </span>
           </h1>
         </div>
