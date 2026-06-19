@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { TubesBackground } from "./tubes-background";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 const words = ["learn", "build", "practice", "ship"];
@@ -50,12 +49,52 @@ export function HeroSection() {
 
   return (
     <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-background text-foreground">
-      <div className="absolute right-[-6%] top-1/2 hidden h-[620px] w-[620px] -translate-y-1/2 opacity-50 pointer-events-none mix-blend-multiply md:block lg:h-[820px] lg:w-[820px]">
-        <TubesBackground
-          tone="light"
-          enableClickInteraction={false}
-          className="h-full min-h-full"
-        />
+      <div className="absolute right-[-8%] top-[12%] hidden h-[72%] w-[56%] pointer-events-none md:block">
+        <svg
+          className="h-full w-full overflow-visible opacity-80"
+          viewBox="0 0 800 620"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            className={prefersReducedMotion ? "" : "hero-flow-path"}
+            d="M44 410C168 176 343 121 510 244C626 329 694 262 756 172"
+            stroke="url(#hero-flow-cyan)"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <path
+            className={prefersReducedMotion ? "" : "hero-flow-path hero-flow-path-delay"}
+            d="M72 438C206 230 360 198 498 294C606 369 690 350 762 276"
+            stroke="url(#hero-flow-warm)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <path
+            className={prefersReducedMotion ? "" : "hero-flow-path hero-flow-path-slow"}
+            d="M110 334C224 430 356 444 456 334C548 232 650 196 786 236"
+            stroke="url(#hero-flow-soft)"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <defs>
+            <linearGradient id="hero-flow-cyan" x1="44" y1="410" x2="756" y2="172" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#06b6d4" stopOpacity="0" />
+              <stop offset="0.45" stopColor="#22d3ee" stopOpacity="0.62" />
+              <stop offset="1" stopColor="#67e8f9" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="hero-flow-warm" x1="72" y1="438" x2="762" y2="276" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#f97316" stopOpacity="0" />
+              <stop offset="0.5" stopColor="#fb923c" stopOpacity="0.28" />
+              <stop offset="1" stopColor="#facc15" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="hero-flow-soft" x1="110" y1="334" x2="786" y2="236" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#a7f3d0" stopOpacity="0" />
+              <stop offset="0.48" stopColor="#bae6fd" stopOpacity="0.46" />
+              <stop offset="1" stopColor="#a7f3d0" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
@@ -100,9 +139,9 @@ export function HeroSection() {
                 <span className="relative inline-flex min-w-[7.1ch] items-baseline md:min-w-[7.6ch]">
                   <span key={wordIndex} className="inline-flex">
                     {prefersReducedMotion ? (
-                      <span className="brand-wordmark-text">{activeWord}</span>
+                      <span className="text-foreground drop-shadow-[0_0_18px_rgba(6,182,212,0.18)]">{activeWord}</span>
                     ) : (
-                      <TypedText text={activeWord} characterClassName="brand-wordmark-text" />
+                      <TypedText text={activeWord} characterClassName="text-foreground drop-shadow-[0_0_18px_rgba(6,182,212,0.18)]" />
                     )}
                   </span>
                   {prefersReducedMotion ? (

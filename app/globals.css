@@ -199,6 +199,24 @@
     transform: translateY(0.08em);
   }
 
+  .hero-flow-path {
+    stroke-dasharray: 220 980;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.34));
+    animation: hero-flow 8s ease-in-out infinite;
+  }
+
+  .hero-flow-path-delay {
+    animation-delay: -2.2s;
+    filter: drop-shadow(0 0 16px rgba(251, 146, 60, 0.18));
+  }
+
+  .hero-flow-path-slow {
+    animation-duration: 11s;
+    animation-delay: -4s;
+    filter: drop-shadow(0 0 18px rgba(125, 211, 252, 0.22));
+  }
+
   .brand-wordmark-text {
     background: linear-gradient(110deg, var(--foreground) 0%, var(--foreground) 30%, #06b6d4 42%, #f97316 50%, #67e8f9 58%, var(--foreground) 70%, var(--foreground) 100%);
     background-size: 240% 100%;
@@ -272,6 +290,12 @@
   @keyframes typewriter-caret {
     0%, 45% { opacity: 1; }
     46%, 100% { opacity: 0; }
+  }
+
+  @keyframes hero-flow {
+    0% { stroke-dashoffset: 0; opacity: 0.24; }
+    35% { opacity: 0.9; }
+    100% { stroke-dashoffset: -1200; opacity: 0.24; }
   }
 
   .noise-overlay {
